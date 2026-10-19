@@ -111,7 +111,7 @@ Layout:
 `<x-connector>` attributes:
 - `x1 y1 x2 y2` in canvas pixels.
 - `head="none|end|both"`.
-- `route="vh"` or `"hv"` for an elbow.
+- `route="vh"` (down, then across), `"hv"` (across, then down) or `"elbow"` (across, down, across: use it when an arrow would otherwise end along a box edge).
 - Colour via `style="color:…"`, plus `border-style:dashed` for a dashed line.
 
 ## Component diagram
@@ -176,6 +176,14 @@ export const SLIDES = [
   },
 ];
 // optional: export const SECTIONS = { s2b: { description: 'Data model', start: 'data-types', after: 's2' } };
+```
+
+Real code often contains backticks and `${…}`, which break a template literal. Keep each panel in its own text file and read it from the spec:
+
+```js
+import { readFileSync } from 'node:fs';
+const code = (n) => readFileSync(new URL(`./code/${n}.txt`, import.meta.url), 'utf8').trimEnd();
+// … panels: [{ file: 'src/x.ts', code: code('f1c-1'), caption: '…' }]
 ```
 
 Good panel pairs:

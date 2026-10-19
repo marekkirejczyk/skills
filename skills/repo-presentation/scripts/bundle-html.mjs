@@ -21,7 +21,9 @@ function connector(attrs) {
   const [x1, y1, x2, y2] = ['x1', 'y1', 'x2', 'y2'].map((k) => Number(a[k] ?? 0));
   const color = /color:\s*([^;"]+)/.exec(a.style ?? '')?.[1]?.trim() ?? '#1C1B19';
   const dashed = /border-style:\s*dashed/.test(a.style ?? '');
-  const d = a.route === 'vh' ? `M${x1},${y1} V${y2} H${x2}`
+  const mx = Math.round((x1 + x2) / 2);
+  const d = a.route === 'elbow' ? `M${x1},${y1} H${mx} V${y2} H${x2}`
+    : a.route === 'vh' ? `M${x1},${y1} V${y2} H${x2}`
     : a.route === 'hv' ? `M${x1},${y1} H${x2} V${y2}` : `M${x1},${y1} L${x2},${y2}`;
   const head = a.head ?? 'end';
   const id = `m${Math.random().toString(36).slice(2, 8)}`;

@@ -48,6 +48,7 @@ Every slide that lists files or code is followed by a code slide with real types
 
 ## 3. Screenshots
 - Setup for the browser scripts: in `<work>/shots/`, run `npm init -y && npm i playwright-core`. Then copy `scripts/shoot.mjs` and `scripts/preview.mjs` there and run them from there; Node resolves `playwright-core` relative to the script file. Chromium is taken from `$CHROME` or the Playwright cache. If neither exists, run `npx playwright install chromium`.
+- No UI (a library, CLI or skills repo)? Then "screen" slides show real output instead: a terminal run rendered as a code panel, a generated file, a rendered report or chart.
 - Run the app locally with demo data.
 - Write a small script modelled on `scripts/shoot.mjs`. Desktop is 1440×900 @2x; phone is 390×844 @2x, mobile.
 - Save the PNGs to `<work>/shots/png/`.
