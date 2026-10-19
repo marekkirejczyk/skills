@@ -1,0 +1,14 @@
+{
+  "name": "marekkirejczyk",
+  "owner": { "name": "Marek Kirejczyk", "url": "https://github.com/marekkirejczyk" },
+  "description": "Marek Kirejczyk's skills, as an installable Claude Code plugin.",
+  "plugins": [
+    {
+      "name": "marekkirejczyk-skills",
+      "source": "./",
+      "description": "repo-presentation: turns a codebase into an onboarding deck with screenshots, UML diagrams, key files, code and data-type slides, tech stack and lines of code.",
+      "category": "productivity",
+      "keywords": ["presentation", "architecture", "onboarding"]
+    }
+  ]
+}

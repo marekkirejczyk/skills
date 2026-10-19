@@ -1,0 +1,10 @@
+{
+  "name": "marekkirejczyk-skills",
+  "version": "0.1.0",
+  "description": "Marek Kirejczyk's agent skills. repo-presentation: an architecture-and-features slide deck for any repository.",
+  "author": { "name": "Marek Kirejczyk", "url": "https://github.com/marekkirejczyk" },
+  "repository": "https://github.com/marekkirejczyk/skills",
+  "license": "MIT",
+  "keywords": ["skills", "presentation", "architecture", "onboarding", "slides"],
+  "skills": ["./skills/repo-presentation"]
+}
