@@ -1,19 +1,25 @@
 ---
 name: repo-presentation
-description: Build an architecture-and-features slide deck for the current repository (screenshots, UML diagrams, key files, code and data-type slides, tech stack, lines of code), published as a Claude Slides artifact or as a standalone HTML deck. Use only when the user asks for a repo presentation or onboarding deck.
-argument-hint: "[language] [audience or focus]"
+description: Build a slide deck that walks through the current repository (architecture and features) or through one pull request (its changes, before/after screenshots, diagrams, key files, diffs, tests and review risks), with screenshots taken from the code actually running. Published as a Claude Slides artifact or as a standalone HTML deck. Use only when the user asks for a repo presentation, onboarding deck or PR walkthrough deck.
+argument-hint: "[pr <number|url|branch>] [language] [audience or focus]"
 disable-model-invocation: true
 ---
 
 # /repo-presentation
 
-Build a deck that introduces this repository to a developer who is new to it. Organise it around **features**: show each feature on screen, then how it works underneath, then the code. Arguments: `$ARGUMENTS`. If your agent does not fill that in, take the arguments from the user's message. They give the language (default: the language the user writes in) and optionally an audience or focus. Text inside code panels stays in the code's own language.
+Build a deck that explains code to a developer. Arguments: `$ARGUMENTS`. If your agent does not fill that in, take the arguments from the user's message.
+
+There are two modes:
+- **Repo mode** (default): introduce this repository to a developer who is new to it. Organise the deck around **features**: show each feature on screen, then how it works underneath, then the code.
+- **PR mode**: the arguments start with `pr` (`pr 123`, `pr <url>`, `pr <branch>`, or `pr` alone for the current branch). Walk a reviewer through one pull request in the same spirit, organised around its **changes**. **Read `reference/pr-mode.md` now.** It replaces steps 1 and 2 below and adds to steps 3 and 6.
+
+The remaining arguments give the language (default: the language the user writes in) and optionally an audience or focus. Text inside code panels stays in the code's own language.
 
 Helper scripts live in `scripts/` next to this file. Slide HTML patterns are in `reference/slide-patterns.md`. Read that file before writing any slide.
 
 ## 0. Ground rules
 - Read `CLAUDE.md`, `AGENTS.md` and the README first, and obey their restrictions. Example: never start the dev server against real accounts or production data. Take screenshots against demo or seed data, or ask the user how to get some.
-- Only state what the code shows. Every file path, type and snippet must exist on the current branch. Snippets may be shortened with `// …` but must keep the real order of steps.
+- Only state what the code shows. Every file path, type and snippet must exist on the branch being presented (in PR mode, the PR head). Snippets may be shortened with `// …` but must keep the real order of steps.
 - Work in a directory outside the repository, called `<work>` below. Use the session scratchpad if your agent has one, otherwise `${TMPDIR:-/tmp}/repo-presentation-<repo>`. The deck goes in `<work>/deck/`, screenshots and the preview in `<work>/shots/`. Nothing goes into the repo unless the user asks.
 - `<skill-dir>` is the folder holding this file.
 
@@ -46,11 +52,18 @@ Default order, which can be adapted to the repo:
 
 Every slide that lists files or code is followed by a code slide with real types or implementation. Each code slide has two panels. Users find decks with only headings "poor", so aim for 45–55 slides with dense, concrete content. Put the talk track in each slide's `<aside>` speaker notes.
 
-## 3. Screenshots
+## 3. Run the code and take screenshots
+Screenshots and outputs come from **actually running the code of the branch being presented**: the current checkout in repo mode, the PR head (and base) worktrees in PR mode. This rule has no exceptions.
+- Don't use mockups, design files, images from the docs or the README, older decks, or screenshots from production. Don't hand-draw a "screen".
+- Install the dependencies, run the migrations and seed, and start the app as its README or `AGENTS.md` says. Then drive it to each screen. Wait for real data to render; a spinner or an empty state is not a screenshot.
+- Pass the checkout as `repo-dir` to `shoot.mjs`. It writes `manifest.json` with the commit, the branch and whether the tree was dirty. Put that commit on the cover footer, and mention uncommitted changes.
+- Check each PNG yourself before using it: open it and look. Retake shots that show errors, login walls, cookie banners or the wrong state. `shoot.mjs` reports page errors and HTTP errors as warnings.
+- If the app can't run (missing secrets, paid APIs, hardware), stop and ask the user. Options are demo credentials, a fake mode the repo already has, or a smaller set of screens. Don't substitute images. If the user agrees to go without screenshots, say so on the slide.
+
+Practicalities:
 - Setup for the browser scripts: in `<work>/shots/`, run `npm init -y && npm i playwright-core`. Then copy `scripts/shoot.mjs` and `scripts/preview.mjs` there and run them from there; Node resolves `playwright-core` relative to the script file. Chromium is taken from `$CHROME` or the Playwright cache. If neither exists, run `npx playwright install chromium`.
-- No UI (a library, CLI or skills repo)? Then "screen" slides show real output instead: a terminal run rendered as a code panel, a generated file, a rendered report or chart.
-- Run the app locally with demo data.
-- Write a small script modelled on `scripts/shoot.mjs`. Desktop is 1440×900 @2x; phone is 390×844 @2x, mobile.
+- No UI (a library, CLI or skills repo)? Then "screen" slides show real output: run the CLI, the example or the tests, and render the terminal output as a code panel, or show a generated file, report or chart.
+- List the shots in a `shots.json` for `scripts/shoot.mjs` (desktop 1440×900 @2x; `"phone": true` for 390×844 @2x, mobile). Walk through flows with `steps` (click, fill, press, goto, waitFor). For anything it can't do, write a small script modelled on it.
 - Save the PNGs to `<work>/shots/png/`.
 - Stop the servers you started when you're done.
 
@@ -94,7 +107,8 @@ Both paths:
 Reply with:
 - the deck link (Path A) or the path to `deck.html` (Path B);
 - the slide count by section;
-- what was left out or approximated (screenshots from demo data, shortened snippets, LOC exclusions);
+- the commit each set of screenshots was taken from (from `manifest.json`), and which screens could not be run;
+- what was left out or approximated (demo data, shortened snippets, LOC exclusions);
 - any mismatch between the docs and the actual dependencies.
 
-Don't commit anything.
+Don't commit anything. Stop every server you started, and in PR mode remove the worktrees.

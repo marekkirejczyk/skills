@@ -193,3 +193,76 @@ Good panel pairs:
 - test fake + test that uses it.
 
 The file header may name two files (`a.ts · b.ts`) or a symbol (`file.ts · transition()`).
+
+Diff panels: set `diff: true`, and paste the hunk as unified-diff lines, each starting with `+`, `-` or a space, plus `@@` hunk headers. The marker isn't drawn; added and removed lines get a green or red band instead. Take the hunk from `git diff -U2 <merge-base> <head> -- <file>`, drop the `diff`, `index`, `---` and `+++` lines, and shorten long lines by hand (the marker doesn't count toward the 54 columns). Pair a diff with the new type or test it relies on.
+
+```js
+{ file: 'packages/agents/src/steps.ts', code: code('c1c-1'), diff: true, caption: 'The comment is read before the allowed actions, so it can add one.' }
+```
+
+# PR mode patterns
+
+These use the same palette. Two extra colours mark what a PR did, and are used only for that:
+
+| Token | Value | Use |
+|---|---|---|
+| added | `#2F7D4A` on `#E6F2E9` | new boxes, + counts, "NEW" tags |
+| removed | `#B3412F` on `#F8E6E2` | deleted boxes, − counts |
+
+The accent `#E8630A` marks **changed** things: a 3px accent border on a changed box, and a small "CHANGED" tag.
+
+## Cover (PR)
+The dark cover from above, with these changes:
+- The title is the PR title.
+- An eyebrow line in mono accent above it: `#123 · base ← head`.
+- The subtitle is the goal in one sentence.
+- The footer: `author · +412 −88 in 17 files · head 1a2b3c4 · MONTH YEAR`.
+- The image is the most telling `head-*.png`.
+
+## Before / after (cNa)
+Header, then two screenshots side by side, each with a label above it naming the commit:
+
+```html
+<div style="display:flex;gap:48px">
+<div style="width:808px;display:flex;flex-direction:column;gap:12px">
+<p style="font-size:24px;font-weight:600;color:#6B665C">Before · main @ 9f8e7d6</p>
+<img src="BASE_URL" alt="…" style="width:808px;height:505px;object-fit:contain;border-radius:12px;border:1px solid #D9D4CA">
+</div>
+<div style="width:808px;display:flex;flex-direction:column;gap:12px">
+<p style="font-size:24px;font-weight:600;color:#2F7D4A">After · this PR @ 1a2b3c4</p>
+<img src="HEAD_URL" alt="…" style="width:808px;height:505px;object-fit:contain;border-radius:12px;border:2px solid #2F7D4A">
+</div>
+</div>
+<p style="font-size:26px;line-height:1.4;color:#2B2925">One sentence: what to look at in the "after" shot.</p>
+```
+
+If the change is a new screen with no "before", use the feature-screen pattern with the head shot and 3–4 numbered points. If the screens look alike, add a callout naming the difference, or crop both shots with `selector` in `shots.json`.
+
+## Change map
+Like "numbers + bars", but each package gets two bars from one baseline: green for added and red for removed lines. Bar width is `round(360 × lines / max)`, where max is the largest added or removed count.
+
+```html
+<div style="display:flex;align-items:center;gap:16px"><p style="font-family:'IBM Plex Mono', 'Courier New', monospace;font-size:24px;width:320px;flex:none">packages/agents</p><div style="width:180px;height:24px;flex:none;background:#2F7D4A;border-radius:4px"></div><div style="width:40px;height:24px;flex:none;background:#B3412F;border-radius:4px"></div><p style="font-size:24px;white-space:nowrap"><b style="color:#2F7D4A">+15</b> <b style="color:#B3412F">−13</b></p></div>
+```
+
+On the left, show big figures: files changed, +added, −removed, commits. Below them, list production, tests and fixtures. Add a footer naming the merge base and the exclusions.
+
+## Diagram with the change highlighted (cNb, context slides)
+Use the normal sequence or component diagram, with these changes:
+- Unchanged boxes and arrows go muted (`#9C968B` text, `#D9D4CA` border).
+- Changed boxes get a 3px `#E8630A` border.
+- New boxes and arrows are `#2F7D4A`.
+- Removed ones are dashed `#B3412F`.
+- A small tag sits at a box's top-right corner: `<p style="position:absolute;…;font-size:24px;font-weight:600;color:#FFFFFF;background:#2F7D4A;padding:0 10px;border-radius:6px">NEW</p>`.
+- Keep a legend in one line under the title.
+
+In the key-files grid, start each entry with its status and counts: `<p style="font-family:mono;font-size:24px"><b style="color:#2F7D4A">A</b> packages/x/src/rule.ts <span style="color:#6B665C">+84</span></p>`. Use A for added, M for modified, D for deleted and R for renamed.
+
+## Tests run
+Use a code slide with one panel. It shows the exact command and the trimmed summary output from the head worktree (passed, failed, duration). The caption names what the new tests cover and what they don't. If something failed, keep the failing lines in the panel.
+
+## Review: risks and questions
+Use two columns.
+- The left column is **Risks**: 3–6 items. Each one is a 26px weight-600 statement, then a mono muted `file.ts:123`, then one line on why it matters.
+- The right column is **Questions for the author**, plus a callout box for anything the description claims that the diff doesn't show.
+- End with "Try it locally": the 3–4 commands, in mono.

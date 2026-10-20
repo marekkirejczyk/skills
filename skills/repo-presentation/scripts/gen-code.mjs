@@ -2,6 +2,7 @@
 // Usage: node gen-code.mjs <deck-project-dir> <spec.mjs>
 //   deck-project-dir holds deck.json and slides/
 //   spec.mjs exports SLIDES (see reference/slide-patterns.md) and optionally SECTIONS
+//   a panel with diff: true takes unified-diff lines (+ added, - removed, space context, @@ hunk)
 // Re-running is safe: slides from the spec are removed from the order and reinserted.
 import { readFileSync, writeFileSync, mkdirSync } from 'node:fs';
 import { join, resolve } from 'node:path';
@@ -75,13 +76,28 @@ function highlight(code, withTypes) {
 
 // ---------- slide html ----------
 const MONO = "'IBM Plex Mono', 'Courier New', monospace";
+// Diff panels (p.diff): unified-diff lines, each starting with '+', '-' or a space; '@@' lines
+// are hunk headers. The marker is dropped, the line gets a green or red background and a bar.
+const DIFF = { '+': { bg: '#1F3A26', bar: '#7FCB8A' }, '-': { bg: '#41231F', bar: '#F08A7E' } };
+function diffLines(code) {
+  return code.split('\n').map((l) => (l.startsWith('@@') ? { kind: '@', text: l }
+    : '+- '.includes(l[0] ?? ' ') && l.length ? { kind: l[0], text: l.slice(1) } : { kind: ' ', text: l }));
+}
 function panel(p, withTypes) {
-  const lines = highlight(p.code, withTypes);
+  const dl = p.diff ? diffLines(p.code) : null;
+  const lines = dl
+    ? dl.map((d) => (d.kind === '@' ? { html: `<span style="color:${C.com}">${nb(d.text)}</span>`, spans: 1 }
+      : highlight(d.text, withTypes)[0]))
+    : highlight(p.code, withTypes);
+  const lineStyle = (i) => {
+    const d = dl?.[i] && DIFF[dl[i].kind];
+    return d ? `;background:${d.bg};box-shadow:inset 6px 0 0 ${d.bar};margin:0 -20px;padding:0 20px` : '';
+  };
   const html = `<div style="display:flex;flex-direction:column;gap:16px;min-width:0">
 <div style="display:flex;flex-direction:column;background:#1C1B19;border-radius:14px;overflow:hidden">
 <p style="font-family:${MONO};font-size:24px;line-height:1.3;color:#D8D3C9;background:#2A2926;padding:8px 20px;white-space:nowrap">${esc(p.file)}</p>
 <div style="display:flex;flex-direction:column;padding:14px 20px">
-${lines.map((l) => `<p style="font-family:${MONO};font-size:24px;line-height:1.3;color:${C.text};white-space:nowrap">${l.html}</p>`).join('\n')}
+${lines.map((l, i) => `<p style="font-family:${MONO};font-size:24px;line-height:1.3;color:${C.text};white-space:nowrap${lineStyle(i)}">${l.html}</p>`).join('\n')}
 </div>
 </div>
 ${p.caption ? `<p style="font-size:24px;line-height:1.35;color:#4A463F">${esc(p.caption)}</p>` : ''}
@@ -119,7 +135,7 @@ let bad = 0;
 for (const s of SLIDES) {
   const maxCols = s.panels.length === 1 ? MAX_COLS * 2 : MAX_COLS;
   for (const p of s.panels) {
-    const lines = p.code.split('\n');
+    const lines = p.diff ? diffLines(p.code).map((d) => d.text) : p.code.split('\n');
     if (lines.length > MAX_LINES) { console.warn(`${s.id}: ${p.file}: ${lines.length} lines (max ${MAX_LINES})`); bad++; }
     for (const l of lines) if ([...l].length > maxCols) { console.warn(`${s.id}: ${[...l].length} cols (max ${maxCols}): ${l}`); bad++; }
     if ([...p.file].length > maxCols) { console.warn(`${s.id}: file header too long: ${p.file}`); bad++; }

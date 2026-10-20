@@ -6,7 +6,7 @@
     {
       "name": "marekkirejczyk-skills",
       "source": "./",
-      "description": "repo-presentation: turns a codebase into an onboarding deck with screenshots, UML diagrams, key files, code and data-type slides, tech stack and lines of code.",
+      "description": "repo-presentation: turns a codebase or a pull request into a walkthrough deck with screenshots from the running code, UML diagrams, key files, code and diff slides, tech stack and lines of code.",
       "category": "productivity",
       "keywords": ["presentation", "architecture", "onboarding"]
     }

@@ -4,7 +4,7 @@ Agent skills I use on my own projects. Each one is a folder under `skills/` hold
 
 | Skill | What it does |
 |---|---|
-| [`repo-presentation`](skills/repo-presentation/SKILL.md) | Builds an onboarding slide deck for the current repository, organised by feature. Each feature gets a screenshot, a UML diagram with its key files, and code and data-type slides. The deck also covers the tech stack and lines of code. The output is a Claude Slides artifact, or a standalone `deck.html` in Codex, Antigravity and other agents. |
+| [`repo-presentation`](skills/repo-presentation/SKILL.md) | Builds a slide deck that walks through a repository (onboarding, organised by feature) or through one pull request (organised by change, for review). Each feature or change gets screenshots taken from the code actually running, a UML diagram with its key files, and code slides. A PR deck adds before/after shots, diff panels, test results and review risks. The output is a Claude Slides artifact, or a standalone `deck.html` in Codex, Antigravity and other agents. |
 
 ## Installation
 
@@ -101,14 +101,30 @@ Codex and Antigravity both read `.agents/skills/`. One copy committed to a repos
 ## Using repo-presentation
 
 ```
-/repo-presentation polish, for a new backend developer
+/repo-presentation polish, for a new backend developer      # the whole repository
+/repo-presentation pr 123                                   # one pull request
+/repo-presentation pr https://github.com/o/r/pull/123 english, for the reviewer
+/repo-presentation pr feature/rules                         # a branch against the default branch
+/repo-presentation pr                                       # the current branch
 ```
 
-The arguments are optional. The first sets the deck language, the rest describe the audience or focus.
+The arguments are optional. `pr …` switches to PR mode. The next argument sets the deck language, and the rest describe the audience or focus.
+
+**Screenshots always come from the running code.** The skill installs dependencies, seeds demo data, starts the app from the branch being presented and drives it with Playwright. It records the commit of every set of shots in `manifest.json`, and puts it on the cover. It never uses mockups or old images. If the app can't run, it asks you instead of faking a screen.
 
 The skill only runs when you ask for it: `disable-model-invocation: true` in Claude Code, `allow_implicit_invocation: false` in Codex.
 
-You get a deck of about 50 slides. Each feature has a screen slide, a UML-and-files slide and a code slide. The deck also covers the data model, the tech stack, lines of code, deployment and testing.
+**Repo mode:** about 50 slides. Each feature has a screen slide, a UML-and-files slide and a code slide. The deck also covers the data model, the tech stack, lines of code, deployment and testing.
+
+**PR mode:** 15–35 slides, depending on the size of the diff. The PR is checked out into git worktrees, so your working tree is never touched. The head and the merge base each run on their own port with their own throwaway database, for before/after screenshots. The deck then covers:
+- why the PR exists, and the changes at a glance;
+- just enough context: diagrams with the changed parts highlighted, and a change map of +/− per package;
+- for each change: before/after shots, the diagram and key files with their status, and diff panels;
+- contracts and migrations;
+- the real test run on the head;
+- a review slide with risks at `file:line` and questions for the author.
+
+The skill never comments on, approves or pushes to the PR.
 
 Output:
 - Claude Code: a Slides artifact.
@@ -116,6 +132,7 @@ Output:
 
 It needs:
 - `cloc`, for the lines-of-code slide.
+- `gh` (or `glab`) for PR mode on GitHub (or GitLab). A local branch works with plain `git`.
 - Node 18 or newer.
 - `playwright-core` with a Chromium, for screenshots and the preview. The skill explains how to set these up.
 
