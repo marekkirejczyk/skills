@@ -20,12 +20,13 @@ From the repo root, run `bash <skill-dir>/scripts/pr-stats.sh <merge-base-or-bas
 Then read, delegating to a subagent if the diff is large:
 - The PR description, the linked issues and the commit messages: the problem, the goal, and what the author says is out of scope.
 - The full diff (`git diff <merge-base> <head>`), and the **whole** changed files in `<work>/head`, not only the hunks. Read the callers and callees of the changed code in the head worktree. That is the context a reviewer needs.
+- When you run it, compare the result with what the description claims (its smoke tests, its numbers). A difference is a finding for the review slide even when the code is right.
 - Group the changes into 2–6 **changes** a reviewer can name ("new rule editor", "retry on 429", "schema: add due_date"). One change usually spans several files and packages. Note which files belong to which change. Leftovers (renames, formatting, dependency bumps) go into one "other changes" slide.
 - For each change: what the user can now do or see; the flow before and after (the calls across components); new or changed types, schemas, migrations, API routes, config and env vars; the tests that cover it.
 - What the PR claims but the diff doesn't show, and the reverse. Report both and don't paper over them.
 - Risks: behaviour changes for existing users, data migrations, backward compatibility, security (auth, input handling, secrets), performance, error paths without tests. Each risk must point at a file and line in the head.
 
-## P2. Outline (show the user before building)
+## P2. Outline (show the user before building; if they asked you to just build it, post the outline and continue)
 Size: about 1 slide per 40–80 changed production lines. Usually 15–35 slides; never pad.
 
 1. **Intro:**
@@ -55,6 +56,7 @@ Every slide that lists files is still followed by a code slide. Code panels show
 - Run the head **and** the base. Each runs from its own worktree, with its own dependency install, its own port and its own throwaway database or data directory. Never point both at one database: the head's migrations would change the base's data.
 - Seed both with the same demo data, then take the same shots from both. Name them `base-<name>.png` and `head-<name>.png`, and pass the worktree as `repo-dir` to `shoot.mjs` so `manifest.json` records each commit.
 - Shoot the screens the change touches, plus one unchanged neighbouring screen if it helps to place them. If the change adds a flow, use `steps` in `shots.json` to walk through it on the head and shoot each step.
+- A change with no UI (an API, a worker, a cron) is run the same way: drive it with the PR's own fixtures and scripts, put a small local stub in place of every external service it calls (never the real one), and show the stub's record of what it received. Use made-up secrets in a local env file inside the worktree.
 - Run the test suite in the head worktree, and keep the command and the summary for the tests slide. If a test fails, say so on the slide and to the user. Don't fix the PR.
 - If the base can't be run (it needs services the head added, or it is broken), show the head only, and say so in the speaker notes and the hand-off.
 

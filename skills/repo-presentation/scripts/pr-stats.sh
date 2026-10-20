@@ -14,7 +14,8 @@ tmp=$(mktemp -d); trap 'rm -rf "$tmp"' EXIT
 
 # numstat without rename detection: one path per line; binary files show "-".
 git diff --numstat --no-renames "$mb" "$head" | awk -F'\t' '{ a=($1=="-")?0:$1; d=($2=="-")?0:$2; print a"\t"d"\t"$3 }' > "$tmp/num"
-grep -Ev $'\t'"($ex)" "$tmp/num" > "$tmp/kept" || true
+awk -F'\t' '{ print $3 }' "$tmp/num" | grep -Ev "$ex" > "$tmp/keptnames" || true
+awk -F'\t' 'NR==FNR { keep[$0]=1; next } ($3 in keep)' "$tmp/keptnames" "$tmp/num" > "$tmp/kept"
 kind() { if grep -Eq "$fixture_re" <<<"$1"; then echo fixtures; elif grep -Eq "$test_re" <<<"$1"; then echo tests; else echo production; fi; }
 while IFS=$'\t' read -r a d f; do printf '%s\t%s\t%s\t%s\n' "$a" "$d" "$f" "$(kind "$f")"; done < "$tmp/kept" > "$tmp/k"
 
@@ -41,5 +42,6 @@ echo "== Changed files"
 git diff --name-status -M "$mb" "$head" | while IFS=$'\t' read -r st p1 p2; do
   f=${p2:-$p1}
   line=$(awk -F'\t' -v f="$f" '$3==f { printf "+%d -%d", $1, $2 }' "$tmp/num")
-  printf '%-2s %-14s %s%s\n' "${st:0:1}" "${line:-binary}" "$f" "${p2:+  (from $p1)}"
+  grep -Eq "$ex" <<<"$f" && gen='  [generated, not counted]' || gen=''
+  printf '%-2s %-14s %s%s%s\n' "${st:0:1}" "${line:-binary}" "$f" "${p2:+  (from $p1)}" "$gen"
 done

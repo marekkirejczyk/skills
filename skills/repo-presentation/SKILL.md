@@ -55,7 +55,7 @@ Every slide that lists files or code is followed by a code slide with real types
 ## 3. Run the code and take screenshots
 Screenshots and outputs come from **actually running the code of the branch being presented**: the current checkout in repo mode, the PR head (and base) worktrees in PR mode. This rule has no exceptions.
 - Don't use mockups, design files, images from the docs or the README, older decks, or screenshots from production. Don't hand-draw a "screen".
-- Install the dependencies, run the migrations and seed, and start the app as its README or `AGENTS.md` says. Then drive it to each screen. Wait for real data to render; a spinner or an empty state is not a screenshot.
+- Install the dependencies with the package manager version the repo pins (`packageManager` in `package.json`, `.tool-versions`, …; for example `npx pnpm@<version>`), run the migrations and seed, and start the app as its README or `AGENTS.md` says. Then drive it to each screen. Wait for real data to render; a spinner or an empty state is not a screenshot.
 - Pass the checkout as `repo-dir` to `shoot.mjs`. It writes `manifest.json` with the commit, the branch and whether the tree was dirty. Put that commit on the cover footer, and mention uncommitted changes.
 - Check each PNG yourself before using it: open it and look. Retake shots that show errors, login walls, cookie banners or the wrong state. `shoot.mjs` reports page errors and HTTP errors as warnings.
 - If the app can't run (missing secrets, paid APIs, hardware), stop and ask the user. Options are demo credentials, a fake mode the repo already has, or a smaller set of screens. Don't substitute images. If the user agrees to go without screenshots, say so on the slide.
@@ -64,7 +64,7 @@ Practicalities:
 - Setup for the browser scripts: in `<work>/shots/`, run `npm init -y && npm i playwright-core`. Then copy `scripts/shoot.mjs` and `scripts/preview.mjs` there and run them from there; Node resolves `playwright-core` relative to the script file. Chromium is taken from `$CHROME` or the Playwright cache. If neither exists, run `npx playwright install chromium`.
 - No UI (a library, CLI or skills repo)? Then "screen" slides show real output: run the CLI, the example or the tests, and render the terminal output as a code panel, or show a generated file, report or chart.
 - List the shots in a `shots.json` for `scripts/shoot.mjs` (desktop 1440×900 @2x; `"phone": true` for 390×844 @2x, mobile). Walk through flows with `steps` (click, fill, press, goto, waitFor). For anything it can't do, write a small script modelled on it.
-- Save the PNGs to `<work>/shots/png/`.
+- Save the PNGs to `<work>/shots/png/`, and every terminal output and query result you may show to `<work>/out/` as you go. A `docker run --rm` database is gone once it stops.
 - Stop the servers you started when you're done.
 
 ## 4. Build the deck
@@ -95,11 +95,12 @@ Path B:
 5. Open it, or hand over the path. To share it, zip `deck/` with `shots/`.
 
 Both paths:
-6. Optional local check: `node scripts/preview.mjs <work>/deck/project/slides <outdir> id1 id2 …` renders 1920×1080 PNGs. Look at them. Use it for code-heavy and diagram slides. The deck runtime adds a little table padding that the preview lacks.
+6. Optional local check (Path B only, unless the user asks: the Slides type forbids rendering checks): `node scripts/preview.mjs <work>/deck/project/slides <outdir> id1 id2 …` renders 1920×1080 PNGs. Look at them. Use it for code-heavy and diagram slides. The deck runtime adds a little table padding that the preview lacks.
 
 ## 5. Format limits (learned the hard way)
 - **No `<pre>`.** In code, every line is its own `<p>` with `white-space:nowrap` and spaces as U+00A0. `gen-code.mjs` does this.
-- `white-space` only `normal` or `nowrap`. Font size at least 24px. At most about 200 elements per slide.
+- `white-space` only `normal` or `nowrap`. No `margin` (use `padding` and `gap`). Font size at least 24px. At most about 200 elements per slide.
+- Leading spaces in a hand-written `nowrap` line collapse: write them as U+00A0.
 - Code panels: at most **54 columns × 18 lines** in a two-panel layout. Shorten long lines; never shrink the font.
 - Diagrams are absolutely positioned boxes plus `<x-connector>` arrows on a 1920×1080 canvas. Keep 128px side margins.
 

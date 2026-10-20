@@ -1,6 +1,6 @@
 {
   "name": "marekkirejczyk-skills",
-  "version": "0.3.0",
+  "version": "0.3.1",
   "description": "Marek Kirejczyk's agent skills. repo-presentation: a slide deck walking through any repository or pull request, with screenshots from the running code.",
   "author": { "name": "Marek Kirejczyk", "url": "https://github.com/marekkirejczyk" },
   "repository": "https://github.com/marekkirejczyk/skills",

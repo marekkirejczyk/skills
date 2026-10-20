@@ -91,13 +91,13 @@ function panel(p, withTypes) {
     : highlight(p.code, withTypes);
   const lineStyle = (i) => {
     const d = dl?.[i] && DIFF[dl[i].kind];
-    return d ? `;background:${d.bg};box-shadow:inset 6px 0 0 ${d.bar};margin:0 -20px;padding:0 20px` : '';
+    return d ? `;background:${d.bg};box-shadow:inset 6px 0 0 ${d.bar}` : '';
   };
   const html = `<div style="display:flex;flex-direction:column;gap:16px;min-width:0">
 <div style="display:flex;flex-direction:column;background:#1C1B19;border-radius:14px;overflow:hidden">
 <p style="font-family:${MONO};font-size:24px;line-height:1.3;color:#D8D3C9;background:#2A2926;padding:8px 20px;white-space:nowrap">${esc(p.file)}</p>
-<div style="display:flex;flex-direction:column;padding:14px 20px">
-${lines.map((l, i) => `<p style="font-family:${MONO};font-size:24px;line-height:1.3;color:${C.text};white-space:nowrap${lineStyle(i)}">${l.html}</p>`).join('\n')}
+<div style="display:flex;flex-direction:column;padding:14px 0">
+${lines.map((l, i) => `<p style="font-family:${MONO};font-size:24px;line-height:1.3;color:${C.text};white-space:nowrap;padding:0 20px${lineStyle(i)}">${l.html}</p>`).join('\n')}
 </div>
 </div>
 ${p.caption ? `<p style="font-size:24px;line-height:1.35;color:#4A463F">${esc(p.caption)}</p>` : ''}
