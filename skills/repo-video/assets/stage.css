@@ -85,6 +85,7 @@ p { max-width: 1500px; }
 .code, .term {
   background: var(--code-bg); color: var(--code-ink); border-radius: 16px; padding: 28px 32px;
   font: 24px/1.5 var(--mono); white-space: normal; overflow: hidden;
+  font-variant-ligatures: none; /* show code as typed: >= stays >=, === stays === */
 }
 .code .title, .term .title { display: block; color: var(--code-muted); margin-bottom: 14px; }
 .ln { display: block; white-space: pre; min-height: 1.5em; padding: 0 10px; margin: 0 -10px; border-radius: 6px; }
