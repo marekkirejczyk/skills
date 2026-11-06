@@ -6,9 +6,9 @@
     {
       "name": "marekkirejczyk-skills",
       "source": "./",
-      "description": "repo-presentation: turns a codebase or a pull request into a walkthrough deck with screenshots from the running code, UML diagrams, key files, code and diff slides, tech stack and lines of code.",
+      "description": "repo-presentation: turns a codebase or a pull request into a walkthrough deck with screenshots from the running code, UML diagrams, key files, code and diff slides, tech stack and lines of code. repo-video: turns the same walkthrough into a narrated MP4 with captions, chapters and a transcript.",
       "category": "productivity",
-      "keywords": ["presentation", "architecture", "onboarding"]
+      "keywords": ["presentation", "video", "architecture", "onboarding"]
     }
   ]
 }

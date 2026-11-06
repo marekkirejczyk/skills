@@ -1,10 +1,10 @@
 {
   "name": "marekkirejczyk-skills",
-  "version": "0.3.1",
-  "description": "Marek Kirejczyk's agent skills. repo-presentation: a slide deck walking through any repository or pull request, with screenshots from the running code.",
+  "version": "0.4.0",
+  "description": "Marek Kirejczyk's agent skills. repo-presentation: a slide deck walking through any repository or pull request, with screenshots from the running code. repo-video: the same walkthrough as a narrated video with captions.",
   "author": { "name": "Marek Kirejczyk", "url": "https://github.com/marekkirejczyk" },
   "repository": "https://github.com/marekkirejczyk/skills",
   "license": "MIT",
-  "keywords": ["skills", "presentation", "architecture", "onboarding", "slides", "pull-request", "code-review"],
-  "skills": ["./skills/repo-presentation"]
+  "keywords": ["skills", "presentation", "video", "narration", "architecture", "onboarding", "slides", "pull-request", "code-review"],
+  "skills": ["./skills/repo-presentation", "./skills/repo-video"]
 }
