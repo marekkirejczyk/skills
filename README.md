@@ -1,6 +1,6 @@
 # Skills
 
-**Explain any codebase or pull request, without writing a single slide.** Two agent skills that read your code, run it, and turn what they find into a walkthrough people actually watch: a slide deck, or a narrated video.
+**Explain any codebase or pull request, without writing a single slide.** Two agent skills that read your code, run it, and turn what they find into a walkthrough people actually watch: a slide deck, or a narrated video. A third skill, `refactor-tests`, brings your tests up to a written standard.
 
 Works with Claude Code, Codex, Cursor and other agents that read `SKILL.md`.
 
@@ -34,9 +34,20 @@ Each feature or change gets a screenshot from the code actually running, a diagr
 
 [How it works →](docs/repo-presentation.md)
 
+## refactor-tests: tests to a written standard
+
+Brings the tests of a file, a class or a branch up to the rules for each test type (pure functions, services, route handlers, database round trips), and covers every case those rules name. It refactors in small rounds that stay green. A bug it finds is reported and pinned by a test, not fixed.
+
+```
+/refactor-tests src/orders/order-service.ts   # a file or a class
+/refactor-tests pr 123                        # a branch's changes
+```
+
+The rules assume TypeScript, Vitest and pnpm.
+
 ## Install
 
-**Claude Code**, both skills as a plugin that updates itself:
+**Claude Code**, all three skills as a plugin that updates itself:
 
 ```bash
 claude plugin marketplace add marekkirejczyk/skills
@@ -46,12 +57,12 @@ claude plugin install marekkirejczyk-skills@marekkirejczyk
 **Codex, Cursor and other agents**, one skill at a time:
 
 ```bash
-npx skills add marekkirejczyk/skills --skill repo-video          # or repo-presentation
+npx skills add marekkirejczyk/skills --skill repo-video          # or repo-presentation, refactor-tests
 ```
 
-Then type `/repo-video` or `/repo-presentation` (`$repo-video` in Codex). Both run only when you ask for them. [More install options →](docs/installation.md)
+Then type `/repo-video`, `/repo-presentation` or `/refactor-tests` (`$repo-video` in Codex). Each runs only when you ask for it. [More install options →](docs/installation.md)
 
-## Use
+## Using the explainers
 
 ```
 /<skill>                                      # the whole repository
@@ -59,7 +70,7 @@ Then type `/repo-video` or `/repo-presentation` (`$repo-video` in Codex). Both r
 /<skill> pr 123 polish, for the reviewer      # then a language, then an audience or focus
 ```
 
-Both skills show you an outline first and build only after you approve it. Everything they show comes from running your code: no mockups, no invented numbers.
+`repo-video` and `repo-presentation` show you an outline first and build only after you approve it. Everything they show comes from running your code: no mockups, no invented numbers.
 
 ## License
 
