@@ -1,5 +1,6 @@
 // Narration: one WAV per step (48 kHz mono, loudness-normalised) and out/audio/durations.json.
-// Providers: say (macOS, default), openai, elevenlabs; their keys come from apiKey().
+// Providers: elevenlabs (default when a key is configured), say (macOS, the fallback), openai;
+// their keys come from apiKey().
 import { spawnSync } from "node:child_process";
 import { createHash } from "node:crypto";
 import { copyFileSync, existsSync, mkdirSync, readFileSync, rmSync, writeFileSync } from "node:fs";
@@ -14,11 +15,15 @@ const SAY_VOICES = [
   "Ava (Enhanced)", "Zoe (Enhanced)", "Evan (Enhanced)", "Samantha", "Daniel",
 ];
 
+// A stock voice every ElevenLabs account has, made for explaining things.
+const ELEVENLABS_VOICE = "Matilda";
+
 export async function tts(project) {
   const dir = join(project.out, "audio");
   const cache = join(dir, "cache");
   mkdirSync(cache, { recursive: true });
-  const voice = await resolveVoice(project.voice);
+  const provider = project.voice.provider ?? (findKey("elevenlabs") ? "elevenlabs" : "say");
+  const voice = await resolveVoice({ ...project.voice, provider });
   console.log(`Voice: ${voice.provider}${voice.label ? ` · ${voice.label}` : ""}`);
 
   const durations = {};
@@ -50,26 +55,36 @@ const keys = {};
 
 /**
  * A provider's API key: $<PROVIDER>_API_KEY, else the macOS Keychain item repo-video-<provider>,
- * else ~/.config/repo-video/<provider>.key.
+ * else ~/.config/repo-video/<provider>.key. Undefined when none is configured.
  */
-function apiKey(provider) {
+function findKey(provider) {
   if (keys[provider]) return keys[provider];
-  const variable = `${provider.toUpperCase()}_API_KEY`;
-  let key = process.env[variable]?.trim();
+  let key = process.env[`${provider.toUpperCase()}_API_KEY`]?.trim();
   if (!key && process.platform === "darwin") {
     const found = spawnSync("security", ["find-generic-password", "-s", `repo-video-${provider}`, "-w"], {
       encoding: "utf8",
     });
     if (found.status === 0) key = found.stdout.trim();
   }
-  const file = join(homedir(), ".config", "repo-video", `${provider}.key`);
+  const file = keyFile(provider);
   if (!key && existsSync(file)) key = readFileSync(file, "utf8").trim();
+  if (key) keys[provider] = key;
+  return key || undefined;
+}
+
+function keyFile(provider) {
+  return join(homedir(), ".config", "repo-video", `${provider}.key`);
+}
+
+function apiKey(provider) {
+  const key = findKey(provider);
   if (!key) {
+    const variable = `${provider.toUpperCase()}_API_KEY`;
     throw new Error(
-      `No ${provider} API key: set ${variable}, add the Keychain item repo-video-${provider}, or write ${file}`,
+      `No ${provider} API key: set ${variable}, add the Keychain item repo-video-${provider}, or write ${keyFile(provider)}`,
     );
   }
-  return (keys[provider] = key);
+  return key;
 }
 
 async function resolveVoice(voice) {
@@ -98,18 +113,18 @@ async function resolveVoice(voice) {
     }
     case "elevenlabs": {
       const key = apiKey("elevenlabs");
-      if (!voice.name) throw new Error("voice.provider elevenlabs needs voice.name: a voice name or id");
+      const name = voice.name ?? ELEVENLABS_VOICE;
       // A voice id, or a name as the voices list shows it ("Matilda", or the full "Matilda - …").
       const response = await fetch("https://api.elevenlabs.io/v1/voices", { headers: { "xi-api-key": key } });
       if (!response.ok) throw new Error(`ElevenLabs voices list failed: ${response.status}`);
       const { voices } = await response.json();
-      const wanted = voice.name.toLowerCase();
+      const wanted = name.toLowerCase();
       const match =
-        voices.find((v) => v.voice_id === voice.name) ??
+        voices.find((v) => v.voice_id === name) ??
         voices.find((v) => v.name.toLowerCase() === wanted) ??
         voices.find((v) => v.name.toLowerCase().split(" - ")[0] === wanted);
       if (!match) {
-        throw new Error(`No ElevenLabs voice ${voice.name}. Voices: ${voices.map((v) => v.name).join("; ")}`);
+        throw new Error(`No ElevenLabs voice ${name}. Voices: ${voices.map((v) => v.name).join("; ")}`);
       }
       return {
         provider: "elevenlabs",

@@ -9,7 +9,6 @@ A video is `<project>/script.json` plus one `<project>/scenes/<id>.html` per sce
   "title": "How repo-video works",
   "description": "One sentence for the video page.",
   "meta": "repo · branch @ commit · outputs run on that commit",
-  "voice": { "provider": "say" },
   "lexicon": { "JSON": "jason", "PR": "P R" },
   "scenes": [
     { "id": "format", "title": "The rules file", "steps": ["Step 0 narration.", "Step 1 narration."] }

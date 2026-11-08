@@ -2,7 +2,6 @@
   "title": "How repo-video works",
   "description": "A four-scene example: what the skill makes, its four build stages, how a scene marks what appears and what lights up, and a real build.",
   "meta": "marekkirejczyk/skills · skills/repo-video/assets/example",
-  "voice": { "provider": "say" },
   "lexicon": {
     "repo-video": "repo video",
     "MP4": "M P 4",
@@ -47,7 +46,7 @@
       "id": "build",
       "title": "A real build",
       "steps": [
-        "Here is the real output of building this example with the default macOS voice.",
+        "Here is the real output of building this example with macOS speech.",
         "Narration and frames for all fifteen steps, scene by scene.",
         "And the finished video, with its length and size, ready for the page."
       ]
