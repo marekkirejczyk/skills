@@ -11,7 +11,7 @@ export const FPS = 30;
 export const SAMPLE_RATE = 48000;
 
 const DEFAULTS = {
-  voice: { provider: "say" },
+  voice: {}, // no provider: tts.mjs picks ElevenLabs when a key is configured, else macOS speech
   lexicon: {},
   lead: 0.25, // seconds of picture before a step's narration starts
   sceneLead: 0.6, // the same for a scene's first step, so its reveal plays first

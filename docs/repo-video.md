@@ -19,12 +19,12 @@ The build warns about content that runs off the frame or out of its box, and abo
 
 ## Voices
 
-Set the voice in the project's `script.json`, or for one run with `VIDEO_TTS_PROVIDER` and `VIDEO_TTS_VOICE`.
+The skill uses ElevenLabs with the voice Matilda when it finds an ElevenLabs key, and macOS speech when it doesn't. To choose another, set the voice in the project's `script.json`, or for one run with `VIDEO_TTS_PROVIDER` and `VIDEO_TTS_VOICE`.
 
 | Provider | Needs | Notes |
 |---|---|---|
-| `say` (default) | macOS | Free and offline. The Premium and Enhanced voices (Ava, Zoe, Evan) are free downloads in System Settings › Accessibility › Spoken Content › System voice › Manage Voices, and sound far better than the defaults. |
-| `elevenlabs` | an ElevenLabs API key | The most natural voices; costs one credit a character. Pick a voice by its name in your voice list, for example `Matilda`. |
+| `elevenlabs` (default with a key) | an ElevenLabs API key | The most natural voices; costs one credit a character. Pick a voice by its name in your voice list; `Matilda` unless you say otherwise. |
+| `say` (the fallback) | macOS | Free and offline. The Premium and Enhanced voices (Ava, Zoe, Evan) are free downloads in System Settings › Accessibility › Spoken Content › System voice › Manage Voices, and sound far better than the defaults. |
 | `openai` | an OpenAI API key | `gpt-4o-mini-tts` by default. Not tested yet. |
 
 The skill looks for an API key in `ELEVENLABS_API_KEY` / `OPENAI_API_KEY`, then in the macOS Keychain, then in `~/.config/repo-video/elevenlabs.key` / `openai.key`. To keep it in the Keychain:
@@ -44,4 +44,4 @@ security add-generic-password -a "$USER" -s repo-video-elevenlabs -U -w   # or r
 - Node 18 or newer.
 - `playwright-core` with a Chromium. The skill explains how to set it up.
 - `gh` for PR mode on GitHub.
-- macOS for the default voice, or an ElevenLabs or OpenAI key anywhere else.
+- An ElevenLabs key for the default voice. Without one, macOS speech, or an OpenAI key.

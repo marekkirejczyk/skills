@@ -17,7 +17,7 @@ Scenes reveal their content step by step, and highlight exactly what the voice i
 /repo-video pr 123                          # one pull request, for its reviewer
 ```
 
-The voice is free macOS speech by default, or ElevenLabs or OpenAI if you add a key. [How it works →](docs/repo-video.md)
+The voice is ElevenLabs if you add a key, or free macOS speech without one. [How it works →](docs/repo-video.md)
 
 ## repo-presentation: a walkthrough deck
 

@@ -53,7 +53,7 @@ Read `reference/scene-format.md` now. `assets/example/` is a complete four-scene
 
 ## 5. Build
 
-Once per project: `cd <project> && npm init -y && npm i playwright-core`. Chromium comes from `$CHROME` or the Playwright cache (`npx playwright install chromium` if neither has one); `ffmpeg` and `ffprobe` must be on the PATH, and Node 18 or newer. Off macOS there is no `say`: configure `openai` or `elevenlabs` (see Voice).
+Once per project: `cd <project> && npm init -y && npm i playwright-core`. Chromium comes from `$CHROME` or the Playwright cache (`npx playwright install chromium` if neither has one); `ffmpeg` and `ffprobe` must be on the PATH, and Node 18 or newer. Off macOS there is no `say`: configure `elevenlabs` or `openai` (see Voice).
 
 Run from `<project>`: `node <skill-dir>/scripts/make.mjs . all`. It synthesises the narration (cached per sentence and voice), records every step's animation in Chromium, joins the segments with the narration into `out/video.mp4` with captions, and writes the video page into `out/page/`. After an edit, run `all` again; `--scene <id>` with `render` re-records one scene.
 
@@ -74,14 +74,14 @@ Reply with the page link (or the paths); the length and chapter list; the commit
 
 ## Voice
 
-`script.json` `voice` picks the narrator; the environment variables `VIDEO_TTS_PROVIDER` and `VIDEO_TTS_VOICE` override it for one run.
+Leave `voice` out of `script.json` unless the user asks for a particular narrator: the build then uses ElevenLabs with Matilda when an ElevenLabs key is configured, and macOS speech when none is. When set, `voice` picks the narrator and names its `provider`; the environment variables `VIDEO_TTS_PROVIDER` and `VIDEO_TTS_VOICE` override it for one run.
 
 | provider | `name` | other keys |
 | --- | --- | --- |
-| `say` (default, macOS) | a voice from `say -v '?'`; default: the best installed of Ava, Zoe, Evan, Jamie (Premium, then Enhanced), Samantha, Daniel | `rate` (words a minute, default 175) |
+| `elevenlabs` (default with a key) | a voice name as the account's voice list shows it or its id; default `Matilda` | `model` (default `eleven_multilingual_v2`) |
+| `say` (macOS, the fallback) | a voice from `say -v '?'`; default: the best installed of Ava, Zoe, Evan, Jamie (Premium, then Enhanced), Samantha, Daniel | `rate` (words a minute, default 175) |
 | `openai` | a voice, default `alloy` | `model` (default `gpt-4o-mini-tts`), `instructions` (tone) |
-| `elevenlabs` | required: a voice name as the account's voice list shows it (`Matilda`) or its id | `model` (default `eleven_multilingual_v2`) |
 
 An API key is read, first found wins, from `OPENAI_API_KEY` / `ELEVENLABS_API_KEY`, then the macOS Keychain item `repo-video-openai` / `repo-video-elevenlabs`, then `~/.config/repo-video/openai.key` / `elevenlabs.key`. Never print a key, write it into the project, or ask for it in chat; the user stores it, for example with `security add-generic-password -a "$USER" -s repo-video-elevenlabs -U -w`.
 
-The Premium and Enhanced macOS voices sound far better than the defaults and are free: System Settings › Accessibility › Spoken Content › System voice › Manage Voices. When only a default voice is installed, say so in the hand-off. A paid provider sends the narration text to that company and spends the account's credits: use one only when the user configured it, and use only a voice the account owns or a stock one, never one that imitates a real person.
+Without a key, the Premium and Enhanced macOS voices sound far better than the defaults and are free: System Settings › Accessibility › Spoken Content › System voice › Manage Voices. When the build falls back to a default macOS voice, say so in the hand-off. A paid provider sends the narration text to that company and spends the account's credits (ElevenLabs: one credit a character): use one only when the user configured it, and use only a voice the account owns or a stock one, never one that imitates a real person.
