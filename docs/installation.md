@@ -2,11 +2,11 @@
 
 [← README](../README.md)
 
-Every agent reads the same `skills/<skill>/SKILL.md`. Choose one install method per agent; installing a skill twice makes it show up twice. In the commands below, replace `<skill>` with `repo-presentation` or `repo-video`.
+Every agent reads the same `skills/<skill>/SKILL.md`. Choose one install method per agent; installing a skill twice makes it show up twice. In the commands below, replace `<skill>` with `repo-presentation`, `repo-video` or `refactor-tests`.
 
 ## Claude Code
 
-As a plugin, which installs both skills and updates itself:
+As a plugin, which installs all three skills and updates itself:
 
 ```bash
 claude plugin marketplace add marekkirejczyk/skills
@@ -16,7 +16,7 @@ claude plugin install marekkirejczyk-skills@marekkirejczyk --scope project  # th
 
 Inside a session you can do the same with `/plugin marketplace add marekkirejczyk/skills` and then `/plugin install marekkirejczyk-skills@marekkirejczyk`.
 
-Plugin skills get the plugin name as a prefix, so the full names are `/marekkirejczyk-skills:repo-presentation` and `/marekkirejczyk-skills:repo-video`. Typing `/repo-presentation` or `/repo-video` still finds them in autocomplete.
+Plugin skills get the plugin name as a prefix, so the full names are `/marekkirejczyk-skills:repo-presentation`, `/marekkirejczyk-skills:repo-video` and `/marekkirejczyk-skills:refactor-tests`. Typing `/repo-presentation`, `/repo-video` or `/refactor-tests` still finds them in autocomplete.
 
 As editable files, one skill at a time:
 
