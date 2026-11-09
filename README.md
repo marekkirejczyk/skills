@@ -4,7 +4,14 @@
 
 Works with Claude Code, Codex, Cursor and other agents that read `SKILL.md`.
 
-## explain-with-video: a narrated explainer
+| Skill | What you get | Works on |
+| --- | --- | --- |
+| [`/explain-with-video`](#explain-with-video-a-narrated-explainer) | A narrated MP4 with captions, chapters and a transcript | A repository or a pull request |
+| [`/explain-with-slides`](#explain-with-slides-a-walkthrough-deck) | A slide deck with screenshots from the running code, diagrams and real code | A repository or a pull request |
+| [`/refactor-tests`](#refactor-tests-tests-to-a-written-standard) | Tests rewritten to the rules for their type, with every case covered | A file, a class or a branch |
+| [`/self-documented-code`](#self-documented-code-names-that-explain-themselves) | Names that explain themselves, one name per concept, comments only for the why | A repository, a pull request, a path or a concept |
+
+## /explain-with-video: a narrated explainer
 
 [![explain-with-video explaining this repository: four build stages appearing one by one](docs/media/explain-with-video-demo.gif)](https://claude.ai/artifact/9S3BAqPTEddbLFLnFgKBsP)
 
@@ -20,7 +27,7 @@ Scenes reveal their content step by step, and highlight exactly what the voice i
 
 The voice is ElevenLabs if you add a key, or free macOS speech without one. [How it works →](docs/explain-with-video.md)
 
-## explain-with-slides: a walkthrough deck
+## /explain-with-slides: a walkthrough deck
 
 [![explain-with-slides's deck about this repository](docs/media/explain-with-slides-demo.png)](https://claude.ai/artifact/EQmgztM99GRNdBugNTMoZK)
 
@@ -36,7 +43,7 @@ Each feature or change gets a screenshot from the code actually running, a diagr
 
 [How it works →](docs/explain-with-slides.md)
 
-## refactor-tests: tests to a written standard
+## /refactor-tests: tests to a written standard
 
 Brings the tests of a file, a class or a branch up to the rules for each test type (pure functions, services, route handlers, database round trips), and covers every case those rules name. It refactors in small rounds that stay green. A bug it finds is reported and pinned by a test, not fixed.
 
@@ -47,7 +54,7 @@ Brings the tests of a file, a class or a branch up to the rules for each test ty
 
 The rules assume TypeScript, Vitest and pnpm.
 
-## self-documented-code: names that explain themselves
+## /self-documented-code: names that explain themselves
 
 Reviews every name in a scope, renames what falls short so each concept has one name, keeps comments only for what the code cannot say, and updates the project's glossary to match. It runs without stopping for approval, on its own branch with one commit per round. Lint, tests and behaviour stay as they were, and names other systems depend on (API fields, database columns) are reported rather than changed.
 
