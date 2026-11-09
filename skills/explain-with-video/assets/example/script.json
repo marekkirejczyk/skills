@@ -1,9 +1,9 @@
 {
-  "title": "How repo-video works",
-  "description": "A four-scene example: what the skill makes, its four build stages, how a scene marks what appears and what lights up, and a real build.",
-  "meta": "marekkirejczyk/skills · skills/repo-video/assets/example",
+  "title": "How explain-with-video works",
+  "description": "A six-scene example: a cover, the contents, what the skill makes, its four build stages, how a scene marks what appears and what lights up, and a real build.",
+  "meta": "marekkirejczyk/skills · skills/explain-with-video/assets/example",
   "lexicon": {
-    "repo-video": "repo video",
+    "explain-with-video": "explain with video",
     "MP4": "M P 4",
     "HTML": "H T M L",
     "ffmpeg": "F F mpeg",
@@ -14,9 +14,25 @@
   "scenes": [
     {
       "id": "cover",
+      "title": "explain-with-video",
+      "steps": [
+        "explain-with-video turns a repository or a pull request into a narrated explainer."
+      ]
+    },
+    {
+      "id": "contents",
+      "title": "Contents",
+      "steps": [
+        "First, a summary of what the skill makes.",
+        "Then the four stages of a build.",
+        "Then how a scene marks what appears and what lights up.",
+        "And last, a real build."
+      ]
+    },
+    {
+      "id": "summary",
       "title": "What it makes",
       "steps": [
-        "This is repo-video, a skill that turns a repository or a pull request into a narrated explainer.",
         "Each scene reveals its items one by one, and highlights the one the voice is talking about.",
         "The result is an MP4 with captions, on a page with chapters and a transcript."
       ]
@@ -47,7 +63,7 @@
       "title": "A real build",
       "steps": [
         "Here is the real output of building this example with macOS speech.",
-        "Narration and frames for all fifteen steps, scene by scene.",
+        "Narration and frames for all nineteen steps, scene by scene.",
         "And the finished video, with its length and size, ready for the page."
       ]
     }

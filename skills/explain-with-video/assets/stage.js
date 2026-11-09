@@ -1,4 +1,4 @@
-// Reveal and emphasis for repo-video scenes; render.mjs drives it through window.stage.
+// Reveal and emphasis for explain-with-video scenes; render.mjs drives it through window.stage.
 // data-step="N": hidden before step N, shown from N, emphasised at N.
 // data-focus="N M": also emphasised at those steps. data-emph="none": shown, never emphasised.
 (() => {

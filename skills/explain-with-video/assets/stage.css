@@ -1,4 +1,4 @@
-/* repo-video stage: a 1920×1080 frame, the scene components, and the reveal/emphasis states.
+/* explain-with-video stage: a 1920×1080 frame, the scene components, and the reveal/emphasis states.
    Override the tokens in <project>/theme.css. */
 :root {
   --bg: #f6f5f1;

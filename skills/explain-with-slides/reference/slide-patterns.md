@@ -34,7 +34,7 @@ Sizes:
 `deck.json` shape (the type result may update it):
 
 ```json
-{"v":4,"lists":"css","title":"…","cover":"cover","order":["cover","idea",…],
+{"v":4,"lists":"css","title":"…","cover":"cover","order":["cover","contents","summary",…],
  "sections":{"s1":{"description":"…","start":"cover"},"s2":{"description":"…","start":"components"}},
  "faces":{…},"designSystems":[]}
 ```
@@ -58,14 +58,28 @@ Headers on absolutely positioned slides (diagrams):
 
 ## Cover (dark)
 
+The cover says what the deck explains and nothing else: no screenshot, eyebrow, commit or date.
+
 ```html
 <section id="cover" data-transition="fade" style="background:#1C1B19;color:#F4F2EE;font-family:'IBM Plex Sans', Arial, sans-serif;padding:128px">
-<h1 style="position:absolute;left:128px;top:400px;width:760px;font-size:104px;font-weight:600;line-height:1.05;letter-spacing:-2px">How X works</h1>
-<p style="position:absolute;left:128px;top:640px;width:700px;font-size:34px;line-height:1.35;color:#C9C3B8">Subtitle</p>
-<p style="position:absolute;left:128px;top:880px;width:700px;font-size:24px;color:#9C968B">Screenshots from demo data · code on main, MONTH YEAR</p>
-<img src="ASSET_URL" alt="…" style="position:absolute;left:900px;top:255px;width:892px;height:558px;object-fit:cover;border-radius:16px;border:1px solid #3A3833;box-shadow:0 24px 64px rgba(0,0,0,0.45)">
+<h1 style="position:absolute;left:128px;top:360px;width:1664px;font-size:104px;font-weight:600;line-height:1.05;letter-spacing:-2px">repository-name</h1>
+<p style="position:absolute;left:128px;top:520px;width:1400px;font-size:40px;line-height:1.35;color:#C9C3B8">The repository's description</p>
 <aside>…</aside>
 </section>
+```
+
+## Contents
+
+The major slide groups that follow, numbered, one line each. Use the Header above, with this body:
+
+```html
+<div style="display:flex;flex-direction:column;gap:24px">
+<div style="display:flex;flex-direction:row;gap:32px;align-items:baseline">
+<p style="width:64px;font-size:40px;font-weight:600;color:#9A3F00">1</p>
+<p style="font-size:30px;line-height:1.35"><span style="font-weight:600">Summary.</span> What it is, what it does and for whom</p>
+</div>
+… one row per group …
+</div>
 ```
 
 ## Feature screen (fNa): numbered points beside a screenshot
@@ -212,12 +226,7 @@ These use the same palette. Two extra colours mark what a PR did, and are used o
 The accent `#E8630A` marks **changed** things: a 3px accent border on a changed box, and a small "CHANGED" tag.
 
 ## Cover (PR)
-The dark cover from above, with these changes:
-- The title is the PR title.
-- An eyebrow line in mono accent above it: `#123 · base ← head`.
-- The subtitle is the goal in one sentence.
-- The footer: `author · +412 −88 in 17 files · head 1a2b3c4 · MONTH YEAR`.
-- The image is the most telling `head-*.png`.
+The dark cover from above, with one more line under the description, at `top:700px`, 48px, weight 600: `#123 PR title`. The author, branches, diff size and head commit go on the summary slide.
 
 ## Before / after (cNa)
 Header, then two screenshots side by side, each with a label above it naming the commit:

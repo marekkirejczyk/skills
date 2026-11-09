@@ -29,22 +29,26 @@ Then read, delegating to a subagent if the diff is large:
 ## P2. Outline (show the user before building; if they asked you to just build it, post the outline and continue)
 Size: about 1 slide per 40–80 changed production lines. Usually 15–35 slides; never pad.
 
-1. **Intro:**
-   - Cover: PR title, `#n`, author, `base ← head`, `+a −d` in N files, head commit.
+The first three parts are always there, in this order.
+
+1. **Cover:** the repository's name and description, then the PR's number and title, and nothing else.
+2. **Contents:** one slide listing the major slide groups that follow, numbered, with one line on what each covers.
+3. **Summary:** a detailed summary of the PR.
    - Why: the problem and the goal in one sentence plus 3 points, from the description and the issue.
-   - The changes at a glance: the 2–6 changes, one line each. This is the agenda.
-2. **Context:** only what is needed to follow the change.
+   - The changes at a glance: the 2–6 changes, one line each.
+   - The facts: author, `base ← head`, `+a −d` in N files, head commit.
+4. **Context:** only what is needed to follow the change.
    - The component diagram, with the touched components highlighted.
    - The existing flow or state machine the PR changes, as it was on the base.
    - The change map: `pr-stats.sh` output as +/− bars per package, with production, tests and fixtures split.
-3. **Changes**, for each change N:
+5. **Changes**, for each change N:
    - `cNa` running: before/after screenshots side by side, from base and head. For a change with no UI, show real output from both runs (CLI, API response, log, test output).
    - `cNb` under the hood: a sequence, state or component diagram with the new or changed parts highlighted, plus a key-files grid with status (new, modified, deleted) and +/− per file.
    - `cNc` code: two panels. Prefer a **diff panel** (`diff: true`) for a changed function, and a plain panel of the new type or schema next to it. Before/after panels work when the diff would be unreadable.
    - Optional `cNd` for a second code slide.
-4. **Contracts:** API, schema and migration changes; new config or env vars; breaking changes and how existing data or clients are handled. One or two slides, each followed by a code slide.
-5. **Tests:** what was added or changed and what it covers, with a code slide (a test plus the fixture or fake it uses). Then the **real result of running the tests on the head** (the command and summary output as a panel), and what is not covered.
-6. **Review:**
+6. **Contracts:** API, schema and migration changes; new config or env vars; breaking changes and how existing data or clients are handled. One or two slides, each followed by a code slide.
+7. **Tests:** what was added or changed and what it covers, with a code slide (a test plus the fixture or fake it uses). Then the **real result of running the tests on the head** (the command and summary output as a panel), and what is not covered.
+8. **Review:**
    - Risks and the places to look, each with `file:line`.
    - Open questions for the author.
    - The gap between the description and the diff.

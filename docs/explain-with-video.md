@@ -1,12 +1,14 @@
-# repo-video: how it works
+# explain-with-video: how it works
 
 [← README](../README.md)
 
 ## The flow
 
-The skill surveys the code, shows you an outline of scenes with an estimated length, runs the code for real output (tests, the CLI, the app), and only then writes the video. A PR video runs 3–6 minutes, a repository video 5–12.
+The skill surveys the code, shows you an outline of scenes with an estimated length, runs the code for real output (tests, the CLI, the app), and only then writes the video. A PR video runs 3–6 minutes, a repository video 5–12. It works on the current repository, or on one you pass by URL, which is cloned into a temporary folder. Running someone else's code needs your go-ahead first.
 
-Each scene is one 1920×1080 HTML file. Its items say at which step they appear (`data-step`) and when they light up again (`data-focus`). Every step has one line of narration, so the voice always talks about what's on screen. The full format is in [`skills/repo-video/reference/scene-format.md`](../skills/repo-video/reference/scene-format.md).
+Every video opens the same way: a cover with only the repository's name and description (plus the PR's number and title for a PR), numbered contents, then a detailed summary. Architecture and everything else come after that.
+
+Each scene is one 1920×1080 HTML file. Its items say at which step they appear (`data-step`) and when they light up again (`data-focus`). Every step has one line of narration, so the voice always talks about what's on screen. The full format is in [`skills/explain-with-video/reference/scene-format.md`](../skills/explain-with-video/reference/scene-format.md).
 
 One command, `node scripts/make.mjs . all`, then:
 
@@ -15,7 +17,7 @@ One command, `node scripts/make.mjs . all`, then:
 3. **assemble** joins the frames and the narration with ffmpeg, each picture held exactly as long as its sentence, into an MP4 with soft captions;
 4. **page** writes the video page: the player, clickable chapters, and a transcript that follows playback.
 
-The build warns about content that runs off the frame or out of its box, and about steps that show nothing. It saves a still of every step for checking by eye. [`skills/repo-video/assets/example/`](../skills/repo-video/assets/example/) is a 1½-minute video about the skill itself, ready to build.
+The build warns about content that runs off the frame or out of its box, and about steps that show nothing. It saves a still of every step for checking by eye. [`skills/explain-with-video/assets/example/`](../skills/explain-with-video/assets/example/) is a 1½-minute video about the skill itself, ready to build.
 
 ## Voices
 
