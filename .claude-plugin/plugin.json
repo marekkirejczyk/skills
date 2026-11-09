@@ -1,6 +1,6 @@
 {
   "name": "marekkirejczyk-skills",
-  "version": "0.9.0",
+  "version": "0.10.0",
   "description": "Marek Kirejczyk's agent skills. explain-with-slides: a slide deck walking through any repository or pull request, with screenshots from the running code. explain-with-video: the same walkthrough as a narrated video with captions. refactor-tests: brings a file, class or branch's tests up to written rules for each test type, and covers every case. self-documented-code: renames everything in a scope so each name explains itself and each concept has one name. dont-repeat-yourself: finds concepts implemented more than once and gives each one well-tested implementation.",
   "author": { "name": "Marek Kirejczyk", "url": "https://github.com/marekkirejczyk" },
   "repository": "https://github.com/marekkirejczyk/skills",

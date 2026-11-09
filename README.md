@@ -46,7 +46,7 @@ Each feature or change gets a screenshot from the code actually running, a diagr
 
 ## /refactor-tests: tests to a written standard
 
-Brings the tests of a file, a class or a branch up to the rules for each test type (pure functions, services, route handlers, database round trips), and covers every case those rules name. It refactors in small rounds that stay green, and measures tests, files and the whole suite against speed budgets. A bug it finds is reported and pinned by a test, not fixed.
+Brings the tests of a file, a class or a branch up to the rules for each test type (pure functions, services, route handlers, database round trips), and covers every case those rules name. It pushes each test down to the fastest level that can prove it and removes duplicates, proving each removal by breaking the code. It refactors in small rounds that stay green, measures tests, files and the whole suite against speed budgets, and puts a table of time per test category on the PR. A bug it finds is reported and pinned by a test, not fixed.
 
 ```
 /refactor-tests src/orders/order-service.ts   # a file or a class

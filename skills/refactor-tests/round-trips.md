@@ -5,7 +5,7 @@ A **round trip** checks that a repository stores data faithfully: write an item 
 ## Rules
 
 1. **Short.** Build the item, write it, read it back, compare the whole value: two to four lines in the `it`, with every step visible in it.
-2. **Plain repository.** A repository puts data in and gets data out, so a round trip tests storage, never behaviour. Filtering, state changes and choosing between cases belong in the service, tested there with fakes. When a repository holds such logic, report it as a refactoring candidate and leave it out of the round trips.
+2. **Plain repository.** A repository puts data in and gets data out, so a round trip tests storage, never behaviour. Filtering, state changes and choosing between cases belong in the service, tested there with fakes. Logic written in the repository's TypeScript, such as row mapping, is extracted into a pure function with its own unit tests, moved unchanged. Logic in SQL stays in the round trips by its filter edges, and is reported when it belongs in the service.
 
    The one exception is **locking**: a repository may read a row, apply a change and write it under a lock (`SELECT … FOR UPDATE` in a transaction), because the lock is a storage guarantee. Any non-trivial decision made under the lock is a pure function in its own module with its own unit tests; the repository only calls it. Give each guarantee the lock makes one test of its own, named for the guarantee: `"a change sees what is stored"`, `"two claims at once create one order"`.
 

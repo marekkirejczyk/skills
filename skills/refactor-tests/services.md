@@ -22,12 +22,12 @@ For each public method, a test for each of these that applies:
 - **Every outcome**: each kind of answer it returns, with the writes and sends that go with it, including a call that changes nothing (an unknown ID, an order no longer pending).
 - **Every dependency failing**: each fake that can throw, and what the caller gets, what was left written, and what was logged (spy on `console.error` and assert the error object).
 - **Repeats**: the same call twice (a duplicate webhook, a double click), and a call after one that failed halfway.
-- **Time passing**, for an answer that depends on it: just before, on and just after the bound, by setting the injected time.
+- **Time passing**, for an answer that depends on it: one example on each side, by setting the injected time. The edges of the bound belong to the pure function that decides it.
 - **Every setting it reads**, set and unset.
 
 ## Speed
 
-**Budget: 10 ms per test.** Fresh fakes stay (rule 7), because a fake costs almost nothing. The usual causes:
+**Budget: 5 ms per test on fakes or stubs, 50 ms for a test on a real database or subprocess.** Rule 1 stands, so the 50 ms budget is for tests that already exist, each a candidate to move onto fakes. Fresh fakes stay (rule 7), because a fake costs almost nothing. The usual causes:
 
 - **A real database, git or other subprocess** where a fake belongs.
 - **Real timers or sleeps.**

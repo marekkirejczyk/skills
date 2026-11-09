@@ -4,10 +4,12 @@
 export default class SpeedReporter {
   onTestModuleEnd(testModule) {
     const { setupDuration, collectDuration, duration } = testModule.diagnostic();
-    const tests = [...testModule.children.allTests()].map((test) => ({
-      name: test.fullName,
-      ms: test.diagnostic()?.duration ?? 0,
-    }));
+    const tests = [...testModule.children.allTests()]
+      .filter((test) => test.result().state !== "skipped")
+      .map((test) => ({
+        name: test.fullName,
+        ms: test.diagnostic()?.duration ?? 0,
+      }));
     const inTests = tests.reduce((sum, test) => sum + test.ms, 0);
     const fileMs = setupDuration + collectDuration + Math.max(0, duration - inTests);
     console.log(`file_ms ${fileMs.toFixed(1)} ${testModule.relativeModuleId}`);
