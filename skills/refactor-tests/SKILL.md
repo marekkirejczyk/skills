@@ -15,15 +15,44 @@ Each **test type** has its own file next to this one: what the type checks, its 
 | Route handlers                              | `route-handlers.md` |
 | Services                                    | `services.md`       |
 
+Web component and browser tests have no file here. **Push down** and the speed table apply to them, and those that stay are left as written.
+
 ## Goal
 
-The **scope** is what you were asked to write or refactor tests for: a file, a class, or a branch's changes. You are done when all three hold:
+The **scope** is what you were asked to write or refactor tests for: a file, a class, or a branch's changes. You are done when all four hold:
 
-1. **Written to the rules.** Every test in scope follows every rule of its type's file, with its naming and shape.
-2. **Every case covered.** Every public method of the code in scope has tests, and every case its type's **Cases** list names has a test of its own. List the cases for each method before you write or move a test, then tick each one off against a named `it`; a case with no test is a gap, whatever else passes.
+1. **Written to the rules.** Every test in scope whose type has a file here follows every rule of that file, with its naming and shape.
+2. **Every case covered.** Every public method of the code in scope has tests, and every case its type's **Cases** list names has a test of its own, at the fastest level that can prove it. List the cases for each method before you write or move a test, then tick each one off against a named `it`; a case with no test is a gap, whatever else passes.
 3. **Every cost within the scale.** Tests, files and the suite are within the budgets of **Speed** when measured, or reported as that section says.
+4. **Every test at the fastest level that can prove it.** Each test in scope outside `pure-functions.md` has a verdict under **Push down**.
 
 Then `pnpm format`, `pnpm lint` and `pnpm test` pass, and the tests also pass shuffled (`pnpm vitest run --sequence.shuffle <file>` in the test's package) and one at a time.
+
+Work in this order: the baseline from **Speed**, **Push down**, the type's rules and cases, then **Speed**'s fixes. Each test then gets polished only once it has its final level.
+
+## Push down
+
+Be aggressive: a test stays at a slow level only for what the table below says only that level can prove. The ladder, fastest first, is pure function, service, route handler or web component, browser. For each test in scope that isn't a pure-function test, try the fastest rung first and stop at the first that can prove what the test checks. Write a one-line **verdict** for it in your working notes: _stays_ (what only this level proves), _moves_ (to which level) or _removed_ (the faster test that covers it).
+
+| Level         | Stays at this level                                                 | Moves down                                        |
+| ------------- | ------------------------------------------------------------------- | ------------------------------------------------- |
+| Browser       | One journey per critical flow, and what needs a real browser        | Edge cases and logic, to route or component tests |
+| Route handler | Each status code once, each outside service's wiring, each follow-up effect | Every further reason for a status          |
+| Service       | Each outcome once, and what lands in the fakes                      | Decisions, to pure functions                      |
+| Round trip    | SQL behaviour, filter edges and locks                               | Row mapping written in TypeScript                 |
+| Web component | Rendering and interaction                                           | Formatting and state logic                        |
+
+**Extract to test.** Pull out a small pure function when the code holds a real decision (a branch, a calculation, a parse) and the function gets a name from the domain. Move the code unchanged, under **Refactoring**, and keep it reachable through its module's real interface: a pass-through or a private helper made public only for a test stays where it is. When a test can only move by changing logic, its verdict is _stays_.
+
+**Remove duplicates.** A test whose every assertion a faster or same-level test already proves is removed, slowest first. Search every test that exercises the code in scope. Change and delete only tests in scope, and report an out-of-scope duplicate with the faster test that covers it.
+
+**Proof.** A test moves or goes only after the proof, one check per thing it asserted:
+
+1. Name the faster test that covers it, writing that test first if it doesn't exist yet.
+2. Temporarily break that behaviour in the code, and confirm a remaining test goes red.
+3. Revert the break.
+
+With no red test, the verdict is _stays_ until a faster test goes red on that break.
 
 ## Assertions
 
@@ -84,7 +113,20 @@ Vitest gives each test file a new process by default, so something kept in memor
 
 - **Baseline first, on a clean checkout of the base commit,** on a quiet machine. Record the suite's CPU time, its test count, and each test's and file's cost. Note the machine's load, and treat a loaded run as rough.
 - **Suite:** `/usr/bin/time -p pnpm test`, and add `user` and `sys`. Elapsed time hides extra work on a many-core machine, so the suite's check is CPU time.
-- **Tests and files:** in the test's package, run `pnpm vitest run --no-file-parallelism --reporter=<skill-dir>/scripts/speed-reporter.mjs <files>` three times and take the median of each line. `test_ms` includes `beforeEach` and `afterEach`; `file_ms` runs from the first import to the end of the file's hooks.
+- **Tests and files, by category:** one table per package the scope touches, before and after. `<tmp>` is a temporary directory outside the repository.
+  1. Write `<tmp>/map.json`, giving each test file one category, for the files of both the before and the after state. Declare a category for each test type present, with its budget from its file, and for each other kind of test the package has (web components, browser), with no `budget_ms`. `Services (fakes)` and `Services (real)` are separate categories, and a file mixing both takes the real one. A file left out shows as `Unclassified`.
+     ```json
+     {
+       "file_budget_ms": <the File level's budget>,
+       "categories": [{ "name": "Pure functions", "budget_ms": <its budget> }, { "name": "Web components" }],
+       "files": { "src/slug.test.ts": "Pure functions" }
+     }
+     ```
+  2. In the package, run the whole of it once, one file at a time: `pnpm vitest run --no-file-parallelism --reporter=<skill-dir>/scripts/speed-reporter.mjs > <tmp>/pass.log`.
+  3. Re-run three times, to `<tmp>/rerun-1.log` and so on, the same command with the files that `node <skill-dir>/scripts/speed-table.mjs --map <tmp>/map.json --over <tmp>/pass.log` lists. Take the median of each line for anything you report as over budget.
+  4. Print the table with `node <skill-dir>/scripts/speed-table.mjs --map <tmp>/map.json <tmp>/pass.log <tmp>/rerun-*.log`.
+
+  **Total** and **Time share** include **Setup**: imports, setup files, `beforeAll` and `afterAll`. **Avg per test** and **Over budget** use each test's own time, `beforeEach` and `afterEach` included. Tests another runner owns, such as Playwright, are named in the report instead.
 
 ### Fixing
 
@@ -101,7 +143,12 @@ Vitest gives each test file a new process by default, so something kept in memor
 
 ### Report
 
+The first two items go in your final summary and in the PR description, the rest in your final summary. On the PR, add them as a `## Test speed` section, or replace that section when it exists: `gh pr edit` on an open PR, and the description itself when you open one.
+
+- The category table of each package, before and after.
+- Each test moved or removed, and the test that now covers it.
 - Suite CPU time and test count, before and after.
 - The slowest ten tests and files, before and after.
 - Each test or file still over budget, with its time, its cause and the change that would fix it.
-- Slow tests outside the scope or with no budget here, such as browser tests, left as they are.
+- Duplicates outside the scope, each with the faster test that covers it.
+- Slow tests outside the scope or owned by another runner, left as they are.

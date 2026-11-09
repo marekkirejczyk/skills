@@ -20,12 +20,12 @@ Work the handler leaves for after its answer runs after the response: wait for i
 
 For each route, a test for each of these that applies:
 
-- **Every status code** the handler answers with, and every distinct reason for it: a 401 for a missing token and for a wrong one are two tests.
+- **Every status code** the handler answers with, once. Each further reason for a status is tested where it is decided: a missing and a wrong token are two pure-function or service tests, and one 401 here.
 - **Every outcome** of the request: what each outside service receives, and what a follow-up request shows, including requests that change nothing.
 - **An outside service down** (its fake answering 503), and what the caller gets.
 - **Work after the answer**: its effect, and that a request it ignores sends nothing.
-- **Time passing**, for a route whose answer depends on it (an expiry, a timeout).
-- **Every setting the handler reads**, set and unset.
+- **Time passing**, for a route whose answer depends on it (an expiry, a timeout): one example on each side.
+- **Every setting the handler itself reads**, set and unset. A setting passed on to a service or a pure function is tested there.
 
 ## Speed
 
@@ -44,7 +44,7 @@ For each route, a test for each of these that applies:
 - The outer `describe` is the method and path: `describe("POST /api/orders")`; with ", without PAYMENTS_KEY" in a file with a setting unset.
 - Each `it` starts with the status, then names the request in a few words: `"201: an order with one item"`, `"401: no bearer token"`, `"409: an order paid twice"`.
 
-Read only the `it` lines: they should list every status the route answers with, and every reason for each.
+Read only the `it` lines: they should list every status the route answers with.
 
 ## Shape
 
