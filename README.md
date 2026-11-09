@@ -4,35 +4,37 @@
 
 Works with Claude Code, Codex, Cursor and other agents that read `SKILL.md`.
 
-## repo-video: a narrated explainer
+## explain-with-video: a narrated explainer
 
-[![repo-video explaining this repository: four build stages appearing one by one](docs/media/repo-video-demo.gif)](https://claude.ai/artifact/9S3BAqPTEddbLFLnFgKBsP)
+[![explain-with-video explaining this repository: four build stages appearing one by one](docs/media/explain-with-video-demo.gif)](https://claude.ai/artifact/9S3BAqPTEddbLFLnFgKBsP)
 
-**[▶ Watch the example](https://claude.ai/artifact/9S3BAqPTEddbLFLnFgKBsP):** a 5-minute tour of this repository, made by `/repo-video`.
+**[▶ Watch the example](https://claude.ai/artifact/9S3BAqPTEddbLFLnFgKBsP):** a 5-minute tour of this repository, made by `/explain-with-video`.
 
 Scenes reveal their content step by step, and highlight exactly what the voice is talking about: a card, a line of code, a box in a diagram. You get an MP4 with captions, on a page with chapters and a clickable transcript.
 
 ```
-/repo-video for a new backend developer     # the whole repository
-/repo-video pr 123                          # one pull request, for its reviewer
+/explain-with-video for a new backend developer     # the whole repository
+/explain-with-video https://github.com/o/r          # a repository by URL
+/explain-with-video pr 123                          # one pull request, for its reviewer
 ```
 
-The voice is ElevenLabs if you add a key, or free macOS speech without one. [How it works →](docs/repo-video.md)
+The voice is ElevenLabs if you add a key, or free macOS speech without one. [How it works →](docs/explain-with-video.md)
 
-## repo-presentation: a walkthrough deck
+## explain-with-slides: a walkthrough deck
 
-[![repo-presentation's deck about this repository](docs/media/repo-presentation-demo.png)](https://claude.ai/artifact/EQmgztM99GRNdBugNTMoZK)
+[![explain-with-slides's deck about this repository](docs/media/explain-with-slides-demo.png)](https://claude.ai/artifact/EQmgztM99GRNdBugNTMoZK)
 
-**[▶ See the example deck](https://claude.ai/artifact/EQmgztM99GRNdBugNTMoZK):** this repository, presented by `/repo-presentation`.
+**[▶ See the example deck](https://claude.ai/artifact/EQmgztM99GRNdBugNTMoZK):** this repository, presented by `/explain-with-slides`.
 
 Each feature or change gets a screenshot from the code actually running, a diagram with its key files, and the real code. A PR deck adds before/after shots, diffs, the test run and review risks.
 
 ```
-/repo-presentation for a new backend developer   # the whole repository
-/repo-presentation pr 123                        # one pull request, for its reviewer
+/explain-with-slides for a new backend developer   # the whole repository
+/explain-with-slides https://github.com/o/r        # a repository by URL
+/explain-with-slides pr 123                        # one pull request, for its reviewer
 ```
 
-[How it works →](docs/repo-presentation.md)
+[How it works →](docs/explain-with-slides.md)
 
 ## refactor-tests: tests to a written standard
 
@@ -57,20 +59,21 @@ claude plugin install marekkirejczyk-skills@marekkirejczyk
 **Codex, Cursor and other agents**, one skill at a time:
 
 ```bash
-npx skills add marekkirejczyk/skills --skill repo-video          # or repo-presentation, refactor-tests
+npx skills add marekkirejczyk/skills --skill explain-with-video          # or explain-with-slides, refactor-tests
 ```
 
-Then type `/repo-video`, `/repo-presentation` or `/refactor-tests` (`$repo-video` in Codex). Each runs only when you ask for it. [More install options →](docs/installation.md)
+Then type `/explain-with-video`, `/explain-with-slides` or `/refactor-tests` (`$explain-with-video` in Codex). Each runs only when you ask for it. [More install options →](docs/installation.md)
 
 ## Using the explainers
 
 ```
 /<skill>                                      # the whole repository
+/<skill> https://github.com/o/r               # another repository, by URL
 /<skill> pr 123                               # a pull request: number, URL, branch, or nothing for the current branch
 /<skill> pr 123 polish, for the reviewer      # then a language, then an audience or focus
 ```
 
-`repo-video` and `repo-presentation` show you an outline first and build only after you approve it. Everything they show comes from running your code: no mockups, no invented numbers.
+`explain-with-video` and `explain-with-slides` show you an outline first and build only after you approve it. Each opens with a cover, numbered contents and a detailed summary, then architecture and the rest. Everything they show comes from running your code: no mockups, no invented numbers.
 
 ## License
 

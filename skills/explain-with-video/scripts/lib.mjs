@@ -1,4 +1,4 @@
-// Shared helpers for the repo-video scripts: the project file, processes, timing.
+// Shared helpers for the explain-with-video scripts: the project file, processes, timing.
 import { spawn, spawnSync } from "node:child_process";
 import { existsSync, readdirSync, readFileSync } from "node:fs";
 import { createRequire } from "node:module";

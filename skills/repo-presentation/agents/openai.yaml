@@ -1,3 +1,0 @@
-# Codex: only run this skill when asked ($repo-presentation), never on its own.
-policy:
-  allow_implicit_invocation: false
