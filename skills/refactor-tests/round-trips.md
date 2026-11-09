@@ -24,6 +24,14 @@ For each repository method, a test for each of these that applies:
 - **Every edge of a query's filter**: one item just inside each bound, one just outside, and one exactly on it; one item per condition the filter rejects on.
 - **Every guarantee a lock makes**: the change sees what is stored, the change is written, a change that returns nothing writes nothing, and two changes at once apply one after the other.
 
+## Speed
+
+**Budget: 50 ms per test.** The usual causes:
+
+- **Migrations run per file or per test.** Run them once in `globalSetup`, save the database with PGlite's `dumpDataDir()`, and start each file from it with `new PGlite({ loadDataDir })`.
+- **Many writes** where one proves the point.
+- **Sleeps in lock tests.** Make the second change wait on the first with a promise or a barrier.
+
 ## Naming
 
 - The outer `describe` is the class: `describe("OrderRepository")`.
@@ -50,4 +58,4 @@ describe("OrderRepository", () => {
 });
 ```
 
-`NEW_ORDER` and `PAID_ORDER` carry different IDs and customers, so neither test can read the other's order. The database is real Postgres with the app's own migrations, created once per file and shared by its tests; Postgres in the test's own process (PGlite) needs nothing else running.
+`NEW_ORDER` and `PAID_ORDER` carry different IDs and customers, so neither test can read the other's order. The database is real Postgres with the app's own migrations, migrated once per run into a snapshot, started from that snapshot once per file, and shared by the file's tests; Postgres in the test's own process (PGlite) needs nothing else running.

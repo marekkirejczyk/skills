@@ -25,6 +25,14 @@ For each public method, a test for each of these that applies:
 - **Time passing**, for an answer that depends on it: just before, on and just after the bound, by setting the injected time.
 - **Every setting it reads**, set and unset.
 
+## Speed
+
+**Budget: 10 ms per test.** Fresh fakes stay (rule 7), because a fake costs almost nothing. The usual causes:
+
+- **A real database, git or other subprocess** where a fake belongs.
+- **Real timers or sleeps.**
+- **A heavy `setup()`.**
+
 ## Naming
 
 - The outer `describe` is the class: `describe("OrderService")`; a nested `describe` per method: `describe("placeOrder")`.
