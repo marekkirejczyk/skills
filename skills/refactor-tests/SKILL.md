@@ -10,12 +10,13 @@ Each **test type** has its own file next to this one: what the type checks, its 
 
 | Test type                                   | File                |
 | ------------------------------------------- | ------------------- |
+| Browser tests (a real browser, the whole app) | `browser.md`      |
 | Database round trips (a repository's tests) | `round-trips.md`    |
 | Pure functions                              | `pure-functions.md` |
 | Route handlers                              | `route-handlers.md` |
 | Services                                    | `services.md`       |
 
-Web component and browser tests have no file here. **Push down** and the speed table apply to them, and those that stay are left as written.
+Web component tests have no file here. **Push down** and the speed table apply to them, and those that stay are left as written.
 
 ## Goal
 
@@ -26,7 +27,7 @@ The **scope** is what you were asked to write or refactor tests for: a file, a c
 3. **Every cost within the scale.** Tests, files and the suite are within the budgets of **Speed** when measured, or reported as that section says.
 4. **Every test at the fastest level that can prove it.** Each test in scope outside `pure-functions.md` has a verdict under **Push down**.
 
-Then `pnpm format`, `pnpm lint` and `pnpm test` pass, and the tests also pass shuffled (`pnpm vitest run --sequence.shuffle <file>` in the test's package) and one at a time.
+Then `pnpm format`, `pnpm lint` and `pnpm test` pass, and the tests also pass shuffled (`pnpm vitest run --sequence.shuffle <file>` in the test's package) and one at a time. Browser tests run as **Running** in `browser.md` says.
 
 Work in this order: the baseline from **Speed**, **Push down**, the type's rules and cases, then **Speed**'s fixes. Each test then gets polished only once it has its final level.
 
@@ -68,6 +69,8 @@ expect(payments.charges).toEqual([{ amount: 1200, currency: "gbp" }]);
 ```
 
 Write out every value the test can know: an error message, a URL built from an ID it has, a time it set. Match a value it can't know (a generated ID, a token, a session URL) by its **shape**: `expect.stringMatching(/^[0-9a-f]{64}$/)` for a 32-byte hex token, a UUID pattern for an ID. A shape fails on an empty string, a wrong format or a value in the wrong field, where `expect.any(String)` passes them all.
+
+On a page, a browser test uses Playwright's auto-retrying assertions instead of `toEqual` on a value it has read (rule 3 of `browser.md`).
 
 ## Refactoring
 
@@ -114,7 +117,7 @@ Vitest gives each test file a new process by default, so something kept in memor
 - **Baseline first, on a clean checkout of the base commit,** on a quiet machine. Record the suite's CPU time, its test count, and each test's and file's cost. Note the machine's load, and treat a loaded run as rough.
 - **Suite:** `/usr/bin/time -p pnpm test`, and add `user` and `sys`. Elapsed time hides extra work on a many-core machine, so the suite's check is CPU time.
 - **Tests and files, by category:** one table per package the scope touches, before and after. `<tmp>` is a temporary directory outside the repository.
-  1. Write `<tmp>/map.json`, giving each test file one category, for the files of both the before and the after state. Declare a category for each test type present, with its budget from its file, and for each other kind of test the package has (web components, browser), with no `budget_ms`. `Services (fakes)` and `Services (real)` are separate categories, and a file mixing both takes the real one. A file left out shows as `Unclassified`.
+  1. Write `<tmp>/map.json`, giving each test file one category, for the files of both the before and the after state. Declare a category for each test type present, with its budget from its file, and for each other kind of test the package has (web components), with no `budget_ms`. `Services (fakes)` and `Services (real)` are separate categories, and a file mixing both takes the real one. A file left out shows as `Unclassified`.
      ```json
      {
        "file_budget_ms": <the File level's budget>,
@@ -126,7 +129,7 @@ Vitest gives each test file a new process by default, so something kept in memor
   3. Re-run three times, to `<tmp>/rerun-1.log` and so on, the same command with the files that `node <skill-dir>/scripts/speed-table.mjs --map <tmp>/map.json --over <tmp>/pass.log` lists. Take the median of each line for anything you report as over budget.
   4. Print the table with `node <skill-dir>/scripts/speed-table.mjs --map <tmp>/map.json <tmp>/pass.log <tmp>/rerun-*.log`.
 
-  **Total** and **Time share** include **Setup**: imports, setup files, `beforeAll` and `afterAll`. **Avg per test** and **Over budget** use each test's own time, `beforeEach` and `afterEach` included. Tests another runner owns, such as Playwright, are named in the report instead.
+  **Total** and **Time share** include **Setup**: imports, setup files, `beforeAll` and `afterAll`. **Avg per test** and **Over budget** use each test's own time, `beforeEach` and `afterEach` included. Browser tests get a table of their own, measured with Playwright's reporter (**Speed** in `browser.md`). Tests any other runner owns are named in the report instead.
 
 ### Fixing
 
