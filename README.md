@@ -1,6 +1,6 @@
 # Skills
 
-**Explain any codebase or pull request, without writing a single slide.** Two agent skills that read your code, run it, and turn what they find into a walkthrough people actually watch: a slide deck, or a narrated video. A third skill, `refactor-tests`, brings your tests up to a written standard.
+**Explain any codebase or pull request, without writing a single slide.** Two agent skills that read your code, run it, and turn what they find into a walkthrough people actually watch: a slide deck, or a narrated video. Two more skills clean up the code itself: `refactor-tests` brings your tests up to a written standard, and `self-documented-code` makes every name explain itself.
 
 Works with Claude Code, Codex, Cursor and other agents that read `SKILL.md`.
 
@@ -47,9 +47,19 @@ Brings the tests of a file, a class or a branch up to the rules for each test ty
 
 The rules assume TypeScript, Vitest and pnpm.
 
+## self-documented-code: names that explain themselves
+
+Reviews every name in a scope, renames what falls short so each concept has one name, keeps comments only for what the code cannot say, and updates the project's glossary to match. It runs without stopping for approval, on its own branch with one commit per round. Lint, tests and behaviour stay as they were, and names other systems depend on (API fields, database columns) are reported rather than changed.
+
+```
+/self-documented-code                          # the whole repository
+/self-documented-code pr 123                   # the names a PR adds or changes
+/self-documented-code src/payments             # a directory, file or concept
+```
+
 ## Install
 
-**Claude Code**, all three skills as a plugin that updates itself:
+**Claude Code**, all four skills as a plugin that updates itself:
 
 ```bash
 claude plugin marketplace add marekkirejczyk/skills
@@ -59,10 +69,10 @@ claude plugin install marekkirejczyk-skills@marekkirejczyk
 **Codex, Cursor and other agents**, one skill at a time:
 
 ```bash
-npx skills add marekkirejczyk/skills --skill explain-with-video          # or explain-with-slides, refactor-tests
+npx skills add marekkirejczyk/skills --skill explain-with-video          # or explain-with-slides, refactor-tests, self-documented-code
 ```
 
-Then type `/explain-with-video`, `/explain-with-slides` or `/refactor-tests` (`$explain-with-video` in Codex). Each runs only when you ask for it. [More install options →](docs/installation.md)
+Then type `/explain-with-video`, `/explain-with-slides`, `/refactor-tests` or `/self-documented-code` (`$explain-with-video` in Codex). Each runs only when you ask for it. [More install options →](docs/installation.md)
 
 ## Using the explainers
 

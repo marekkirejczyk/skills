@@ -6,9 +6,9 @@
     {
       "name": "marekkirejczyk-skills",
       "source": "./",
-      "description": "explain-with-slides: turns a codebase or a pull request into a walkthrough deck with screenshots from the running code, UML diagrams, key files, code and diff slides, tech stack and lines of code. explain-with-video: turns the same walkthrough into a narrated MP4 with captions, chapters and a transcript. refactor-tests: brings a file, class or branch's tests up to written rules for each test type, and covers every case.",
+      "description": "explain-with-slides: turns a codebase or a pull request into a walkthrough deck with screenshots from the running code, UML diagrams, key files, code and diff slides, tech stack and lines of code. explain-with-video: turns the same walkthrough into a narrated MP4 with captions, chapters and a transcript. refactor-tests: brings a file, class or branch's tests up to written rules for each test type, and covers every case. self-documented-code: renames everything in a scope so each name explains itself and each concept has one name.",
       "category": "productivity",
-      "keywords": ["presentation", "video", "architecture", "onboarding", "testing", "refactoring"]
+      "keywords": ["presentation", "video", "architecture", "onboarding", "testing", "refactoring", "naming"]
     }
   ]
 }
