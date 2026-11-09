@@ -14,7 +14,7 @@ The handler stays thin: what it parses or checks is a pure function tested by `p
 6. **One environment per file.** The app reads its env once, so a case that needs a setting unset, such as a secret not configured yet, gets a file of its own, with the app started without it.
 7. **One example per test.** One request under test per `it`, which differs from its neighbours' in one visible way, and that difference is what the test is about. Follow-up requests only observe.
 
-Work the handler leaves for after its answer runs after the response: wait for its effect on a fake with `vi.waitFor`. Where it should do nothing, give it a moment, then check that no fake received anything.
+Work the handler leaves for after its answer runs after the response: wait for its effect on a fake with `vi.waitFor`. Where it should do nothing, prove that the work after the answer has finished, by a signal the app already gives or a follow-up request, then check that no fake received anything.
 
 ## Cases
 
@@ -26,6 +26,18 @@ For each route, a test for each of these that applies:
 - **Work after the answer**: its effect, and that a request it ignores sends nothing.
 - **Time passing**, for a route whose answer depends on it (an expiry, a timeout).
 - **Every setting the handler reads**, set and unset.
+
+## Speed
+
+**Budget: 100 ms per test.** The usual causes:
+
+- **Routes compiled on first request.** Build the app once per run.
+- **Fixed sleeps**, in the test or the app.
+- **Polling at a slow interval.** Give `vi.waitFor` a short `interval`.
+- **Real retry backoff or timeouts in the app.** Make the delay a setting the harness shortens.
+- **An outside service with no fake**, waiting on DNS or a connection.
+- **Deliberately expensive work**, such as password hashing at production cost.
+- **Long arrange chains** through many routes.
 
 ## Naming
 

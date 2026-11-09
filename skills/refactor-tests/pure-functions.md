@@ -20,6 +20,10 @@ For each non-trivial pure function, a test for each of these that applies:
 
 A trivial function (a one-line rename, getter or pass-through) needs no test of its own.
 
+## Speed
+
+**Budget: 5 ms per test.** A pure function has nothing to wait for, so one over budget has hidden I/O or a very large input: find out which.
+
 ## Naming
 
 - The outer `describe` is the function: `describe("slugOf")`. A module of several functions gets a nested `describe` per function.
