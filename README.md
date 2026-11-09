@@ -1,6 +1,6 @@
 # Skills
 
-**Explain any codebase or pull request, without writing a single slide.** Two agent skills that read your code, run it, and turn what they find into a walkthrough people actually watch: a slide deck, or a narrated video. Two more skills clean up the code itself: `refactor-tests` brings your tests up to a written standard, and `self-documented-code` makes every name explain itself.
+**Explain any codebase or pull request, without writing a single slide.** Two agent skills that read your code, run it, and turn what they find into a walkthrough people actually watch: a slide deck, or a narrated video. Three more skills clean up the code itself: `refactor-tests` brings your tests up to a written standard, `self-documented-code` makes every name explain itself, and `dont-repeat-yourself` gives each concept one implementation.
 
 Works with Claude Code, Codex, Cursor and other agents that read `SKILL.md`.
 
@@ -10,6 +10,7 @@ Works with Claude Code, Codex, Cursor and other agents that read `SKILL.md`.
 | [`/explain-with-slides`](#explain-with-slides-a-walkthrough-deck) | A slide deck with screenshots from the running code, diagrams and real code | A repository or a pull request |
 | [`/refactor-tests`](#refactor-tests-tests-to-a-written-standard) | Tests rewritten to the rules for their type, with every case covered | A file, a class or a branch |
 | [`/self-documented-code`](#self-documented-code-names-that-explain-themselves) | Names that explain themselves, one name per concept, comments only for the why | A repository, a pull request, a path or a concept |
+| [`/dont-repeat-yourself`](#dont-repeat-yourself-one-implementation-per-concept) | One well-tested implementation of each concept that was written several times | A repository, a pull request, a path or a concept |
 
 ## /explain-with-video: a narrated explainer
 
@@ -64,9 +65,19 @@ Reviews every name in a scope, renames what falls short so each concept has one 
 /self-documented-code src/payments             # a directory, file or concept
 ```
 
+## /dont-repeat-yourself: one implementation per concept
+
+Finds concepts implemented more than once, even when the copies are written differently, and gives each one shared, tested implementation. Copies with identical behaviour are extracted automatically, on their own branch with one commit per extraction. Copies that differ, look-alikes that may be separate concepts, and anything touching money, auth, migrations or locking come to you as one list of decisions at the end.
+
+```
+/dont-repeat-yourself                          # the whole repository
+/dont-repeat-yourself pr 123                   # a PR's new code, against the whole repository
+/dont-repeat-yourself src/payments             # a directory, file or concept
+```
+
 ## Install
 
-**Claude Code**, all four skills as a plugin that updates itself:
+**Claude Code**, all five skills as a plugin that updates itself:
 
 ```bash
 claude plugin marketplace add marekkirejczyk/skills
@@ -76,10 +87,10 @@ claude plugin install marekkirejczyk-skills@marekkirejczyk
 **Codex, Cursor and other agents**, one skill at a time:
 
 ```bash
-npx skills add marekkirejczyk/skills --skill explain-with-video          # or explain-with-slides, refactor-tests, self-documented-code
+npx skills add marekkirejczyk/skills --skill explain-with-video          # or explain-with-slides, refactor-tests, self-documented-code, dont-repeat-yourself
 ```
 
-Then type `/explain-with-video`, `/explain-with-slides`, `/refactor-tests` or `/self-documented-code` (`$explain-with-video` in Codex). Each runs only when you ask for it. [More install options →](docs/installation.md)
+Then type `/explain-with-video`, `/explain-with-slides`, `/refactor-tests`, `/self-documented-code` or `/dont-repeat-yourself` (`$explain-with-video` in Codex). Each runs only when you ask for it. [More install options →](docs/installation.md)
 
 ## Using the explainers
 

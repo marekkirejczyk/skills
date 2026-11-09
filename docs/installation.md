@@ -2,11 +2,11 @@
 
 [← README](../README.md)
 
-Every agent reads the same `skills/<skill>/SKILL.md`. Choose one install method per agent; installing a skill twice makes it show up twice. In the commands below, replace `<skill>` with `explain-with-slides`, `explain-with-video`, `refactor-tests` or `self-documented-code`.
+Every agent reads the same `skills/<skill>/SKILL.md`. Choose one install method per agent; installing a skill twice makes it show up twice. In the commands below, replace `<skill>` with `explain-with-slides`, `explain-with-video`, `refactor-tests`, `self-documented-code` or `dont-repeat-yourself`.
 
 ## Claude Code
 
-As a plugin, which installs all four skills and updates itself:
+As a plugin, which installs all five skills and updates itself:
 
 ```bash
 claude plugin marketplace add marekkirejczyk/skills
@@ -16,7 +16,7 @@ claude plugin install marekkirejczyk-skills@marekkirejczyk --scope project  # th
 
 Inside a session you can do the same with `/plugin marketplace add marekkirejczyk/skills` and then `/plugin install marekkirejczyk-skills@marekkirejczyk`.
 
-Plugin skills get the plugin name as a prefix, so the full names are `/marekkirejczyk-skills:explain-with-slides`, `/marekkirejczyk-skills:explain-with-video`, `/marekkirejczyk-skills:refactor-tests` and `/marekkirejczyk-skills:self-documented-code`. Typing `/explain-with-slides`, `/explain-with-video`, `/refactor-tests` or `/self-documented-code` still finds them in autocomplete.
+Plugin skills get the plugin name as a prefix, so the full names are `/marekkirejczyk-skills:explain-with-slides`, `/marekkirejczyk-skills:explain-with-video`, `/marekkirejczyk-skills:refactor-tests`, `/marekkirejczyk-skills:self-documented-code` and `/marekkirejczyk-skills:dont-repeat-yourself`. Typing `/explain-with-slides`, `/explain-with-video`, `/refactor-tests`, `/self-documented-code` or `/dont-repeat-yourself` still finds them in autocomplete.
 
 As editable files, one skill at a time:
 
