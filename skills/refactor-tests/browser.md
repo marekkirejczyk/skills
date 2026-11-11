@@ -6,7 +6,7 @@ Browser tests are the slowest and the fewest. **Push down** leaves here one jour
 
 ## Rules
 
-1. **Whole app, outside world faked.** Playwright's `webServer` starts the production build and each fake once per run, with the app's env pointing at the fakes. A fake here is a server of its own, because the app runs in its own process and Playwright's workers share no memory: it implements the endpoints the app calls, with the real API's auth, and has a read endpoint that answers what it received for one record. `page.route` reaches only the requests the browser makes, so use it for third parties the page calls itself (analytics, a widget's scripts). The run sends nothing to the real outside world.
+1. **Whole app, outside world faked.** The app runs from a production build, made once and reused until the app's own code changes. Playwright's `webServer` starts it and each fake once for the whole run, shared by every test and worker, with the app's env pointing at the fakes, and `reuseExistingServer: !process.env.CI` keeps a server that is already running between local runs. A round that changes only tests rebuilds nothing. A fake here is a server of its own, because the app runs in its own process and Playwright's workers share no memory: it implements the endpoints the app calls, with the real API's auth, and has a read endpoint that answers what it received for one record. `page.route` reaches only the requests the browser makes, so use it for third parties the page calls itself (analytics, a widget's scripts). The run sends nothing to the real outside world.
 2. **Black box, as the user sees it.** Find each element by role, then label, then text: `getByRole("button", { name: "Pay" })`, narrowed by chaining or `filter`. Locators name what the user sees, independent of CSS classes, XPath and position. An element with no accessible name gets a `data-testid` and `getByTestId`, and the missing name goes in the report. A test reaches the app only through the browser and its HTTP routes, never its database or modules.
 3. **Auto-retrying assertions.** Assert on the page with `await expect(locator).toBeVisible()` and its siblings, which retry until true, in place of reading a value once with `isVisible()` or `textContent()`. Read a fake or a route with `expect.poll`. Every wait is an assertion on the thing waited for, which replaces `waitForTimeout` and `networkidle`. Lint with `@typescript-eslint/no-floating-promises`, so a missing `await` fails.
 4. **The journey in the test.** Write each `goto`, click, fill and assertion in the `test`, in the user's order, so the test reads as the journey. Fixtures and helpers only arrange. Where the project has page objects, they find elements and act, and every assertion stays in the test.
@@ -41,7 +41,7 @@ Leave out a flag the project's Playwright doesn't list under `playwright test --
 
 ## Speed
 
-**Budget: 3 s per test.** The **File** level has no budget here: the build, `webServer` and the sign-in setup are paid once per run.
+**Budget: 3 s per test.** The **File** level has no budget here: `webServer` and the sign-in setup are paid once per run, and the build once per change to the app's code.
 
 Measure as **Speed** says, in a table of its own with a `Browser` category at `"budget_ms": 3000` and a category with no budget for setup projects. In step 2 run `pnpm playwright test --retries=0 --workers=1 --reporter=<skill-dir>/scripts/playwright-speed-reporter.mjs > <tmp>/pass.log`, with Playwright's `rootDir`-relative paths as the map's keys. For the suite's CPU time, wrap the same command in `/usr/bin/time -p`.
 
@@ -50,6 +50,7 @@ The usual causes:
 - **Signing in through the UI** in every test.
 - **Arranging by clicking** what a request could set up.
 - **A dev server** compiling each route on first visit.
+- **Rebuilding the app** for a round that changed only tests.
 - **Fixed sleeps**, `waitForTimeout` or `networkidle`.
 - **Real third-party requests** the page waits on: stub them with `page.route`.
 - **Trace or video always on.**
