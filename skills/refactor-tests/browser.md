@@ -4,6 +4,8 @@ A **browser test** drives a real browser with Playwright through the whole app, 
 
 Browser tests are the slowest and the fewest. **Push down** leaves here one journey per critical flow and what needs a real browser, so each decision and edge case is proved at a faster level, and these tests prove that the pieces work together.
 
+Browser tests are **optional**. This file applies to the browser tests already in scope, and its **Cases** to the flows they cover. A project or flow without browser tests stays without them, and a missing one is not a gap.
+
 ## Rules
 
 1. **Whole app, outside world faked.** The app runs from a production build, made once and reused until the app's own code changes. Playwright's `webServer` starts it and each fake once for the whole run, shared by every test and worker, with the app's env pointing at the fakes, and `reuseExistingServer: !process.env.CI` keeps a server that is already running between local runs. A round that changes only tests rebuilds nothing. A fake here is a server of its own, because the app runs in its own process and Playwright's workers share no memory: it implements the endpoints the app calls, with the real API's auth, and has a read endpoint that answers what it received for one record. `page.route` reaches only the requests the browser makes, so use it for third parties the page calls itself (analytics, a widget's scripts). The run sends nothing to the real outside world.
