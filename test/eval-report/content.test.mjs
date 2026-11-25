@@ -81,6 +81,12 @@ describe('renderOutput', () => {
     assert.match(markup, /<div class="card-title">Question<\/div>.*<p>Which\?<\/p>.*<span class="chip">A<\/span><span class="chip">B<\/span>/);
   });
 
+  it('keeps a reply\'s blocks together, so a wide page can set them side by side', () => {
+    const markup = String(renderOutput({ text: 'Pick', blocks: [{ type: 'card', title: 'A' }, { type: 'card', title: 'B' }] }));
+    assert.match(markup, /^<p>Pick<\/p><div class="blocks"><div class="card">.*<\/div><div class="card">.*<\/div><\/div>$/s);
+    assert.doesNotMatch(String(renderOutput({ text: 'Pick', blocks: [] })), /class="blocks"/);
+  });
+
   it('renders a list of labelled values', () => {
     assert.match(text(renderOutput({ text: 'x', blocks: [{ type: 'list', items: [{ label: 'APR', value: '9.9%' }] }] })), /<li><strong>APR<\/strong> 9.9%<\/li>/);
   });
@@ -117,9 +123,9 @@ describe('renderJson', () => {
   it('makes a fold of each object and list, a line of everything else', () => {
     assert.equal(
       String(renderJson({ b: 1, c: ['x', null], d: {} })),
-      '<div class="json"><details class="json-fold" open><summary data-folded=" … }">{</summary><div class="json-children">' +
+      '<div class="json"><details class="json-fold" data-key="" open><summary data-folded=" … }">{</summary><div class="json-children">' +
         '<div class="json-line">&quot;b&quot;: 1,</div>' +
-        '<details class="json-fold" open><summary data-folded=" … ],">&quot;c&quot;: [</summary><div class="json-children">' +
+        '<details class="json-fold" data-key="c" open><summary data-folded=" … ],">&quot;c&quot;: [</summary><div class="json-children">' +
         '<div class="json-line">&quot;x&quot;,</div><div class="json-line">null</div>' +
         '</div><div class="json-line">],</div></details>' +
         '<div class="json-line">&quot;d&quot;: {}</div>' +
@@ -127,12 +133,17 @@ describe('renderJson', () => {
     );
   });
 
+  it('names each fold by its key, or its place in a list', () => {
+    const keys = [...String(renderJson({ a: [{ b: 1 }, { '<c>': 2 }] })).matchAll(/class="json-fold" data-key="([^"]*)"/g)].map((match) => match[1]);
+    assert.deepEqual(keys, ['', 'a', '0', '1']);
+  });
+
   it('writes a plain value as JSON', () => {
     assert.equal(String(renderJson('a "b"')), '<div class="json"><div class="json-line">&quot;a \\&quot;b\\&quot;&quot;</div></div>');
   });
 
   it('escapes HTML in keys and values', () => {
-    assert.equal(String(renderJson({ '<i>': '<b>' })), '<div class="json"><details class="json-fold" open><summary data-folded=" … }">{</summary><div class="json-children"><div class="json-line">&quot;&lt;i&gt;&quot;: &quot;&lt;b&gt;&quot;</div></div><div class="json-line">}</div></details></div>');
+    assert.equal(String(renderJson({ '<i>': '<b>' })), '<div class="json"><details class="json-fold" data-key="" open><summary data-folded=" … }">{</summary><div class="json-children"><div class="json-line">&quot;&lt;i&gt;&quot;: &quot;&lt;b&gt;&quot;</div></div><div class="json-line">}</div></details></div>');
   });
 });
 

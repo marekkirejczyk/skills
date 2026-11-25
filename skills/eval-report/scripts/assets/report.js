@@ -1,7 +1,7 @@
-// Filters, review ticks, expand/collapse and the theme switch.
-// Filters live in the URL hash (#status=failed&scope=changed&review=todo), so a
-// filtered view can be linked. Review ticks and the theme live in this
-// browser's localStorage: they are each reviewer's own and outlast the report.
+// Filters, review ticks, expand/collapse, JSON folds, what a check means and the
+// theme switch. Filters live in the URL hash (#status=failed&scope=changed&review=todo),
+// so a filtered view can be linked. Review ticks, shut folds and the theme live in
+// this browser's localStorage: they are each reviewer's own and outlast the report.
 (() => {
   const all = (selector, root = document) => [...root.querySelectorAll(selector)];
   const runs = all('tr.run');
@@ -36,6 +36,77 @@
     }
     storage.write(reviewKey, reviewed);
     apply();
+  }
+
+  // ---- JSON folds a reader shut: { "<file>::<case>#<round>|<where in the run>": true } ----
+  // Where a fold sits is its column, then each message, card, pair and JSON key down
+  // to it, never the words around it, so it is found again in the next report.
+  const foldStore = `${reviewKey}:folds`;
+  const shutFolds = storage.read(foldStore, {});
+  const PLACED = ['td', '.message', '.card', 'li'];
+  function foldKey(fold) {
+    const parts = [];
+    for (let node = fold; node && !node.matches('tr.run'); node = node.parentElement) {
+      const placed = PLACED.find((selector) => node.matches(selector));
+      if (node.matches('details.json-fold')) parts.push(node.dataset.key);
+      else if (node.matches('dd')) parts.push(node.previousElementSibling.textContent);
+      else if (placed) parts.push(`${placed}${[...node.parentElement.children].filter((sibling) => sibling.matches(placed)).indexOf(node)}`);
+    }
+    return `${fold.closest('tr.run').dataset.key}|${parts.reverse().join('/')}`;
+  }
+
+  // ---- What a check means: one bubble, under the check that was clicked ----
+  const bubble = Object.assign(document.createElement('div'), { className: 'about-bubble', id: 'about-bubble', hidden: true });
+  bubble.setAttribute('role', 'note');
+  document.body.append(bubble);
+  let aboutButton = null;
+
+  function closeAbout() {
+    if (!aboutButton) return;
+    aboutButton.setAttribute('aria-expanded', 'false');
+    aboutButton = null;
+    bubble.hidden = true;
+  }
+
+  function openAbout(button) {
+    closeAbout();
+    const check = button.closest('.check');
+    aboutButton = button;
+    button.setAttribute('aria-expanded', 'true');
+    button.setAttribute('aria-controls', bubble.id);
+    bubble.textContent = check.dataset.about;
+    bubble.hidden = false;
+    const box = check.getBoundingClientRect();
+    const width = Math.min(Math.max(box.width, 240), 420, window.innerWidth - 16);
+    bubble.style.width = `${width}px`;
+    bubble.style.left = `${Math.max(8, Math.min(box.left, window.innerWidth - width - 8))}px`;
+    const below = box.bottom + 6;
+    const fits = below + bubble.offsetHeight <= window.innerHeight - 8;
+    bubble.style.top = `${fits ? below : Math.max(8, box.top - 6 - bubble.offsetHeight)}px`;
+  }
+
+  // ---- The list of files and cases beside the report, on a very wide screen ----
+  const caseLinks = all('[data-case-link]');
+  const caseHead = (link) => document.getElementById(link.hash.slice(1));
+  const besideReport = window.matchMedia('(min-width: 1920px)');
+
+  // The case being read: the last one whose heading has reached the top of the page.
+  function markCurrentCase() {
+    if (!besideReport.matches) return;
+    const line = (document.querySelector('.toolbar')?.offsetHeight ?? 0) + 80;
+    const onPage = caseLinks.filter((link) => !link.hidden && caseHead(link).getClientRects().length > 0);
+    const current = onPage.filter((link) => caseHead(link).getBoundingClientRect().top <= line).at(-1) ?? onPage[0];
+    for (const link of caseLinks) {
+      if (link === current) link.setAttribute('aria-current', 'true');
+      else link.removeAttribute('aria-current');
+    }
+  }
+
+  function showCase(link) {
+    const head = caseHead(link);
+    head.closest('details.file').open = true;
+    const covered = toolbar.offsetHeight + head.closest('table').querySelector('th').offsetHeight;
+    window.scrollTo({ top: head.getBoundingClientRect().top + window.scrollY - covered });
   }
 
   // ---- Filters ----
@@ -100,6 +171,14 @@
       select.value = filters[filter];
       select.classList.toggle('active', filters[filter] !== 'all');
     }
+    for (const link of caseLinks) {
+      const evalCase = caseHead(link).closest('tbody.case');
+      const rows = all('tr.run', evalCase);
+      link.hidden = evalCase.hidden;
+      link.querySelector('.case-list-tick').hidden = !rows.every(isReviewed);
+    }
+    for (const group of all('.case-list-file')) group.hidden = !group.querySelector('[data-case-link]:not([hidden])');
+    markCurrentCase();
     const done = runs.filter(isReviewed).length;
     document.querySelector('[data-reviewed-count]').textContent = done;
     document.querySelector('[data-reviewed-bar]').style.width = `${runs.length ? (100 * done) / runs.length : 0}%`;
@@ -124,6 +203,15 @@
 
   // ---- Events ----
   document.addEventListener('click', (event) => {
+    const caseLink = event.target.closest('[data-case-link]');
+    if (caseLink) {
+      // Not the link's own jump: that would replace the filters kept in the URL hash.
+      event.preventDefault();
+      showCase(caseLink);
+    }
+    const about = event.target.closest('.about-button');
+    if (about && about !== aboutButton) openAbout(about);
+    else if (about || !event.target.closest('.about-bubble')) closeAbout();
     const filterButton = event.target.closest('button[data-filter]');
     if (filterButton) {
       filters[filterButton.dataset.filter] = filterButton.dataset.value;
@@ -157,6 +245,34 @@
     else if (box.matches('[data-review-case]')) markReviewed(all('tr.run', box.closest('tbody.case')), box.checked);
     else if (box.matches('[data-review-file]')) markReviewed(all('tr.run', box.closest('details.file')), box.checked);
   });
+  // The bubble sits where its check was: once the page moves, it goes.
+  document.addEventListener('keydown', (event) => {
+    if (event.key !== 'Escape' || !aboutButton) return;
+    aboutButton.focus();
+    closeAbout();
+  });
+  window.addEventListener('scroll', closeAbout, { capture: true, passive: true });
+  window.addEventListener('resize', closeAbout);
+  let marking = false;
+  window.addEventListener('scroll', () => {
+    if (marking) return;
+    marking = true;
+    requestAnimationFrame(() => {
+      marking = false;
+      markCurrentCase();
+    });
+  }, { passive: true });
+  besideReport.addEventListener('change', markCurrentCase);
+  // `toggle` doesn't bubble, so it is caught on its way down.
+  document.addEventListener('toggle', (event) => {
+    const fold = event.target;
+    if (!(fold instanceof HTMLElement) || !fold.matches('details.json-fold')) return;
+    const key = foldKey(fold);
+    if (fold.open === !(key in shutFolds)) return;
+    if (fold.open) delete shutFolds[key];
+    else shutFolds[key] = true;
+    storage.write(foldStore, shutFolds);
+  }, true);
   window.addEventListener('hashchange', () => {
     readHash();
     apply();
@@ -165,6 +281,12 @@
   readHash();
   apply();
   showTheme();
+  // The click bubble takes over from the hover tooltip, which would show beside it.
+  for (const check of all('.check.has-about')) {
+    check.dataset.about = check.title;
+    check.removeAttribute('title');
+  }
+  for (const fold of all('details.json-fold')) if (foldKey(fold) in shutFolds) fold.open = false;
   // A file you have reviewed completely starts folded.
   for (const file of all('details.file')) {
     const rows = all('tr.run', file);

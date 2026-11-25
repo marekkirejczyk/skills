@@ -53,8 +53,20 @@ describe('eval-report.mjs run on the fixture evals', () => {
     assert.match(page, /<div class="check pass">/);
   });
 
+  it('makes the name of a check that says what it means a button, for the bubble', () => {
+    assert.match(page, /<button type="button" class="about-button" aria-expanded="false">ends &quot;done&quot;<\/button>/);
+    assert.doesNotMatch(page, /<button type="button" class="about-button"[^>]*>the 6 rules for every reply/);
+  });
+
   it('shows the tools\' arguments and results as JSON that folds', () => {
-    assert.match(page, /<details class="raw"><summary>Arguments and results<\/summary><div class="json"><details class="json-fold" open>/);
+    assert.match(page, /<details class="raw"><summary>Arguments and results<\/summary><div class="json"><details class="json-fold" data-key="" open>/);
+  });
+
+  it('lists every case under its file, each linked to where it is on the page', () => {
+    const links = [...page.matchAll(/<a href="#(case-\d+)" data-case-link>/g)].map((match) => match[1]);
+    assert.equal(links.length, 20);
+    assert.equal(page.match(/<div class="case-list-file">/g).length, 3);
+    for (const id of links) assert.ok(page.includes(`<tr class="case-head" id="${id}">`), id);
   });
 
   it('loads nothing from the network', () => {
