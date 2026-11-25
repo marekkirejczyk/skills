@@ -1,0 +1,56 @@
+# Fixture evals for eval-report, defined as data (promptfoo-style) rather than
+# code: structured inputs and data outputs. Not run: ../results.json was
+# written to look like a real run of them.
+description: SQL assistant
+tests:
+  - description: reads the schema before writing a query
+    vars: { question: How many orders last week?, database: shop }
+    mocks: { describe_table: "fake: ordersSchema", run_query: [{ count: 412 }] }
+    assert:
+      - type: tool-call-order
+        value: [describe_table, run_query]
+      - type: contains
+        value: "412"
+
+  - description: refuses to run a query that changes data
+    vars: { question: Delete all test users., database: shop }
+    assert:
+      - type: not-tool-call
+        value: run_query
+      - type: llm-rubric
+        value: explains it only reads data
+
+  - description: a top-N question returns a table
+    vars: { question: Top 5 products by revenue this month, database: shop }
+    mocks: { run_query: "fake: topProducts" }
+    assert:
+      - type: is-json
+      - type: javascript
+        value: output.data.length === 5
+      - type: llm-rubric
+        value: names the revenue column clearly
+
+  - description: an ambiguous column is asked about, not guessed
+    vars: { question: Average value per customer, database: shop }
+    mocks: { describe_table: "fake: ordersSchema" }
+    assert:
+      - type: shows-card
+        value: question
+      - type: not-tool-call
+        value: run_query
+
+  - description: a slow query gets a LIMIT
+    vars: { question: Show me all events, database: analytics }
+    mocks: { run_query: "fake: events" }
+    assert:
+      - type: regex
+        value: "LIMIT \\d+"
+
+  - description: explains the SQL it ran in one sentence
+    vars: { question: Which countries had no orders in October?, database: shop }
+    mocks: { run_query: [{ country: Iceland }, { country: Malta }] }
+    assert:
+      - type: llm-rubric
+        value: one-sentence explanation of the query
+      - type: llm-rubric
+        value: lists both countries

@@ -1182,7 +1182,7 @@
       ]
     },
     {
-      "file": "skills/eval-report/fixtures/evals/sql-assistant.eval.ts",
+      "file": "skills/eval-report/fixtures/evals/sql-assistant.eval.yaml",
       "name": "reads the schema before writing a query",
       "round": 1,
       "durationMs": 4356,
@@ -1239,7 +1239,7 @@
       ]
     },
     {
-      "file": "skills/eval-report/fixtures/evals/sql-assistant.eval.ts",
+      "file": "skills/eval-report/fixtures/evals/sql-assistant.eval.yaml",
       "name": "reads the schema before writing a query",
       "round": 2,
       "durationMs": 5333,
@@ -1292,7 +1292,7 @@
       ]
     },
     {
-      "file": "skills/eval-report/fixtures/evals/sql-assistant.eval.ts",
+      "file": "skills/eval-report/fixtures/evals/sql-assistant.eval.yaml",
       "name": "refuses to run a query that changes data",
       "round": 1,
       "durationMs": 6310,
@@ -1321,7 +1321,7 @@
       "mocks": []
     },
     {
-      "file": "skills/eval-report/fixtures/evals/sql-assistant.eval.ts",
+      "file": "skills/eval-report/fixtures/evals/sql-assistant.eval.yaml",
       "name": "a top-N question returns a table",
       "round": 1,
       "durationMs": 7287,
@@ -1385,7 +1385,7 @@
       ]
     },
     {
-      "file": "skills/eval-report/fixtures/evals/sql-assistant.eval.ts",
+      "file": "skills/eval-report/fixtures/evals/sql-assistant.eval.yaml",
       "name": "a top-N question returns a table",
       "round": 2,
       "durationMs": 8264,
@@ -1443,7 +1443,7 @@
       ]
     },
     {
-      "file": "skills/eval-report/fixtures/evals/sql-assistant.eval.ts",
+      "file": "skills/eval-report/fixtures/evals/sql-assistant.eval.yaml",
       "name": "an ambiguous column is asked about, not guessed",
       "round": 1,
       "durationMs": 9241,
@@ -1493,7 +1493,7 @@
       ]
     },
     {
-      "file": "skills/eval-report/fixtures/evals/sql-assistant.eval.ts",
+      "file": "skills/eval-report/fixtures/evals/sql-assistant.eval.yaml",
       "name": "a slow query gets a LIMIT",
       "round": 1,
       "durationMs": 10218,
@@ -1528,7 +1528,7 @@
       ]
     },
     {
-      "file": "skills/eval-report/fixtures/evals/sql-assistant.eval.ts",
+      "file": "skills/eval-report/fixtures/evals/sql-assistant.eval.yaml",
       "name": "a slow query gets a LIMIT",
       "round": 2,
       "durationMs": 11195,
@@ -1561,7 +1561,7 @@
       ]
     },
     {
-      "file": "skills/eval-report/fixtures/evals/sql-assistant.eval.ts",
+      "file": "skills/eval-report/fixtures/evals/sql-assistant.eval.yaml",
       "name": "explains the SQL it ran in one sentence",
       "round": 1,
       "durationMs": 12172,

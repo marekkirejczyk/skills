@@ -76,3 +76,15 @@ test('links each case to its line on GitHub', () => {
     'https://github.com/o/r/blob/abc/e/a.eval.ts',
   ]);
 });
+
+test('cases defined as data (YAML) are located and marked the same way', () => {
+  const { dir, git, write } = repo();
+  const yaml = (rubric) => `tests:\n  - description: first case\n    assert: [{ type: contains, value: a }]\n\n  - description: second case\n    assert: [{ type: llm-rubric, value: ${rubric} }]\n`;
+  write('e.eval.yaml', yaml('polite'));
+  git('add', '.'); git('commit', '-qm', 'base');
+  write('e.eval.yaml', yaml('polite and brief'));
+  const report = buildReport(['first case', 'second case'].map((name) => ({ file: 'e.eval.yaml', name, checks: [] })));
+  locateCases(dir, report);
+  markFresh(dir, report, 'HEAD');
+  assert.deepEqual(report.files[0].cases.map((c) => [c.name, c.line, c.fresh]), [['first case', 2, null], ['second case', 5, 'changed']]);
+});
