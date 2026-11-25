@@ -549,7 +549,7 @@
       ]
     },
     {
-      "file": "skills/eval-report/fixtures/evals/travel-planner.eval.ts",
+      "file": "skills/eval-report/fixtures/evals/travel-planner.eval.json",
       "name": "a weekend itinerary has one plan per day",
       "round": 1,
       "durationMs": 9655,
@@ -617,7 +617,7 @@
       ]
     },
     {
-      "file": "skills/eval-report/fixtures/evals/travel-planner.eval.ts",
+      "file": "skills/eval-report/fixtures/evals/travel-planner.eval.json",
       "name": "a weekend itinerary has one plan per day",
       "round": 2,
       "durationMs": 10632,
@@ -658,7 +658,7 @@
       ]
     },
     {
-      "file": "skills/eval-report/fixtures/evals/travel-planner.eval.ts",
+      "file": "skills/eval-report/fixtures/evals/travel-planner.eval.json",
       "name": "flight options show price, stops and times",
       "round": 1,
       "durationMs": 11609,
@@ -738,7 +738,7 @@
       ]
     },
     {
-      "file": "skills/eval-report/fixtures/evals/travel-planner.eval.ts",
+      "file": "skills/eval-report/fixtures/evals/travel-planner.eval.json",
       "name": "flight options show price, stops and times",
       "round": 2,
       "durationMs": 12586,
@@ -793,7 +793,7 @@
       ]
     },
     {
-      "file": "skills/eval-report/fixtures/evals/travel-planner.eval.ts",
+      "file": "skills/eval-report/fixtures/evals/travel-planner.eval.json",
       "name": "asks for dates before searching flights",
       "round": 1,
       "durationMs": 4563,
@@ -841,7 +841,7 @@
       ]
     },
     {
-      "file": "skills/eval-report/fixtures/evals/travel-planner.eval.ts",
+      "file": "skills/eval-report/fixtures/evals/travel-planner.eval.json",
       "name": "asks for dates before searching flights",
       "round": 2,
       "durationMs": 5540,
@@ -889,7 +889,7 @@
       ]
     },
     {
-      "file": "skills/eval-report/fixtures/evals/travel-planner.eval.ts",
+      "file": "skills/eval-report/fixtures/evals/travel-planner.eval.json",
       "name": "a visa question points to the official source",
       "round": 1,
       "durationMs": 6517,
@@ -921,7 +921,7 @@
       "mocks": []
     },
     {
-      "file": "skills/eval-report/fixtures/evals/travel-planner.eval.ts",
+      "file": "skills/eval-report/fixtures/evals/travel-planner.eval.json",
       "name": "a hotel shortlist stays within budget",
       "round": 1,
       "durationMs": 7494,
@@ -989,7 +989,7 @@
       ]
     },
     {
-      "file": "skills/eval-report/fixtures/evals/travel-planner.eval.ts",
+      "file": "skills/eval-report/fixtures/evals/travel-planner.eval.json",
       "name": "a hotel shortlist stays within budget",
       "round": 2,
       "durationMs": 8471,
@@ -1041,7 +1041,7 @@
       ]
     },
     {
-      "file": "skills/eval-report/fixtures/evals/travel-planner.eval.ts",
+      "file": "skills/eval-report/fixtures/evals/travel-planner.eval.json",
       "name": "a hotel shortlist stays within budget",
       "round": 3,
       "durationMs": 9448,
@@ -1081,7 +1081,7 @@
       ]
     },
     {
-      "file": "skills/eval-report/fixtures/evals/travel-planner.eval.ts",
+      "file": "skills/eval-report/fixtures/evals/travel-planner.eval.json",
       "name": "weather is given for the trip dates, not today",
       "round": 1,
       "durationMs": 10425,
@@ -1116,7 +1116,7 @@
       ]
     },
     {
-      "file": "skills/eval-report/fixtures/evals/travel-planner.eval.ts",
+      "file": "skills/eval-report/fixtures/evals/travel-planner.eval.json",
       "name": "a tool error is explained and retried once",
       "round": 1,
       "durationMs": 30000,
@@ -1138,7 +1138,7 @@
       ]
     },
     {
-      "file": "skills/eval-report/fixtures/evals/travel-planner.eval.ts",
+      "file": "skills/eval-report/fixtures/evals/travel-planner.eval.json",
       "name": "a tool error is explained and retried once",
       "round": 2,
       "durationMs": 12379,
