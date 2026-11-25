@@ -4,20 +4,18 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Eval report: fixture evals</title>
+<script>try { const theme = JSON.parse(localStorage.getItem('eval-report-theme')); if (theme === 'light' || theme === 'dark') document.documentElement.dataset.theme = theme; } catch {}</script>
 <style>:root {
-  --fg: #1f2328; --muted: #59636e; --border: #d1d9e0; --canvas: #ffffff; --subtle: #f6f8fa; --link: #0969da;
-  --pass: #1a7f37; --pass-text: #116329; --pass-bg: #dafbe1;
-  --fail: #d1242f; --fail-text: #a40e26; --fail-bg: #ffebe9;
-  --code-bg: #eff2f5;
+  /* Light and dark follow the system, unless the theme switch picks one. */
+  color-scheme: light dark;
+  --fg: light-dark(#1f2328, #f0f6fc); --muted: light-dark(#59636e, #9198a1); --border: light-dark(#d1d9e0, #3d444d);
+  --canvas: light-dark(#ffffff, #0d1117); --subtle: light-dark(#f6f8fa, #151b23); --link: light-dark(#0969da, #4493f8);
+  --pass: light-dark(#1a7f37, #3fb950); --pass-text: light-dark(#116329, #56d364); --pass-bg: light-dark(#dafbe1, rgba(46, 160, 67, 0.18));
+  --fail: light-dark(#d1242f, #f85149); --fail-text: light-dark(#a40e26, #ff7b72); --fail-bg: light-dark(#ffebe9, rgba(248, 81, 73, 0.18));
+  --code-bg: light-dark(#eff2f5, #212830);
 }
-@media (prefers-color-scheme: dark) {
-  :root {
-    --fg: #f0f6fc; --muted: #9198a1; --border: #3d444d; --canvas: #0d1117; --subtle: #151b23; --link: #4493f8;
-    --pass: #3fb950; --pass-text: #56d364; --pass-bg: rgba(46, 160, 67, 0.18);
-    --fail: #f85149; --fail-text: #ff7b72; --fail-bg: rgba(248, 81, 73, 0.18);
-    --code-bg: #212830;
-  }
-}
+:root[data-theme="light"] { color-scheme: light; }
+:root[data-theme="dark"] { color-scheme: dark; }
 * { box-sizing: border-box; }
 body { margin: 0; background: var(--canvas); color: var(--fg); font: 14px/1.5 -apple-system, BlinkMacSystemFont, "Segoe UI", "Noto Sans", Helvetica, Arial, sans-serif; }
 a { color: var(--link); text-decoration: none; }
@@ -87,7 +85,7 @@ table.runs td.checks { padding: 10px 12px; }
 .case-name { font-size: 15px; font-weight: 600; }
 .case-note { font-size: 13px; color: var(--muted); margin-top: 4px; }
 .case-note strong { color: var(--fg); }
-.run-label { font-size: 12px; font-weight: 600; margin-bottom: 6px; }
+.run-label { font-size: 12px; font-weight: 600; margin-bottom: 6px; display: flex; justify-content: space-between; gap: 8px; align-items: center; }
 .run-label.pass { color: var(--pass-text); }
 .run-label.fail { color: var(--fail-text); }
 .message { margin-bottom: 8px; }
@@ -115,16 +113,24 @@ dl.pairs dd { margin: 0; }
 .fake { font-size: 12px; color: var(--muted); font-style: italic; }
 details.raw summary { cursor: pointer; color: var(--muted); font-size: 12px; margin-top: 6px; }
 pre.code { white-space: pre-wrap; background: var(--subtle); border: 1px solid var(--border); border-radius: 6px; padding: 8px; margin: 6px 0 8px; }
+input.review-box { width: 16px; height: 16px; margin: 0; flex: none; cursor: pointer; accent-color: var(--link); }
+.review { display: inline-flex; gap: 4px; align-items: center; color: var(--muted); font-weight: 500; cursor: pointer; }
+tr.run.is-reviewed > td { opacity: 0.55; }
+.changed-since { font-size: 12px; color: var(--link); margin-bottom: 6px; }
+.review-bar { background: var(--border); }
+.review-bar div { background: var(--link); }
+button.theme { padding: 4px 8px; }
+button.theme svg { fill: currentColor; }
 [hidden] { display: none !important; }
 @media (max-width: 640px) { .wrap { padding: 0 16px; } .toolbar { position: static; } }
 </style>
 </head>
-<body>
+<body data-review-store="eval-report-reviewed:marekkirejczyk/skills">
 <header class="top"><div class="wrap top-inner">
   <div class="heading">
-    <div class="context"><a href="https://github.com/marekkirejczyk/skills">marekkirejczyk/skills</a><span class="muted">·</span><a href="https://github.com/marekkirejczyk/skills/pull/14">#14 eval-report 0.12.0: a readable HTML report of every eval run</a><span class="muted">·</span><a class="sha mono" href="https://github.com/marekkirejczyk/skills/commit/523639a72ec22a04268c7cb55605f83a2d27ac88">523639a</a></div>
+    <div class="context"><a href="https://github.com/marekkirejczyk/skills">marekkirejczyk/skills</a><span class="muted">·</span><a href="https://github.com/marekkirejczyk/skills/pull/14">#14 eval-report 0.12.0: a readable HTML report of every eval run</a><span class="muted">·</span><a class="sha mono" href="https://github.com/marekkirejczyk/skills/commit/a2086979a49029b117fd94178f133424a1feca68">a208697</a></div>
     <h1>Eval report: fixture evals</h1>
-    <div class="muted small">2026-11-25 16:49 UTC · 3 files · 20 cases · 28 runs · 2m 40s of runs</div>
+    <div class="muted small">2026-11-25 17:01 UTC · 3 files · 20 cases · 28 runs · 2m 40s of runs</div>
   </div>
   <div class="stats">
     <div class="stat">
@@ -142,6 +148,11 @@ pre.code { white-space: pre-wrap; background: var(--subtle); border: 1px solid v
     <div class="stat-value"><span class="fail-text">21</span><span class="muted"> / 28</span></div>
     <div class="bar"><div style="width: 75%"></div></div>
   </div>
+    <div class="stat">
+    <div class="label">Reviewed by you</div>
+    <div class="stat-value"><span data-reviewed-count>0</span><span class="muted"> / 28</span></div>
+    <div class="bar review-bar"><div data-reviewed-bar style="width: 0%"></div></div>
+  </div>
   </div>
 </div></header>
 <nav class="toolbar"><div class="wrap toolbar-inner">
@@ -151,19 +162,24 @@ pre.code { white-space: pre-wrap; background: var(--subtle); border: 1px solid v
   <div class="filter"><span class="label">Scope</span><div class="segmented" role="group" aria-label="scope">
     <button type="button" data-filter="scope" data-value="all" aria-pressed="true">All <span class="count"></span></button><button type="button" data-filter="scope" data-value="changed" aria-pressed="">New or changed <span class="count"></span></button>
   </div></div>
+  <div class="filter"><span class="label">Review</span><div class="segmented" role="group" aria-label="review">
+    <button type="button" data-filter="review" data-value="all" aria-pressed="true">All <span class="count"></span></button><button type="button" data-filter="review" data-value="todo" aria-pressed="">To review <span class="count"></span></button><button type="button" data-filter="review" data-value="done" aria-pressed="">Reviewed <span class="count"></span></button>
+  </div></div>
   <span class="spacer"></span>
   <button type="button" class="plain" data-expand="true">Expand all</button>
   <button type="button" class="plain" data-expand="false">Collapse all</button>
+  <button type="button" class="plain theme" data-theme-switch aria-label="Colour theme: system"><svg width="16" height="16" viewBox="0 0 16 16" aria-hidden="true"><path d="M8 0a8 8 0 1 1 0 16A8 8 0 0 1 8 0Zm0 1.5v13a6.5 6.5 0 0 0 0-13Z"/></svg></button>
 </div></nav>
 <main class="wrap">
   <p class="empty no-match" hidden>No runs match these filters.</p>
   <details class="file" open>
     <summary>
+      <input type="checkbox" class="review-box" data-review-file aria-label="Mark every run in this file reviewed">
       <svg class="chevron" width="16" height="16" viewBox="0 0 16 16" aria-hidden="true"><path d="M6.22 3.22a.75.75 0 0 1 1.06 0l4.25 4.25a.75.75 0 0 1 0 1.06l-4.25 4.25a.75.75 0 0 1-1.06-1.06L9.94 8 6.22 4.28a.75.75 0 0 1 0-1.06Z"/></svg>
       <span class="mono strong file-path">test/eval-report/fixtures/evals/cars-search.eval.mjs</span>
       <span class="badge fail">9 / 12</span>
       <span class="spacer"></span>
-      <span class="muted small">8 cases</span>
+      <span class="muted small"><span data-file-reviewed>0</span> / 12 reviewed · 8 cases</span>
     </summary>
     <div class="table-scroll"><table class="runs">
       <colgroup><col class="col-input"><col class="col-output"><col class="col-checks"><col class="col-mocks"></colgroup>
@@ -171,18 +187,23 @@ pre.code { white-space: pre-wrap; background: var(--subtle); border: 1px solid v
       <tbody class="case" data-fresh="true">
     <tr class="case-head"><td colspan="4">
       <div class="case-title">
+        <input type="checkbox" class="review-box" data-review-case aria-label="Mark every run of this case reviewed">
         <svg class="icon fail" width="16" height="16" viewBox="0 0 16 16" role="img" aria-label="failed"><path d="M2.34 13.66A8 8 0 1 1 13.66 2.34 8 8 0 0 1 2.34 13.66ZM6.03 4.97a.75.75 0 0 0-1.06 1.06L6.94 8 4.97 9.97a.75.75 0 1 0 1.06 1.06L8 9.06l1.97 1.97a.75.75 0 1 0 1.06-1.06L9.06 8l1.97-1.97a.75.75 0 0 0-1.06-1.06L8 6.94Z"/></svg>
         <span class="case-name">searches are built from the brief, never said to be cars found</span>
         <span class="badge fail">1 / 2 runs</span>
         <span class="tag">New</span>
         <span class="spacer"></span>
-        <a class="mono" href="https://github.com/marekkirejczyk/skills/blob/523639a72ec22a04268c7cb55605f83a2d27ac88/test/eval-report/fixtures/evals/cars-search.eval.mjs#L14">cars-search.eval.mjs:14 ↗</a>
+        <a class="mono" href="https://github.com/marekkirejczyk/skills/blob/a2086979a49029b117fd94178f133424a1feca68/test/eval-report/fixtures/evals/cars-search.eval.mjs#L14">cars-search.eval.mjs:14 ↗</a>
       </div>
       <div class="case-note"><strong>Rule:</strong> Instructions, ‘Searches on listing sites’: say what the cards are; never say you have found the cars behind a link</div>
       <div class="case-note"><strong>Note:</strong> Intermittent: Gemini sometimes counts the cars behind the links.</div>
     </td></tr>
-    <tr class="run" data-passed="true">
-    <td><div class="run-label pass">Run 1 · passed · 4.7s</div><p>I want a diesel Skoda Octavia estate, up to £12,000. Show me what’s out there.</p></td>
+    <tr class="run" data-passed="true" data-key="test/eval-report/fixtures/evals/cars-search.eval.mjs::searches are built from the brief, never said to be cars found#1" data-fingerprint="24f5a7a86214">
+    <td>
+      <div class="run-label pass"><span>Run 1 · passed · 4.7s</span><label class="review"><input type="checkbox" class="review-box" data-review-run aria-label="Reviewed"> Reviewed</label></div>
+      <div class="changed-since" hidden>Changed since you reviewed it</div>
+      <p>I want a diesel Skoda Octavia estate, up to £12,000. Show me what’s out there.</p>
+    </td>
     <td class="output"><p>The sites we read don’t have any diesel Octavia estates under £12,000 right now. I’ve set up searches on Auto Trader, Gumtree and eBay below so you can look across the wider market.</p><p>What sort of mileage or gearbox did you have in mind?</p><div class="card">
         <div class="card-title">3 search cards</div>
         <p>Skoda Octavia, diesel, up to £12,000 → autotrader.co.uk, gumtree.com, ebay.co.uk</p>
@@ -250,8 +271,12 @@ pre.code { white-space: pre-wrap; background: var(--subtle); border: 1px solid v
     }
   }
 ]</pre></details></td>
-  </tr><tr class="run" data-passed="">
-    <td><div class="run-label fail">Run 2 · failed · 5.4s</div><p>I want a diesel Skoda Octavia estate, up to £12,000. Show me what’s out there.</p></td>
+  </tr><tr class="run" data-passed="" data-key="test/eval-report/fixtures/evals/cars-search.eval.mjs::searches are built from the brief, never said to be cars found#2" data-fingerprint="014fc185dcd2">
+    <td>
+      <div class="run-label fail"><span>Run 2 · failed · 5.4s</span><label class="review"><input type="checkbox" class="review-box" data-review-run aria-label="Reviewed"> Reviewed</label></div>
+      <div class="changed-since" hidden>Changed since you reviewed it</div>
+      <p>I want a diesel Skoda Octavia estate, up to £12,000. Show me what’s out there.</p>
+    </td>
     <td class="output"><p>I found <strong>14</strong> diesel Octavia estates under £12,000 across these sites:</p><div class="card">
         <div class="card-title">3 search cards</div>
         <p>Skoda Octavia, diesel, up to £12,000 → autotrader.co.uk, gumtree.com, ebay.co.uk</p>
@@ -323,18 +348,23 @@ pre.code { white-space: pre-wrap; background: var(--subtle); border: 1px solid v
   </tbody><tbody class="case" data-fresh="true">
     <tr class="case-head"><td colspan="4">
       <div class="case-title">
+        <input type="checkbox" class="review-box" data-review-case aria-label="Mark every run of this case reviewed">
         <svg class="icon pass" width="16" height="16" viewBox="0 0 16 16" role="img" aria-label="passed"><path d="M8 16A8 8 0 1 1 8 0a8 8 0 0 1 0 16Zm3.78-9.72a.75.75 0 0 0-1.06-1.06L6.75 9.19 5.28 7.72a.75.75 0 0 0-1.06 1.06l2 2a.75.75 0 0 0 1.06 0Z"/></svg>
         <span class="case-name">a full postcode and distance go into the searches</span>
         <span class="badge pass">2 / 2 runs</span>
         <span class="tag">New</span>
         <span class="spacer"></span>
-        <a class="mono" href="https://github.com/marekkirejczyk/skills/blob/523639a72ec22a04268c7cb55605f83a2d27ac88/test/eval-report/fixtures/evals/cars-search.eval.mjs#L37">cars-search.eval.mjs:37 ↗</a>
+        <a class="mono" href="https://github.com/marekkirejczyk/skills/blob/a2086979a49029b117fd94178f133424a1feca68/test/eval-report/fixtures/evals/cars-search.eval.mjs#L37">cars-search.eval.mjs:37 ↗</a>
       </div>
       <div class="case-note"><strong>Rule:</strong> Instructions, ‘Searches on listing sites’: give it their postcode with how far they will travel</div>
       
     </td></tr>
-    <tr class="run" data-passed="true">
-    <td><div class="run-label pass">Run 1 · passed · 4.7s</div><p>Petrol Ford Focus within 30 miles of LS1 4AP, up to £9,000 please.</p></td>
+    <tr class="run" data-passed="true" data-key="test/eval-report/fixtures/evals/cars-search.eval.mjs::a full postcode and distance go into the searches#1" data-fingerprint="9b62785e6773">
+    <td>
+      <div class="run-label pass"><span>Run 1 · passed · 4.7s</span><label class="review"><input type="checkbox" class="review-box" data-review-run aria-label="Reviewed"> Reviewed</label></div>
+      <div class="changed-since" hidden>Changed since you reviewed it</div>
+      <p>Petrol Ford Focus within 30 miles of LS1 4AP, up to £9,000 please.</p>
+    </td>
     <td class="output"><p class="muted no-words">(no words)</p><div class="card">
         <div class="card-title">Question card</div>
         <p>Which gearbox would you prefer?</p>
@@ -401,8 +431,12 @@ pre.code { white-space: pre-wrap; background: var(--subtle); border: 1px solid v
     &quot;result&quot;: &quot;shown&quot;
   }
 ]</pre></details></td>
-  </tr><tr class="run" data-passed="true">
-    <td><div class="run-label pass">Run 2 · passed · 5.4s</div><p>Petrol Ford Focus within 30 miles of LS1 4AP, up to £9,000 please.</p></td>
+  </tr><tr class="run" data-passed="true" data-key="test/eval-report/fixtures/evals/cars-search.eval.mjs::a full postcode and distance go into the searches#2" data-fingerprint="ddaac5a6c6ce">
+    <td>
+      <div class="run-label pass"><span>Run 2 · passed · 5.4s</span><label class="review"><input type="checkbox" class="review-box" data-review-run aria-label="Reviewed"> Reviewed</label></div>
+      <div class="changed-since" hidden>Changed since you reviewed it</div>
+      <p>Petrol Ford Focus within 30 miles of LS1 4AP, up to £9,000 please.</p>
+    </td>
     <td class="output"><p>Here are searches near Leeds. Manual or automatic?</p><div class="card">
         <div class="card-title">3 search cards</div>
         <p>Ford Focus, petrol, up to £9,000, within 30 miles of LS1 4AP → autotrader.co.uk, gumtree.com, ebay.co.uk</p>
@@ -459,18 +493,23 @@ pre.code { white-space: pre-wrap; background: var(--subtle); border: 1px solid v
   </tbody><tbody class="case" data-fresh="true">
     <tr class="case-head"><td colspan="4">
       <div class="case-title">
+        <input type="checkbox" class="review-box" data-review-case aria-label="Mark every run of this case reviewed">
         <svg class="icon pass" width="16" height="16" viewBox="0 0 16 16" role="img" aria-label="passed"><path d="M8 16A8 8 0 1 1 8 0a8 8 0 0 1 0 16Zm3.78-9.72a.75.75 0 0 0-1.06-1.06L6.75 9.19 5.28 7.72a.75.75 0 0 0-1.06 1.06l2 2a.75.75 0 0 0 1.06 0Z"/></svg>
         <span class="case-name">nearby without a postcode: links without a place, postcode asked once</span>
         <span class="badge pass">1 / 1 runs</span>
         <span class="tag">New</span>
         <span class="spacer"></span>
-        <a class="mono" href="https://github.com/marekkirejczyk/skills/blob/523639a72ec22a04268c7cb55605f83a2d27ac88/test/eval-report/fixtures/evals/cars-search.eval.mjs#L63">cars-search.eval.mjs:63 ↗</a>
+        <a class="mono" href="https://github.com/marekkirejczyk/skills/blob/a2086979a49029b117fd94178f133424a1feca68/test/eval-report/fixtures/evals/cars-search.eval.mjs#L63">cars-search.eval.mjs:63 ↗</a>
       </div>
       <div class="case-note"><strong>Rule:</strong> Instructions, ‘Searches on listing sites’: ask once for the full one, and offer the links without a location in the meantime</div>
       
     </td></tr>
-    <tr class="run" data-passed="true">
-    <td><div class="run-label pass">Run 1 · passed · 4.7s</div><p>Anything near me? Around £7k, small hatchback.</p></td>
+    <tr class="run" data-passed="true" data-key="test/eval-report/fixtures/evals/cars-search.eval.mjs::nearby without a postcode: links without a place, postcode asked once#1" data-fingerprint="24e1222c116f">
+    <td>
+      <div class="run-label pass"><span>Run 1 · passed · 4.7s</span><label class="review"><input type="checkbox" class="review-box" data-review-run aria-label="Reviewed"> Reviewed</label></div>
+      <div class="changed-since" hidden>Changed since you reviewed it</div>
+      <p>Anything near me? Around £7k, small hatchback.</p>
+    </td>
     <td class="output"><p>Here are searches for small hatchbacks up to £7,000 anywhere in the UK. What’s your full postcode, so I can narrow them to near you?</p><div class="card">
         <div class="card-title">3 search cards</div>
         <p>Hatchback, up to £7,000 → autotrader.co.uk, gumtree.com, ebay.co.uk</p>
@@ -526,18 +565,23 @@ pre.code { white-space: pre-wrap; background: var(--subtle); border: 1px solid v
   </tbody><tbody class="case" data-fresh="true">
     <tr class="case-head"><td colspan="4">
       <div class="case-title">
+        <input type="checkbox" class="review-box" data-review-case aria-label="Mark every run of this case reviewed">
         <svg class="icon fail" width="16" height="16" viewBox="0 0 16 16" role="img" aria-label="failed"><path d="M2.34 13.66A8 8 0 1 1 13.66 2.34 8 8 0 0 1 2.34 13.66ZM6.03 4.97a.75.75 0 0 0-1.06 1.06L6.94 8 4.97 9.97a.75.75 0 1 0 1.06 1.06L8 9.06l1.97 1.97a.75.75 0 1 0 1.06-1.06L9.06 8l1.97-1.97a.75.75 0 0 0-1.06-1.06L8 6.94Z"/></svg>
         <span class="case-name">a partial postcode is completed by asking once</span>
         <span class="badge fail">0 / 1 runs</span>
         <span class="tag">New</span>
         <span class="spacer"></span>
-        <a class="mono" href="https://github.com/marekkirejczyk/skills/blob/523639a72ec22a04268c7cb55605f83a2d27ac88/test/eval-report/fixtures/evals/cars-search.eval.mjs#L76">cars-search.eval.mjs:76 ↗</a>
+        <a class="mono" href="https://github.com/marekkirejczyk/skills/blob/a2086979a49029b117fd94178f133424a1feca68/test/eval-report/fixtures/evals/cars-search.eval.mjs#L76">cars-search.eval.mjs:76 ↗</a>
       </div>
       <div class="case-note"><strong>Rule:</strong> Instructions, ‘Searches on listing sites’: a district alone (LS1) is not enough for a radius</div>
       
     </td></tr>
-    <tr class="run" data-passed="">
-    <td><div class="run-label fail">Run 1 · failed · 4.7s</div><div class="message"><div class="who">buyer</div><p>Focus near LS1, 20 miles.</p></div><div class="message"><div class="who">assistant</div><p>What’s your full postcode?</p></div><div class="message"><div class="who">buyer</div><p>LS1</p></div></td>
+    <tr class="run" data-passed="" data-key="test/eval-report/fixtures/evals/cars-search.eval.mjs::a partial postcode is completed by asking once#1" data-fingerprint="20b7b79a44ba">
+    <td>
+      <div class="run-label fail"><span>Run 1 · failed · 4.7s</span><label class="review"><input type="checkbox" class="review-box" data-review-run aria-label="Reviewed"> Reviewed</label></div>
+      <div class="changed-since" hidden>Changed since you reviewed it</div>
+      <div class="message"><div class="who">buyer</div><p>Focus near LS1, 20 miles.</p></div><div class="message"><div class="who">assistant</div><p>What’s your full postcode?</p></div><div class="message"><div class="who">buyer</div><p>LS1</p></div>
+    </td>
     <td class="output"><p>What’s your full postcode? I need all of it, like LS1 4AP.</p></td>
     <td class="checks"><div class="check-group">
     <div class="label">Judge</div>
@@ -574,18 +618,23 @@ pre.code { white-space: pre-wrap; background: var(--subtle); border: 1px solid v
   </tbody><tbody class="case" data-fresh="true">
     <tr class="case-head"><td colspan="4">
       <div class="case-title">
+        <input type="checkbox" class="review-box" data-review-case aria-label="Mark every run of this case reviewed">
         <svg class="icon pass" width="16" height="16" viewBox="0 0 16 16" role="img" aria-label="passed"><path d="M8 16A8 8 0 1 1 8 0a8 8 0 0 1 0 16Zm3.78-9.72a.75.75 0 0 0-1.06-1.06L6.75 9.19 5.28 7.72a.75.75 0 0 0-1.06 1.06l2 2a.75.75 0 0 0 1.06 0Z"/></svg>
         <span class="case-name">a budget below the market is explained with what it buys</span>
         <span class="badge pass">1 / 1 runs</span>
         <span class="tag">New</span>
         <span class="spacer"></span>
-        <a class="mono" href="https://github.com/marekkirejczyk/skills/blob/523639a72ec22a04268c7cb55605f83a2d27ac88/test/eval-report/fixtures/evals/cars-search.eval.mjs#L90">cars-search.eval.mjs:90 ↗</a>
+        <a class="mono" href="https://github.com/marekkirejczyk/skills/blob/a2086979a49029b117fd94178f133424a1feca68/test/eval-report/fixtures/evals/cars-search.eval.mjs#L90">cars-search.eval.mjs:90 ↗</a>
       </div>
       <div class="case-note"><strong>Rule:</strong> Instructions, ‘Budgets’: say what the budget buys instead, never just that it is too low</div>
       
     </td></tr>
-    <tr class="run" data-passed="true">
-    <td><div class="run-label pass">Run 1 · passed · 4.7s</div><p>A 2022 BMW 3 Series for £5,000?</p></td>
+    <tr class="run" data-passed="true" data-key="test/eval-report/fixtures/evals/cars-search.eval.mjs::a budget below the market is explained with what it buys#1" data-fingerprint="f6bac1720e0e">
+    <td>
+      <div class="run-label pass"><span>Run 1 · passed · 4.7s</span><label class="review"><input type="checkbox" class="review-box" data-review-run aria-label="Reviewed"> Reviewed</label></div>
+      <div class="changed-since" hidden>Changed since you reviewed it</div>
+      <p>A 2022 BMW 3 Series for £5,000?</p>
+    </td>
     <td class="output"><p>£5,000 is well below what 2022 3 Series sell for. For that budget you could look at:</p><ul><li>a <strong>2012–2014 BMW 3 Series</strong> with higher mileage</li><li>a <strong>2017 Ford Focus</strong> or <strong>Vauxhall Astra</strong></li><li>a <strong>2016 Skoda Octavia</strong>, which holds up well</li></ul><p>Want searches for any of these?</p></td>
     <td class="checks"><div class="check-group">
     <div class="label">Judge</div>
@@ -625,18 +674,23 @@ pre.code { white-space: pre-wrap; background: var(--subtle); border: 1px solid v
   </tbody><tbody class="case" data-fresh="true">
     <tr class="case-head"><td colspan="4">
       <div class="case-title">
+        <input type="checkbox" class="review-box" data-review-case aria-label="Mark every run of this case reviewed">
         <svg class="icon pass" width="16" height="16" viewBox="0 0 16 16" role="img" aria-label="passed"><path d="M8 16A8 8 0 1 1 8 0a8 8 0 0 1 0 16Zm3.78-9.72a.75.75 0 0 0-1.06-1.06L6.75 9.19 5.28 7.72a.75.75 0 0 0-1.06 1.06l2 2a.75.75 0 0 0 1.06 0Z"/></svg>
         <span class="case-name">an unknown model name is checked, not guessed</span>
         <span class="badge pass">1 / 1 runs</span>
         <span class="tag">New</span>
         <span class="spacer"></span>
-        <a class="mono" href="https://github.com/marekkirejczyk/skills/blob/523639a72ec22a04268c7cb55605f83a2d27ac88/test/eval-report/fixtures/evals/cars-search.eval.mjs#L102">cars-search.eval.mjs:102 ↗</a>
+        <a class="mono" href="https://github.com/marekkirejczyk/skills/blob/a2086979a49029b117fd94178f133424a1feca68/test/eval-report/fixtures/evals/cars-search.eval.mjs#L102">cars-search.eval.mjs:102 ↗</a>
       </div>
       <div class="case-note"><strong>Rule:</strong> Instructions, ‘Makes and models’: ask when a model isn’t in the catalogue</div>
       
     </td></tr>
-    <tr class="run" data-passed="true">
-    <td><div class="run-label pass">Run 1 · passed · 4.7s</div><dl class="pairs"><dt>make</dt><dd>Skoda</dd><dt>model</dt><dd>Octavio</dd><dt>fuel</dt><dd>diesel</dd><dt>channel</dt><dd>web-form</dd></dl></td>
+    <tr class="run" data-passed="true" data-key="test/eval-report/fixtures/evals/cars-search.eval.mjs::an unknown model name is checked, not guessed#1" data-fingerprint="a3d7f1dbefb3">
+    <td>
+      <div class="run-label pass"><span>Run 1 · passed · 4.7s</span><label class="review"><input type="checkbox" class="review-box" data-review-run aria-label="Reviewed"> Reviewed</label></div>
+      <div class="changed-since" hidden>Changed since you reviewed it</div>
+      <dl class="pairs"><dt>make</dt><dd>Skoda</dd><dt>model</dt><dd>Octavio</dd><dt>fuel</dt><dd>diesel</dd><dt>channel</dt><dd>web-form</dd></dl>
+    </td>
     <td class="output"><p>I couldn’t find a Skoda “Octavio”. Did you mean the <strong>Octavia</strong>?</p></td>
     <td class="checks"><div class="check-group">
     <div class="label">Exact</div>
@@ -677,18 +731,23 @@ pre.code { white-space: pre-wrap; background: var(--subtle); border: 1px solid v
   </tbody><tbody class="case" data-fresh="true">
     <tr class="case-head"><td colspan="4">
       <div class="case-title">
+        <input type="checkbox" class="review-box" data-review-case aria-label="Mark every run of this case reviewed">
         <svg class="icon pass" width="16" height="16" viewBox="0 0 16 16" role="img" aria-label="passed"><path d="M8 16A8 8 0 1 1 8 0a8 8 0 0 1 0 16Zm3.78-9.72a.75.75 0 0 0-1.06-1.06L6.75 9.19 5.28 7.72a.75.75 0 0 0-1.06 1.06l2 2a.75.75 0 0 0 1.06 0Z"/></svg>
         <span class="case-name">an electric car search carries the minimum range</span>
         <span class="badge pass">3 / 3 runs</span>
         <span class="tag">New</span>
         <span class="spacer"></span>
-        <a class="mono" href="https://github.com/marekkirejczyk/skills/blob/523639a72ec22a04268c7cb55605f83a2d27ac88/test/eval-report/fixtures/evals/cars-search.eval.mjs#L112">cars-search.eval.mjs:112 ↗</a>
+        <a class="mono" href="https://github.com/marekkirejczyk/skills/blob/a2086979a49029b117fd94178f133424a1feca68/test/eval-report/fixtures/evals/cars-search.eval.mjs#L112">cars-search.eval.mjs:112 ↗</a>
       </div>
       <div class="case-note"><strong>Rule:</strong> Instructions, ‘Searches on listing sites’: put a stated range into the filters</div>
       
     </td></tr>
-    <tr class="run" data-passed="true">
-    <td><div class="run-label pass">Run 1 · passed · 3.5s</div><p>Electric, at least 250 miles of range, under £20k.</p></td>
+    <tr class="run" data-passed="true" data-key="test/eval-report/fixtures/evals/cars-search.eval.mjs::an electric car search carries the minimum range#1" data-fingerprint="1e3bc0558746">
+    <td>
+      <div class="run-label pass"><span>Run 1 · passed · 3.5s</span><label class="review"><input type="checkbox" class="review-box" data-review-run aria-label="Reviewed"> Reviewed</label></div>
+      <div class="changed-since" hidden>Changed since you reviewed it</div>
+      <p>Electric, at least 250 miles of range, under £20k.</p>
+    </td>
     <td class="output"><p>Here are searches for electric cars with 250+ miles of range under £20,000.</p><div class="card">
         <div class="card-title">3 search cards</div>
         <p>Electric, 250+ miles range, up to £20,000 → autotrader.co.uk, gumtree.com, ebay.co.uk</p>
@@ -721,8 +780,12 @@ pre.code { white-space: pre-wrap; background: var(--subtle); border: 1px solid v
     }
   }
 ]</pre></details></td>
-  </tr><tr class="run" data-passed="true">
-    <td><div class="run-label pass">Run 2 · passed · 3.9s</div><p>Electric, at least 250 miles of range, under £20k.</p></td>
+  </tr><tr class="run" data-passed="true" data-key="test/eval-report/fixtures/evals/cars-search.eval.mjs::an electric car search carries the minimum range#2" data-fingerprint="1e3bc0558746">
+    <td>
+      <div class="run-label pass"><span>Run 2 · passed · 3.9s</span><label class="review"><input type="checkbox" class="review-box" data-review-run aria-label="Reviewed"> Reviewed</label></div>
+      <div class="changed-since" hidden>Changed since you reviewed it</div>
+      <p>Electric, at least 250 miles of range, under £20k.</p>
+    </td>
     <td class="output"><p>Here are searches for electric cars with 250+ miles of range under £20,000.</p><div class="card">
         <div class="card-title">3 search cards</div>
         <p>Electric, 250+ miles range, up to £20,000 → autotrader.co.uk, gumtree.com, ebay.co.uk</p>
@@ -755,8 +818,12 @@ pre.code { white-space: pre-wrap; background: var(--subtle); border: 1px solid v
     }
   }
 ]</pre></details></td>
-  </tr><tr class="run" data-passed="true">
-    <td><div class="run-label pass">Run 3 · passed · 4.3s</div><p>Electric, at least 250 miles of range, under £20k.</p></td>
+  </tr><tr class="run" data-passed="true" data-key="test/eval-report/fixtures/evals/cars-search.eval.mjs::an electric car search carries the minimum range#3" data-fingerprint="1e3bc0558746">
+    <td>
+      <div class="run-label pass"><span>Run 3 · passed · 4.3s</span><label class="review"><input type="checkbox" class="review-box" data-review-run aria-label="Reviewed"> Reviewed</label></div>
+      <div class="changed-since" hidden>Changed since you reviewed it</div>
+      <p>Electric, at least 250 miles of range, under £20k.</p>
+    </td>
     <td class="output"><p>Here are searches for electric cars with 250+ miles of range under £20,000.</p><div class="card">
         <div class="card-title">3 search cards</div>
         <p>Electric, 250+ miles range, up to £20,000 → autotrader.co.uk, gumtree.com, ebay.co.uk</p>
@@ -793,18 +860,23 @@ pre.code { white-space: pre-wrap; background: var(--subtle); border: 1px solid v
   </tbody><tbody class="case" data-fresh="true">
     <tr class="case-head"><td colspan="4">
       <div class="case-title">
+        <input type="checkbox" class="review-box" data-review-case aria-label="Mark every run of this case reviewed">
         <svg class="icon fail" width="16" height="16" viewBox="0 0 16 16" role="img" aria-label="failed"><path d="M2.34 13.66A8 8 0 1 1 13.66 2.34 8 8 0 0 1 2.34 13.66ZM6.03 4.97a.75.75 0 0 0-1.06 1.06L6.94 8 4.97 9.97a.75.75 0 1 0 1.06 1.06L8 9.06l1.97 1.97a.75.75 0 1 0 1.06-1.06L9.06 8l1.97-1.97a.75.75 0 0 0-1.06-1.06L8 6.94Z"/></svg>
         <span class="case-name">a search tool timeout is told to the buyer</span>
         <span class="badge fail">0 / 1 runs</span>
         <span class="tag">New</span>
         <span class="spacer"></span>
-        <a class="mono" href="https://github.com/marekkirejczyk/skills/blob/523639a72ec22a04268c7cb55605f83a2d27ac88/test/eval-report/fixtures/evals/cars-search.eval.mjs#L124">cars-search.eval.mjs:124 ↗</a>
+        <a class="mono" href="https://github.com/marekkirejczyk/skills/blob/a2086979a49029b117fd94178f133424a1feca68/test/eval-report/fixtures/evals/cars-search.eval.mjs#L124">cars-search.eval.mjs:124 ↗</a>
       </div>
       <div class="case-note"><strong>Rule:</strong> Instructions, ‘Errors’: say a site didn’t answer and offer to retry</div>
       
     </td></tr>
-    <tr class="run" data-passed="">
-    <td><div class="run-label fail">Run 1 · failed · 30.4s</div><p>Any Toyota Yaris hybrids under £10k?</p></td>
+    <tr class="run" data-passed="" data-key="test/eval-report/fixtures/evals/cars-search.eval.mjs::a search tool timeout is told to the buyer#1" data-fingerprint="d45b39e61c44">
+    <td>
+      <div class="run-label fail"><span>Run 1 · failed · 30.4s</span><label class="review"><input type="checkbox" class="review-box" data-review-run aria-label="Reviewed"> Reviewed</label></div>
+      <div class="changed-since" hidden>Changed since you reviewed it</div>
+      <p>Any Toyota Yaris hybrids under £10k?</p>
+    </td>
     <td class="output"><div class="crash"><strong>Error</strong> search_links timed out after 30s; the eval stopped before a reply</div></td>
     <td class="checks"><div class="check-group">
     <div class="label">Exact</div>
@@ -839,11 +911,12 @@ pre.code { white-space: pre-wrap; background: var(--subtle); border: 1px solid v
     </table></div>
   </details><details class="file" open>
     <summary>
+      <input type="checkbox" class="review-box" data-review-file aria-label="Mark every run in this file reviewed">
       <svg class="chevron" width="16" height="16" viewBox="0 0 16 16" aria-hidden="true"><path d="M6.22 3.22a.75.75 0 0 1 1.06 0l4.25 4.25a.75.75 0 0 1 0 1.06l-4.25 4.25a.75.75 0 0 1-1.06-1.06L9.94 8 6.22 4.28a.75.75 0 0 1 0-1.06Z"/></svg>
       <span class="mono strong file-path">test/eval-report/fixtures/evals/finance-quote.eval.mjs</span>
       <span class="badge fail">6 / 9</span>
       <span class="spacer"></span>
-      <span class="muted small">7 cases</span>
+      <span class="muted small"><span data-file-reviewed>0</span> / 9 reviewed · 7 cases</span>
     </summary>
     <div class="table-scroll"><table class="runs">
       <colgroup><col class="col-input"><col class="col-output"><col class="col-checks"><col class="col-mocks"></colgroup>
@@ -851,18 +924,23 @@ pre.code { white-space: pre-wrap; background: var(--subtle); border: 1px solid v
       <tbody class="case" data-fresh="true">
     <tr class="case-head"><td colspan="4">
       <div class="case-title">
+        <input type="checkbox" class="review-box" data-review-case aria-label="Mark every run of this case reviewed">
         <svg class="icon fail" width="16" height="16" viewBox="0 0 16 16" role="img" aria-label="failed"><path d="M2.34 13.66A8 8 0 1 1 13.66 2.34 8 8 0 0 1 2.34 13.66ZM6.03 4.97a.75.75 0 0 0-1.06 1.06L6.94 8 4.97 9.97a.75.75 0 1 0 1.06 1.06L8 9.06l1.97 1.97a.75.75 0 1 0 1.06-1.06L9.06 8l1.97-1.97a.75.75 0 0 0-1.06-1.06L8 6.94Z"/></svg>
         <span class="case-name">APR is quoted only after the eligibility check</span>
         <span class="badge fail">1 / 2 runs</span>
         <span class="tag">New</span>
         <span class="spacer"></span>
-        <a class="mono" href="https://github.com/marekkirejczyk/skills/blob/523639a72ec22a04268c7cb55605f83a2d27ac88/test/eval-report/fixtures/evals/finance-quote.eval.mjs#L10">finance-quote.eval.mjs:10 ↗</a>
+        <a class="mono" href="https://github.com/marekkirejczyk/skills/blob/a2086979a49029b117fd94178f133424a1feca68/test/eval-report/fixtures/evals/finance-quote.eval.mjs#L10">finance-quote.eval.mjs:10 ↗</a>
       </div>
       <div class="case-note"><strong>Rule:</strong> Instructions, ‘Finance’: never quote a rate before check_eligibility returns</div>
       
     </td></tr>
-    <tr class="run" data-passed="">
-    <td><div class="run-label fail">Run 1 · failed · 4.7s</div><div class="message"><div class="who">buyer</div><p>What would monthly payments be on the £10,995 Golf?</p></div><div class="message"><div class="who">assistant</div><p>Over how many years?</p></div><div class="message"><div class="who">buyer</div><p>Four, with £1,500 down.</p></div></td>
+    <tr class="run" data-passed="" data-key="test/eval-report/fixtures/evals/finance-quote.eval.mjs::APR is quoted only after the eligibility check#1" data-fingerprint="ccdd69b28dd1">
+    <td>
+      <div class="run-label fail"><span>Run 1 · failed · 4.7s</span><label class="review"><input type="checkbox" class="review-box" data-review-run aria-label="Reviewed"> Reviewed</label></div>
+      <div class="changed-since" hidden>Changed since you reviewed it</div>
+      <div class="message"><div class="who">buyer</div><p>What would monthly payments be on the £10,995 Golf?</p></div><div class="message"><div class="who">assistant</div><p>Over how many years?</p></div><div class="message"><div class="who">buyer</div><p>Four, with £1,500 down.</p></div>
+    </td>
     <td class="output"><p>Here’s a rough idea, before any credit check:</p><div class="card">
         
         <ul><li><strong>Deposit</strong> £1,500</li><li><strong>Term</strong> 48 months</li><li><strong>APR</strong> 9.9% representative</li><li><strong>Monthly</strong> £239.40</li></ul>
@@ -907,8 +985,12 @@ pre.code { white-space: pre-wrap; background: var(--subtle); border: 1px solid v
     &quot;tool&quot;: &quot;check_eligibility&quot;
   }
 ]</pre></details></td>
-  </tr><tr class="run" data-passed="true">
-    <td><div class="run-label pass">Run 2 · passed · 5.4s</div><div class="message"><div class="who">buyer</div><p>What would monthly payments be on the £10,995 Golf?</p></div><div class="message"><div class="who">assistant</div><p>Over how many years?</p></div><div class="message"><div class="who">buyer</div><p>Four, with £1,500 down.</p></div></td>
+  </tr><tr class="run" data-passed="true" data-key="test/eval-report/fixtures/evals/finance-quote.eval.mjs::APR is quoted only after the eligibility check#2" data-fingerprint="d4fda2ff086b">
+    <td>
+      <div class="run-label pass"><span>Run 2 · passed · 5.4s</span><label class="review"><input type="checkbox" class="review-box" data-review-run aria-label="Reviewed"> Reviewed</label></div>
+      <div class="changed-since" hidden>Changed since you reviewed it</div>
+      <div class="message"><div class="who">buyer</div><p>What would monthly payments be on the £10,995 Golf?</p></div><div class="message"><div class="who">assistant</div><p>Over how many years?</p></div><div class="message"><div class="who">buyer</div><p>Four, with £1,500 down.</p></div>
+    </td>
     <td class="output"><p>I’ll check what you’re eligible for first; it won’t affect your credit score.</p><div class="card">
         <div class="card-title">Eligibility form</div>
         <p>Name, date of birth, address for the last 3 years</p>
@@ -947,18 +1029,23 @@ pre.code { white-space: pre-wrap; background: var(--subtle); border: 1px solid v
   </tbody><tbody class="case" data-fresh="true">
     <tr class="case-head"><td colspan="4">
       <div class="case-title">
+        <input type="checkbox" class="review-box" data-review-case aria-label="Mark every run of this case reviewed">
         <svg class="icon pass" width="16" height="16" viewBox="0 0 16 16" role="img" aria-label="passed"><path d="M8 16A8 8 0 1 1 8 0a8 8 0 0 1 0 16Zm3.78-9.72a.75.75 0 0 0-1.06-1.06L6.75 9.19 5.28 7.72a.75.75 0 0 0-1.06 1.06l2 2a.75.75 0 0 0 1.06 0Z"/></svg>
         <span class="case-name">a declined credit check is told kindly, with a next step</span>
         <span class="badge pass">1 / 1 runs</span>
         <span class="tag">New</span>
         <span class="spacer"></span>
-        <a class="mono" href="https://github.com/marekkirejczyk/skills/blob/523639a72ec22a04268c7cb55605f83a2d27ac88/test/eval-report/fixtures/evals/finance-quote.eval.mjs#L36">finance-quote.eval.mjs:36 ↗</a>
+        <a class="mono" href="https://github.com/marekkirejczyk/skills/blob/a2086979a49029b117fd94178f133424a1feca68/test/eval-report/fixtures/evals/finance-quote.eval.mjs#L36">finance-quote.eval.mjs:36 ↗</a>
       </div>
       <div class="case-note"><strong>Rule:</strong> Instructions, ‘Finance’: say plainly it was declined, and offer what is still possible</div>
       
     </td></tr>
-    <tr class="run" data-passed="true">
-    <td><div class="run-label pass">Run 1 · passed · 4.7s</div><p>Did I get approved?</p></td>
+    <tr class="run" data-passed="true" data-key="test/eval-report/fixtures/evals/finance-quote.eval.mjs::a declined credit check is told kindly, with a next step#1" data-fingerprint="a050407ec062">
+    <td>
+      <div class="run-label pass"><span>Run 1 · passed · 4.7s</span><label class="review"><input type="checkbox" class="review-box" data-review-run aria-label="Reviewed"> Reviewed</label></div>
+      <div class="changed-since" hidden>Changed since you reviewed it</div>
+      <p>Did I get approved?</p>
+    </td>
     <td class="output"><p>Not this time, sorry: the lender couldn’t offer finance on this car.</p><p>You could still buy it outright, or I can look for cars under £6,000 that other lenders cover.</p></td>
     <td class="checks"><div class="check-group">
     <div class="label">Judge</div>
@@ -995,18 +1082,23 @@ pre.code { white-space: pre-wrap; background: var(--subtle); border: 1px solid v
   </tbody><tbody class="case" data-fresh="true">
     <tr class="case-head"><td colspan="4">
       <div class="case-title">
+        <input type="checkbox" class="review-box" data-review-case aria-label="Mark every run of this case reviewed">
         <svg class="icon pass" width="16" height="16" viewBox="0 0 16 16" role="img" aria-label="passed"><path d="M8 16A8 8 0 1 1 8 0a8 8 0 0 1 0 16Zm3.78-9.72a.75.75 0 0 0-1.06-1.06L6.75 9.19 5.28 7.72a.75.75 0 0 0-1.06 1.06l2 2a.75.75 0 0 0 1.06 0Z"/></svg>
         <span class="case-name">finance options are compared in a table</span>
         <span class="badge pass">1 / 1 runs</span>
         <span class="tag">New</span>
         <span class="spacer"></span>
-        <a class="mono" href="https://github.com/marekkirejczyk/skills/blob/523639a72ec22a04268c7cb55605f83a2d27ac88/test/eval-report/fixtures/evals/finance-quote.eval.mjs#L46">finance-quote.eval.mjs:46 ↗</a>
+        <a class="mono" href="https://github.com/marekkirejczyk/skills/blob/a2086979a49029b117fd94178f133424a1feca68/test/eval-report/fixtures/evals/finance-quote.eval.mjs#L46">finance-quote.eval.mjs:46 ↗</a>
       </div>
       <div class="case-note"><strong>Rule:</strong> Instructions, ‘Finance’: show HP and PCP side by side once eligible</div>
       
     </td></tr>
-    <tr class="run" data-passed="true">
-    <td><div class="run-label pass">Run 1 · passed · 4.7s</div><p>Compare HP and PCP for me on the Golf.</p></td>
+    <tr class="run" data-passed="true" data-key="test/eval-report/fixtures/evals/finance-quote.eval.mjs::finance options are compared in a table#1" data-fingerprint="6d5ce85da0ba">
+    <td>
+      <div class="run-label pass"><span>Run 1 · passed · 4.7s</span><label class="review"><input type="checkbox" class="review-box" data-review-run aria-label="Reviewed"> Reviewed</label></div>
+      <div class="changed-since" hidden>Changed since you reviewed it</div>
+      <p>Compare HP and PCP for me on the Golf.</p>
+    </td>
     <td class="output"><p>You’re eligible with this lender. Side by side:</p><div class="card table-card">
         <div class="card-title">Golf, £10,995, £1,500 down, 48 months</div>
         <table class="mini"><thead><tr><th></th><th>HP</th><th>PCP</th></tr></thead>
@@ -1081,18 +1173,23 @@ pre.code { white-space: pre-wrap; background: var(--subtle); border: 1px solid v
   </tbody><tbody class="case" data-fresh="true">
     <tr class="case-head"><td colspan="4">
       <div class="case-title">
+        <input type="checkbox" class="review-box" data-review-case aria-label="Mark every run of this case reviewed">
         <svg class="icon pass" width="16" height="16" viewBox="0 0 16 16" role="img" aria-label="passed"><path d="M8 16A8 8 0 1 1 8 0a8 8 0 0 1 0 16Zm3.78-9.72a.75.75 0 0 0-1.06-1.06L6.75 9.19 5.28 7.72a.75.75 0 0 0-1.06 1.06l2 2a.75.75 0 0 0 1.06 0Z"/></svg>
         <span class="case-name">a deposit above the price is questioned</span>
         <span class="badge pass">1 / 1 runs</span>
         <span class="tag">New</span>
         <span class="spacer"></span>
-        <a class="mono" href="https://github.com/marekkirejczyk/skills/blob/523639a72ec22a04268c7cb55605f83a2d27ac88/test/eval-report/fixtures/evals/finance-quote.eval.mjs#L63">finance-quote.eval.mjs:63 ↗</a>
+        <a class="mono" href="https://github.com/marekkirejczyk/skills/blob/a2086979a49029b117fd94178f133424a1feca68/test/eval-report/fixtures/evals/finance-quote.eval.mjs#L63">finance-quote.eval.mjs:63 ↗</a>
       </div>
       
       
     </td></tr>
-    <tr class="run" data-passed="true">
-    <td><div class="run-label pass">Run 1 · passed · 4.7s</div><p>I’ll put down £12,000 on the £10,995 Golf.</p></td>
+    <tr class="run" data-passed="true" data-key="test/eval-report/fixtures/evals/finance-quote.eval.mjs::a deposit above the price is questioned#1" data-fingerprint="84f35476a09c">
+    <td>
+      <div class="run-label pass"><span>Run 1 · passed · 4.7s</span><label class="review"><input type="checkbox" class="review-box" data-review-run aria-label="Reviewed"> Reviewed</label></div>
+      <div class="changed-since" hidden>Changed since you reviewed it</div>
+      <p>I’ll put down £12,000 on the £10,995 Golf.</p>
+    </td>
     <td class="output"><p>That deposit is more than the car’s price. Did you mean £1,200?</p></td>
     <td class="checks"><div class="check-group">
     <div class="label">Judge</div>
@@ -1115,18 +1212,23 @@ pre.code { white-space: pre-wrap; background: var(--subtle); border: 1px solid v
   </tbody><tbody class="case" data-fresh="true">
     <tr class="case-head"><td colspan="4">
       <div class="case-title">
+        <input type="checkbox" class="review-box" data-review-case aria-label="Mark every run of this case reviewed">
         <svg class="icon fail" width="16" height="16" viewBox="0 0 16 16" role="img" aria-label="failed"><path d="M2.34 13.66A8 8 0 1 1 13.66 2.34 8 8 0 0 1 2.34 13.66ZM6.03 4.97a.75.75 0 0 0-1.06 1.06L6.94 8 4.97 9.97a.75.75 0 1 0 1.06 1.06L8 9.06l1.97 1.97a.75.75 0 1 0 1.06-1.06L9.06 8l1.97-1.97a.75.75 0 0 0-1.06-1.06L8 6.94Z"/></svg>
         <span class="case-name">no financial advice, only facts about the products</span>
         <span class="badge fail">1 / 2 runs</span>
         <span class="tag">New</span>
         <span class="spacer"></span>
-        <a class="mono" href="https://github.com/marekkirejczyk/skills/blob/523639a72ec22a04268c7cb55605f83a2d27ac88/test/eval-report/fixtures/evals/finance-quote.eval.mjs#L72">finance-quote.eval.mjs:72 ↗</a>
+        <a class="mono" href="https://github.com/marekkirejczyk/skills/blob/a2086979a49029b117fd94178f133424a1feca68/test/eval-report/fixtures/evals/finance-quote.eval.mjs#L72">finance-quote.eval.mjs:72 ↗</a>
       </div>
       <div class="case-note"><strong>Rule:</strong> Instructions, ‘Finance’: explain, never recommend which product to take</div>
       
     </td></tr>
-    <tr class="run" data-passed="true">
-    <td><div class="run-label pass">Run 1 · passed · 4.7s</div><p>Which is better for me, HP or PCP?</p></td>
+    <tr class="run" data-passed="true" data-key="test/eval-report/fixtures/evals/finance-quote.eval.mjs::no financial advice, only facts about the products#1" data-fingerprint="b3b6def85231">
+    <td>
+      <div class="run-label pass"><span>Run 1 · passed · 4.7s</span><label class="review"><input type="checkbox" class="review-box" data-review-run aria-label="Reviewed"> Reviewed</label></div>
+      <div class="changed-since" hidden>Changed since you reviewed it</div>
+      <p>Which is better for me, HP or PCP?</p>
+    </td>
     <td class="output"><p>It depends on what you want at the end:</p><ol><li><strong>HP</strong>: you own the car after the last payment.</li><li><strong>PCP</strong>: lower monthly payments, then pay the final amount, hand it back or swap.</li></ol><p>I can’t tell you which to choose, but I can show both for your car.</p></td>
     <td class="checks"><div class="check-group">
     <div class="label">Judge</div>
@@ -1145,8 +1247,12 @@ pre.code { white-space: pre-wrap; background: var(--subtle); border: 1px solid v
     </div>
   </div></td>
     <td><span class="muted">No tools run</span></td>
-  </tr><tr class="run" data-passed="">
-    <td><div class="run-label fail">Run 2 · failed · 5.4s</div><p>Which is better for me, HP or PCP?</p></td>
+  </tr><tr class="run" data-passed="" data-key="test/eval-report/fixtures/evals/finance-quote.eval.mjs::no financial advice, only facts about the products#2" data-fingerprint="04d28d6e0636">
+    <td>
+      <div class="run-label fail"><span>Run 2 · failed · 5.4s</span><label class="review"><input type="checkbox" class="review-box" data-review-run aria-label="Reviewed"> Reviewed</label></div>
+      <div class="changed-since" hidden>Changed since you reviewed it</div>
+      <p>Which is better for me, HP or PCP?</p>
+    </td>
     <td class="output"><p>Go for PCP: it’s cheaper each month and most people choose it.</p></td>
     <td class="checks"><div class="check-group">
     <div class="label">Judge</div>
@@ -1169,18 +1275,23 @@ pre.code { white-space: pre-wrap; background: var(--subtle); border: 1px solid v
   </tbody><tbody class="case" data-fresh="true">
     <tr class="case-head"><td colspan="4">
       <div class="case-title">
+        <input type="checkbox" class="review-box" data-review-case aria-label="Mark every run of this case reviewed">
         <svg class="icon pass" width="16" height="16" viewBox="0 0 16 16" role="img" aria-label="passed"><path d="M8 16A8 8 0 1 1 8 0a8 8 0 0 1 0 16Zm3.78-9.72a.75.75 0 0 0-1.06-1.06L6.75 9.19 5.28 7.72a.75.75 0 0 0-1.06 1.06l2 2a.75.75 0 0 0 1.06 0Z"/></svg>
         <span class="case-name">money is written in pounds with thousands separators</span>
         <span class="badge pass">1 / 1 runs</span>
         <span class="tag">New</span>
         <span class="spacer"></span>
-        <a class="mono" href="https://github.com/marekkirejczyk/skills/blob/523639a72ec22a04268c7cb55605f83a2d27ac88/test/eval-report/fixtures/evals/finance-quote.eval.mjs#L85">finance-quote.eval.mjs:85 ↗</a>
+        <a class="mono" href="https://github.com/marekkirejczyk/skills/blob/a2086979a49029b117fd94178f133424a1feca68/test/eval-report/fixtures/evals/finance-quote.eval.mjs#L85">finance-quote.eval.mjs:85 ↗</a>
       </div>
       
       
     </td></tr>
-    <tr class="run" data-passed="true">
-    <td><div class="run-label pass">Run 1 · passed · 4.7s</div><p>How much is the Golf all in on HP?</p></td>
+    <tr class="run" data-passed="true" data-key="test/eval-report/fixtures/evals/finance-quote.eval.mjs::money is written in pounds with thousands separators#1" data-fingerprint="99bbd74d8d24">
+    <td>
+      <div class="run-label pass"><span>Run 1 · passed · 4.7s</span><label class="review"><input type="checkbox" class="review-box" data-review-run aria-label="Reviewed"> Reviewed</label></div>
+      <div class="changed-since" hidden>Changed since you reviewed it</div>
+      <p>How much is the Golf all in on HP?</p>
+    </td>
     <td class="output"><p>On HP you’d pay <strong>£12,991</strong> in total: £1,500 down and 48 payments of £239.40.</p></td>
     <td class="checks"><div class="check-group">
     <div class="label">Exact</div>
@@ -1215,18 +1326,23 @@ pre.code { white-space: pre-wrap; background: var(--subtle); border: 1px solid v
   </tbody><tbody class="case" data-fresh="true">
     <tr class="case-head"><td colspan="4">
       <div class="case-title">
+        <input type="checkbox" class="review-box" data-review-case aria-label="Mark every run of this case reviewed">
         <svg class="icon fail" width="16" height="16" viewBox="0 0 16 16" role="img" aria-label="failed"><path d="M2.34 13.66A8 8 0 1 1 13.66 2.34 8 8 0 0 1 2.34 13.66ZM6.03 4.97a.75.75 0 0 0-1.06 1.06L6.94 8 4.97 9.97a.75.75 0 1 0 1.06 1.06L8 9.06l1.97 1.97a.75.75 0 1 0 1.06-1.06L9.06 8l1.97-1.97a.75.75 0 0 0-1.06-1.06L8 6.94Z"/></svg>
         <span class="case-name">a balloon payment is explained before it is quoted</span>
         <span class="badge fail">0 / 1 runs</span>
         <span class="tag">New</span>
         <span class="spacer"></span>
-        <a class="mono" href="https://github.com/marekkirejczyk/skills/blob/523639a72ec22a04268c7cb55605f83a2d27ac88/test/eval-report/fixtures/evals/finance-quote.eval.mjs#L94">finance-quote.eval.mjs:94 ↗</a>
+        <a class="mono" href="https://github.com/marekkirejczyk/skills/blob/a2086979a49029b117fd94178f133424a1feca68/test/eval-report/fixtures/evals/finance-quote.eval.mjs#L94">finance-quote.eval.mjs:94 ↗</a>
       </div>
       <div class="case-note"><strong>Rule:</strong> Instructions, ‘Finance’: the final payment of a PCP is named and explained the first time it appears</div>
       
     </td></tr>
-    <tr class="run" data-passed="">
-    <td><div class="run-label fail">Run 1 · failed · 4.7s</div><p>What’s the PCP on the Golf?</p></td>
+    <tr class="run" data-passed="" data-key="test/eval-report/fixtures/evals/finance-quote.eval.mjs::a balloon payment is explained before it is quoted#1" data-fingerprint="a579f5a37688">
+    <td>
+      <div class="run-label fail"><span>Run 1 · failed · 4.7s</span><label class="review"><input type="checkbox" class="review-box" data-review-run aria-label="Reviewed"> Reviewed</label></div>
+      <div class="changed-since" hidden>Changed since you reviewed it</div>
+      <p>What’s the PCP on the Golf?</p>
+    </td>
     <td class="output"><p>PCP on the Golf:</p><div class="card">
         
         <ul><li><strong>Monthly</strong> £176.10</li><li><strong>Balloon</strong> £3,850</li></ul>
@@ -1268,11 +1384,12 @@ pre.code { white-space: pre-wrap; background: var(--subtle); border: 1px solid v
     </table></div>
   </details><details class="file" open>
     <summary>
+      <input type="checkbox" class="review-box" data-review-file aria-label="Mark every run in this file reviewed">
       <svg class="chevron" width="16" height="16" viewBox="0 0 16 16" aria-hidden="true"><path d="M6.22 3.22a.75.75 0 0 1 1.06 0l4.25 4.25a.75.75 0 0 1 0 1.06l-4.25 4.25a.75.75 0 0 1-1.06-1.06L9.94 8 6.22 4.28a.75.75 0 0 1 0-1.06Z"/></svg>
       <span class="mono strong file-path">test/eval-report/fixtures/evals/support-handoff.eval.mjs</span>
       <span class="badge fail">6 / 7</span>
       <span class="spacer"></span>
-      <span class="muted small">5 cases</span>
+      <span class="muted small"><span data-file-reviewed>0</span> / 7 reviewed · 5 cases</span>
     </summary>
     <div class="table-scroll"><table class="runs">
       <colgroup><col class="col-input"><col class="col-output"><col class="col-checks"><col class="col-mocks"></colgroup>
@@ -1280,18 +1397,23 @@ pre.code { white-space: pre-wrap; background: var(--subtle); border: 1px solid v
       <tbody class="case" data-fresh="true">
     <tr class="case-head"><td colspan="4">
       <div class="case-title">
+        <input type="checkbox" class="review-box" data-review-case aria-label="Mark every run of this case reviewed">
         <svg class="icon fail" width="16" height="16" viewBox="0 0 16 16" role="img" aria-label="failed"><path d="M2.34 13.66A8 8 0 1 1 13.66 2.34 8 8 0 0 1 2.34 13.66ZM6.03 4.97a.75.75 0 0 0-1.06 1.06L6.94 8 4.97 9.97a.75.75 0 1 0 1.06 1.06L8 9.06l1.97 1.97a.75.75 0 1 0 1.06-1.06L9.06 8l1.97-1.97a.75.75 0 0 0-1.06-1.06L8 6.94Z"/></svg>
         <span class="case-name">a complaint goes to a person</span>
         <span class="badge fail">1 / 2 runs</span>
         <span class="tag">New</span>
         <span class="spacer"></span>
-        <a class="mono" href="https://github.com/marekkirejczyk/skills/blob/523639a72ec22a04268c7cb55605f83a2d27ac88/test/eval-report/fixtures/evals/support-handoff.eval.mjs#L11">support-handoff.eval.mjs:11 ↗</a>
+        <a class="mono" href="https://github.com/marekkirejczyk/skills/blob/a2086979a49029b117fd94178f133424a1feca68/test/eval-report/fixtures/evals/support-handoff.eval.mjs#L11">support-handoff.eval.mjs:11 ↗</a>
       </div>
       <div class="case-note"><strong>Rule:</strong> Instructions, ‘People’: a complaint is never handled by the assistant</div>
       
     </td></tr>
-    <tr class="run" data-passed="true">
-    <td><div class="run-label pass">Run 1 · passed · 4.7s</div><p>The car you sold me broke down after two days. I want my money back.</p></td>
+    <tr class="run" data-passed="true" data-key="test/eval-report/fixtures/evals/support-handoff.eval.mjs::a complaint goes to a person#1" data-fingerprint="cc4718aa9641">
+    <td>
+      <div class="run-label pass"><span>Run 1 · passed · 4.7s</span><label class="review"><input type="checkbox" class="review-box" data-review-run aria-label="Reviewed"> Reviewed</label></div>
+      <div class="changed-since" hidden>Changed since you reviewed it</div>
+      <p>The car you sold me broke down after two days. I want my money back.</p>
+    </td>
     <td class="output"><p>I’m sorry. I’ve passed this to our customer team with your order details; someone will call you today.</p><div class="card">
         <div class="card-title">Handoff card</div>
         <p>Complaint · order 55102 · call back today</p>
@@ -1343,8 +1465,12 @@ pre.code { white-space: pre-wrap; background: var(--subtle); border: 1px solid v
     }
   }
 ]</pre></details></td>
-  </tr><tr class="run" data-passed="">
-    <td><div class="run-label fail">Run 2 · failed · 5.4s</div><p>The car you sold me broke down after two days. I want my money back.</p></td>
+  </tr><tr class="run" data-passed="" data-key="test/eval-report/fixtures/evals/support-handoff.eval.mjs::a complaint goes to a person#2" data-fingerprint="c10eda50d730">
+    <td>
+      <div class="run-label fail"><span>Run 2 · failed · 5.4s</span><label class="review"><input type="checkbox" class="review-box" data-review-run aria-label="Reviewed"> Reviewed</label></div>
+      <div class="changed-since" hidden>Changed since you reviewed it</div>
+      <p>The car you sold me broke down after two days. I want my money back.</p>
+    </td>
     <td class="output"><p>Sorry to hear that. Under the Consumer Rights Act you can reject the car within 30 days, so I’ve started a refund for you.</p></td>
     <td class="checks"><div class="check-group">
     <div class="label">Judge</div>
@@ -1395,18 +1521,23 @@ pre.code { white-space: pre-wrap; background: var(--subtle); border: 1px solid v
   </tbody><tbody class="case" data-fresh="true">
     <tr class="case-head"><td colspan="4">
       <div class="case-title">
+        <input type="checkbox" class="review-box" data-review-case aria-label="Mark every run of this case reviewed">
         <svg class="icon pass" width="16" height="16" viewBox="0 0 16 16" role="img" aria-label="passed"><path d="M8 16A8 8 0 1 1 8 0a8 8 0 0 1 0 16Zm3.78-9.72a.75.75 0 0 0-1.06-1.06L6.75 9.19 5.28 7.72a.75.75 0 0 0-1.06 1.06l2 2a.75.75 0 0 0 1.06 0Z"/></svg>
         <span class="case-name">opening hours come from the branch tool</span>
         <span class="badge pass">1 / 1 runs</span>
         <span class="tag">New</span>
         <span class="spacer"></span>
-        <a class="mono" href="https://github.com/marekkirejczyk/skills/blob/523639a72ec22a04268c7cb55605f83a2d27ac88/test/eval-report/fixtures/evals/support-handoff.eval.mjs#L28">support-handoff.eval.mjs:28 ↗</a>
+        <a class="mono" href="https://github.com/marekkirejczyk/skills/blob/a2086979a49029b117fd94178f133424a1feca68/test/eval-report/fixtures/evals/support-handoff.eval.mjs#L28">support-handoff.eval.mjs:28 ↗</a>
       </div>
       
       
     </td></tr>
-    <tr class="run" data-passed="true">
-    <td><div class="run-label pass">Run 1 · passed · 4.7s</div><p>Are you open on Sunday?</p></td>
+    <tr class="run" data-passed="true" data-key="test/eval-report/fixtures/evals/support-handoff.eval.mjs::opening hours come from the branch tool#1" data-fingerprint="6ea02c828c8b">
+    <td>
+      <div class="run-label pass"><span>Run 1 · passed · 4.7s</span><label class="review"><input type="checkbox" class="review-box" data-review-run aria-label="Reviewed"> Reviewed</label></div>
+      <div class="changed-since" hidden>Changed since you reviewed it</div>
+      <p>Are you open on Sunday?</p>
+    </td>
     <td class="output"><p>The Leeds branch is open <strong>10:00–16:00</strong> on Sundays.</p></td>
     <td class="checks"><div class="check-group">
     <div class="label">Exact</div>
@@ -1445,18 +1576,23 @@ pre.code { white-space: pre-wrap; background: var(--subtle); border: 1px solid v
   </tbody><tbody class="case" data-fresh="true">
     <tr class="case-head"><td colspan="4">
       <div class="case-title">
+        <input type="checkbox" class="review-box" data-review-case aria-label="Mark every run of this case reviewed">
         <svg class="icon pass" width="16" height="16" viewBox="0 0 16 16" role="img" aria-label="passed"><path d="M8 16A8 8 0 1 1 8 0a8 8 0 0 1 0 16Zm3.78-9.72a.75.75 0 0 0-1.06-1.06L6.75 9.19 5.28 7.72a.75.75 0 0 0-1.06 1.06l2 2a.75.75 0 0 0 1.06 0Z"/></svg>
         <span class="case-name">a refund status is looked up across a long conversation</span>
         <span class="badge pass">1 / 1 runs</span>
         <span class="tag">New</span>
         <span class="spacer"></span>
-        <a class="mono" href="https://github.com/marekkirejczyk/skills/blob/523639a72ec22a04268c7cb55605f83a2d27ac88/test/eval-report/fixtures/evals/support-handoff.eval.mjs#L37">support-handoff.eval.mjs:37 ↗</a>
+        <a class="mono" href="https://github.com/marekkirejczyk/skills/blob/a2086979a49029b117fd94178f133424a1feca68/test/eval-report/fixtures/evals/support-handoff.eval.mjs#L37">support-handoff.eval.mjs:37 ↗</a>
       </div>
       
       
     </td></tr>
-    <tr class="run" data-passed="true">
-    <td><div class="run-label pass">Run 1 · passed · 4.7s</div><div class="message"><div class="who">buyer</div><p>Hi, I returned a car last week.</p></div><div class="message"><div class="who">assistant</div><p>Sorry it didn’t work out. Which email did you order with?</p></div><div class="message"><div class="who">buyer</div><p>buyer@example.com</p></div><div class="message"><div class="who">assistant</div><p>Thanks. Was it the 2017 Ford Focus delivered on 20 November?</p></div><div class="message"><div class="who">buyer</div><p>Yes. When will I get the money?</p></div></td>
+    <tr class="run" data-passed="true" data-key="test/eval-report/fixtures/evals/support-handoff.eval.mjs::a refund status is looked up across a long conversation#1" data-fingerprint="8620c0dbf389">
+    <td>
+      <div class="run-label pass"><span>Run 1 · passed · 4.7s</span><label class="review"><input type="checkbox" class="review-box" data-review-run aria-label="Reviewed"> Reviewed</label></div>
+      <div class="changed-since" hidden>Changed since you reviewed it</div>
+      <div class="message"><div class="who">buyer</div><p>Hi, I returned a car last week.</p></div><div class="message"><div class="who">assistant</div><p>Sorry it didn’t work out. Which email did you order with?</p></div><div class="message"><div class="who">buyer</div><p>buyer@example.com</p></div><div class="message"><div class="who">assistant</div><p>Thanks. Was it the 2017 Ford Focus delivered on 20 November?</p></div><div class="message"><div class="who">buyer</div><p>Yes. When will I get the money?</p></div>
+    </td>
     <td class="output"><p>Your refund of <strong>£8,450</strong> was sent on 24 November. Banks usually take 3–5 working days, so it should arrive by 29 November.</p></td>
     <td class="checks"><div class="check-group">
     <div class="label">Exact</div>
@@ -1508,18 +1644,23 @@ pre.code { white-space: pre-wrap; background: var(--subtle); border: 1px solid v
   </tbody><tbody class="case" data-fresh="true">
     <tr class="case-head"><td colspan="4">
       <div class="case-title">
+        <input type="checkbox" class="review-box" data-review-case aria-label="Mark every run of this case reviewed">
         <svg class="icon pass" width="16" height="16" viewBox="0 0 16 16" role="img" aria-label="passed"><path d="M8 16A8 8 0 1 1 8 0a8 8 0 0 1 0 16Zm3.78-9.72a.75.75 0 0 0-1.06-1.06L6.75 9.19 5.28 7.72a.75.75 0 0 0-1.06 1.06l2 2a.75.75 0 0 0 1.06 0Z"/></svg>
         <span class="case-name">an abusive message gets one calm reply</span>
         <span class="badge pass">1 / 1 runs</span>
         <span class="tag">New</span>
         <span class="spacer"></span>
-        <a class="mono" href="https://github.com/marekkirejczyk/skills/blob/523639a72ec22a04268c7cb55605f83a2d27ac88/test/eval-report/fixtures/evals/support-handoff.eval.mjs#L52">support-handoff.eval.mjs:52 ↗</a>
+        <a class="mono" href="https://github.com/marekkirejczyk/skills/blob/a2086979a49029b117fd94178f133424a1feca68/test/eval-report/fixtures/evals/support-handoff.eval.mjs#L52">support-handoff.eval.mjs:52 ↗</a>
       </div>
       <div class="case-note"><strong>Rule:</strong> Instructions, ‘People’: stay calm, don&#39;t mirror the tone, offer a person</div>
       
     </td></tr>
-    <tr class="run" data-passed="true">
-    <td><div class="run-label pass">Run 1 · passed · 4.7s</div><p>This is useless. You people are crooks.</p></td>
+    <tr class="run" data-passed="true" data-key="test/eval-report/fixtures/evals/support-handoff.eval.mjs::an abusive message gets one calm reply#1" data-fingerprint="ad341c9c1839">
+    <td>
+      <div class="run-label pass"><span>Run 1 · passed · 4.7s</span><label class="review"><input type="checkbox" class="review-box" data-review-run aria-label="Reviewed"> Reviewed</label></div>
+      <div class="changed-since" hidden>Changed since you reviewed it</div>
+      <p>This is useless. You people are crooks.</p>
+    </td>
     <td class="output"><p>I’m sorry this has been frustrating. Would you like me to put you through to someone on the team?</p></td>
     <td class="checks"><div class="check-group">
     <div class="label">Judge</div>
@@ -1542,18 +1683,23 @@ pre.code { white-space: pre-wrap; background: var(--subtle); border: 1px solid v
   </tbody><tbody class="case" data-fresh="true">
     <tr class="case-head"><td colspan="4">
       <div class="case-title">
+        <input type="checkbox" class="review-box" data-review-case aria-label="Mark every run of this case reviewed">
         <svg class="icon pass" width="16" height="16" viewBox="0 0 16 16" role="img" aria-label="passed"><path d="M8 16A8 8 0 1 1 8 0a8 8 0 0 1 0 16Zm3.78-9.72a.75.75 0 0 0-1.06-1.06L6.75 9.19 5.28 7.72a.75.75 0 0 0-1.06 1.06l2 2a.75.75 0 0 0 1.06 0Z"/></svg>
         <span class="case-name">a test drive is booked from the slots offered</span>
         <span class="badge pass">2 / 2 runs</span>
         <span class="tag">New</span>
         <span class="spacer"></span>
-        <a class="mono" href="https://github.com/marekkirejczyk/skills/blob/523639a72ec22a04268c7cb55605f83a2d27ac88/test/eval-report/fixtures/evals/support-handoff.eval.mjs#L62">support-handoff.eval.mjs:62 ↗</a>
+        <a class="mono" href="https://github.com/marekkirejczyk/skills/blob/a2086979a49029b117fd94178f133424a1feca68/test/eval-report/fixtures/evals/support-handoff.eval.mjs#L62">support-handoff.eval.mjs:62 ↗</a>
       </div>
       
       
     </td></tr>
-    <tr class="run" data-passed="true">
-    <td><div class="run-label pass">Run 1 · passed · 5.5s</div><p>Can I test drive the Octavia this weekend?</p></td>
+    <tr class="run" data-passed="true" data-key="test/eval-report/fixtures/evals/support-handoff.eval.mjs::a test drive is booked from the slots offered#1" data-fingerprint="21fc66dfcabe">
+    <td>
+      <div class="run-label pass"><span>Run 1 · passed · 5.5s</span><label class="review"><input type="checkbox" class="review-box" data-review-run aria-label="Reviewed"> Reviewed</label></div>
+      <div class="changed-since" hidden>Changed since you reviewed it</div>
+      <p>Can I test drive the Octavia this weekend?</p>
+    </td>
     <td class="output"><p>These slots are free at the Leeds branch:</p><div class="card">
         <div class="card-title">Question card</div>
         <p>Which time suits you?</p>
@@ -1591,8 +1737,12 @@ pre.code { white-space: pre-wrap; background: var(--subtle); border: 1px solid v
     ]
   }
 ]</pre></details></td>
-  </tr><tr class="run" data-passed="true">
-    <td><div class="run-label pass">Run 2 · passed · 5.8s</div><p>Can I test drive the Octavia this weekend?</p></td>
+  </tr><tr class="run" data-passed="true" data-key="test/eval-report/fixtures/evals/support-handoff.eval.mjs::a test drive is booked from the slots offered#2" data-fingerprint="21fc66dfcabe">
+    <td>
+      <div class="run-label pass"><span>Run 2 · passed · 5.8s</span><label class="review"><input type="checkbox" class="review-box" data-review-run aria-label="Reviewed"> Reviewed</label></div>
+      <div class="changed-since" hidden>Changed since you reviewed it</div>
+      <p>Can I test drive the Octavia this weekend?</p>
+    </td>
     <td class="output"><p>These slots are free at the Leeds branch:</p><div class="card">
         <div class="card-title">Question card</div>
         <p>Which time suits you?</p>
@@ -1635,66 +1785,155 @@ pre.code { white-space: pre-wrap; background: var(--subtle); border: 1px solid v
     </table></div>
   </details>
 </main>
-<script>// Filters runs by status and scope, keeping the choice in the URL hash
-// (#status=failed&scope=changed) so a filtered view can be linked.
+<script>// Filters, review ticks, expand/collapse and the theme switch.
+// Filters live in the URL hash (#status=failed&scope=changed&review=todo), so a
+// filtered view can be linked. Review ticks and the theme live in this
+// browser's localStorage: they are each reviewer's own and outlast the report.
 (() => {
-  const filters = { status: 'all', scope: 'all' };
-  const runs = [...document.querySelectorAll('tr.run')];
+  const all = (selector, root = document) => [...root.querySelectorAll(selector)];
+  const runs = all('tr.run');
 
-  const isFresh = (run) => run.closest('tbody.case').dataset.fresh === 'true';
-  const matchesStatus = (run, status) => status === 'all' || (status === 'passed') === (run.dataset.passed === 'true');
-  const matchesScope = (run, scope) => scope === 'all' || isFresh(run);
+  const storage = {
+    read(key, fallback) {
+      try {
+        return JSON.parse(localStorage.getItem(key)) ?? fallback;
+      } catch {
+        return fallback;
+      }
+    },
+    write(key, value) {
+      try {
+        localStorage.setItem(key, JSON.stringify(value));
+      } catch {
+        // Private windows and blocked storage: ticks last until the page closes.
+      }
+    },
+  };
+
+  // ---- Review ticks: { "<file>::<case>#<round>": "<fingerprint>" } ----
+  const reviewKey = document.body.dataset.reviewStore;
+  const reviewed = storage.read(reviewKey, {});
+  const isReviewed = (run) => reviewed[run.dataset.key] === run.dataset.fingerprint;
+  const changedSince = (run) => run.dataset.key in reviewed && !isReviewed(run);
+
+  function markReviewed(rows, on) {
+    for (const run of rows) {
+      if (on) reviewed[run.dataset.key] = run.dataset.fingerprint;
+      else delete reviewed[run.dataset.key];
+    }
+    storage.write(reviewKey, reviewed);
+    apply();
+  }
+
+  // ---- Filters ----
+  const filters = { status: 'all', scope: 'all', review: 'all' };
+  const matchers = {
+    status: (run, value) => value === 'all' || (value === 'passed') === (run.dataset.passed === 'true'),
+    scope: (run, value) => value === 'all' || run.closest('tbody.case').dataset.fresh === 'true',
+    review: (run, value) => value === 'all' || (value === 'done') === isReviewed(run),
+  };
+  const matchesOthers = (run, skipped) => Object.keys(filters).every((name) => name === skipped || matchers[name](run, filters[name]));
 
   function readHash() {
     const params = new URLSearchParams(location.hash.slice(1));
     for (const name of Object.keys(filters)) {
       const value = params.get(name);
-      const known = document.querySelector(`button[data-filter="${name}"][data-value="${value}"]`);
-      filters[name] = known ? value : 'all';
+      filters[name] = document.querySelector(`button[data-filter="${name}"][data-value="${value}"]`) ? value : 'all';
     }
   }
 
   function writeHash() {
-    const params = new URLSearchParams();
-    for (const [name, value] of Object.entries(filters)) if (value !== 'all') params.set(name, value);
+    const params = new URLSearchParams(Object.entries(filters).filter(([, value]) => value !== 'all'));
     const hash = params.toString();
-    history.replaceState(null, '', hash ? `#${hash}` : location.pathname + location.search);
+    try {
+      history.replaceState(null, '', hash ? `#${hash}` : location.href.split('#')[0]);
+    } catch {
+      // Some hosts refuse URL changes: the filter still applies, it just can't be linked.
+    }
+  }
+
+  function setGroupBox(box, rows) {
+    const done = rows.filter(isReviewed).length;
+    box.checked = rows.length > 0 && done === rows.length;
+    box.indeterminate = done > 0 && done < rows.length;
   }
 
   function apply() {
-    for (const run of runs) run.hidden = !(matchesStatus(run, filters.status) && matchesScope(run, filters.scope));
-    for (const evalCase of document.querySelectorAll('tbody.case')) evalCase.hidden = !evalCase.querySelector('tr.run:not([hidden])');
-    for (const file of document.querySelectorAll('details.file')) file.hidden = !file.querySelector('tbody.case:not([hidden])');
-    for (const button of document.querySelectorAll('button[data-filter]')) {
+    for (const run of runs) {
+      run.hidden = !matchesOthers(run, null);
+      run.classList.toggle('is-reviewed', isReviewed(run));
+      run.querySelector('[data-review-run]').checked = isReviewed(run);
+      run.querySelector('.changed-since').hidden = !changedSince(run);
+    }
+    for (const evalCase of all('tbody.case')) {
+      evalCase.hidden = !evalCase.querySelector('tr.run:not([hidden])');
+      setGroupBox(evalCase.querySelector('[data-review-case]'), all('tr.run', evalCase));
+    }
+    for (const file of all('details.file')) {
+      const rows = all('tr.run', file);
+      file.hidden = !file.querySelector('tbody.case:not([hidden])');
+      setGroupBox(file.querySelector('[data-review-file]'), rows);
+      file.querySelector('[data-file-reviewed]').textContent = rows.filter(isReviewed).length;
+    }
+    for (const button of all('button[data-filter]')) {
       const { filter, value } = button.dataset;
       button.setAttribute('aria-pressed', String(filters[filter] === value));
-      const count = filter === 'status'
-        ? runs.filter((run) => matchesScope(run, filters.scope) && matchesStatus(run, value)).length
-        : runs.filter((run) => matchesStatus(run, filters.status) && matchesScope(run, value)).length;
-      button.querySelector('.count').textContent = count;
+      button.querySelector('.count').textContent = runs.filter((run) => matchesOthers(run, filter) && matchers[filter](run, value)).length;
     }
+    const done = runs.filter(isReviewed).length;
+    document.querySelector('[data-reviewed-count]').textContent = done;
+    document.querySelector('[data-reviewed-bar]').style.width = `${runs.length ? (100 * done) / runs.length : 0}%`;
     const noMatch = document.querySelector('.no-match');
     if (noMatch) noMatch.hidden = runs.length === 0 || runs.some((run) => !run.hidden);
   }
 
+  // ---- Theme: the system's → light → dark ----
+  const themes = ['system', 'light', 'dark'];
+  const themeButton = document.querySelector('[data-theme-switch]');
+  const currentTheme = () => document.documentElement.dataset.theme ?? 'system';
+  function showTheme() {
+    const label = `Colour theme: ${currentTheme()}`;
+    themeButton.title = `${label} (click to change)`;
+    themeButton.setAttribute('aria-label', label);
+  }
+
+  // ---- Events ----
   document.addEventListener('click', (event) => {
     const filterButton = event.target.closest('button[data-filter]');
     if (filterButton) {
       filters[filterButton.dataset.filter] = filterButton.dataset.value;
-      writeHash();
       apply();
+      writeHash();
     }
     const expandButton = event.target.closest('button[data-expand]');
-    if (expandButton) {
-      for (const file of document.querySelectorAll('details.file')) file.open = expandButton.dataset.expand === 'true';
+    if (expandButton) for (const file of all('details.file')) file.open = expandButton.dataset.expand === 'true';
+    if (event.target.closest('[data-theme-switch]')) {
+      const next = themes[(themes.indexOf(currentTheme()) + 1) % themes.length];
+      if (next === 'system') delete document.documentElement.dataset.theme;
+      else document.documentElement.dataset.theme = next;
+      storage.write('eval-report-theme', next);
+      showTheme();
     }
+  });
+  document.addEventListener('change', (event) => {
+    const box = event.target;
+    if (box.matches('[data-review-run]')) markReviewed([box.closest('tr.run')], box.checked);
+    else if (box.matches('[data-review-case]')) markReviewed(all('tr.run', box.closest('tbody.case')), box.checked);
+    else if (box.matches('[data-review-file]')) markReviewed(all('tr.run', box.closest('details.file')), box.checked);
   });
   window.addEventListener('hashchange', () => {
     readHash();
     apply();
   });
+
   readHash();
   apply();
+  showTheme();
+  // A file you have reviewed completely starts folded.
+  for (const file of all('details.file')) {
+    const rows = all('tr.run', file);
+    if (rows.length && rows.every(isReviewed)) file.open = false;
+  }
 })();
 </script>
 </body>
