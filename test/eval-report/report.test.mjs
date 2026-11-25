@@ -53,6 +53,10 @@ describe('eval-report.mjs run on the fixture evals', () => {
     assert.match(page, /<div class="check pass">/);
   });
 
+  it('shows the tools\' arguments and results as JSON that folds', () => {
+    assert.match(page, /<details class="raw"><summary>Arguments and results<\/summary><div class="json"><details class="json-fold" open>/);
+  });
+
   it('loads nothing from the network', () => {
     assert.doesNotMatch(page, /<(script|link)[^>]+(src|href)="http/);
   });

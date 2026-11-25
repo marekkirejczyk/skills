@@ -96,7 +96,7 @@ table.mini th, table.mini td { border: 1px solid var(--border); padding: 3px 6px
 dl.pairs { display: grid; grid-template-columns: max-content 1fr; gap: 2px 10px; }
 dl.pairs dt { font-weight: 600; color: var(--muted); }
 dl.pairs dd { margin: 0; min-width: 0; }
-dl.pairs pre.code, li > pre.code { margin: 2px 0 4px; }
+dl.pairs .json, li > .json { margin: 2px 0 4px; }
 .crash { background: var(--fail-bg); color: var(--fail-text); border-radius: 6px; padding: 6px 8px; margin-bottom: 8px; }
 .check-group { margin-bottom: 6px; }
 .check-group .label { margin: 2px 0 4px 8px; }
@@ -108,8 +108,16 @@ dl.pairs pre.code, li > pre.code { margin: 2px 0 4px; }
 .why { font-size: 12px; color: var(--fail-text); margin-top: 2px; }
 .mock { font-size: 13px; margin-bottom: 4px; }
 .fake { font-size: 12px; color: var(--muted); font-style: italic; }
-details.raw summary { cursor: pointer; color: var(--muted); font-size: 12px; margin-top: 6px; }
+details.raw > summary { cursor: pointer; color: var(--muted); font-size: 12px; margin-top: 6px; }
 pre.code { white-space: pre-wrap; overflow-wrap: anywhere; background: var(--subtle); border: 1px solid var(--border); border-radius: 6px; padding: 8px; margin: 6px 0 8px; }
+.json { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: 12px; line-height: 1.5; background: var(--subtle); border: 1px solid var(--border); border-radius: 6px; padding: 8px 8px 8px 22px; margin: 6px 0 8px; }
+.json-line, .json-fold > summary { white-space: pre-wrap; overflow-wrap: anywhere; }
+.json-children { padding-left: 2ch; }
+.json-fold > summary { list-style: none; cursor: pointer; position: relative; }
+.json-fold > summary::-webkit-details-marker { display: none; }
+.json-fold > summary::before { content: "▸"; position: absolute; left: -14px; color: var(--muted); }
+.json-fold[open] > summary::before { content: "▾"; }
+.json-fold:not([open]) > summary::after { content: attr(data-folded); color: var(--muted); }
 input.review-box { width: 16px; height: 16px; margin: 0; flex: none; cursor: pointer; accent-color: var(--link); }
 .review { white-space: nowrap; display: inline-flex; gap: 4px; align-items: center; color: var(--muted); font-weight: 500; cursor: pointer; }
 tr.run.is-reviewed > td { opacity: 0.55; }

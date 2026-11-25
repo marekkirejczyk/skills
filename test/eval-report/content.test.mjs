@@ -1,6 +1,6 @@
 import { describe, it } from 'node:test';
 import assert from 'node:assert/strict';
-import { renderInput, renderMarkdown, renderOutput, renderValue, summarizeValue } from '../../skills/eval-report/scripts/lib/content.mjs';
+import { renderInput, renderJson, renderMarkdown, renderOutput, renderValue, summarizeValue } from '../../skills/eval-report/scripts/lib/content.mjs';
 import { html } from '../../skills/eval-report/scripts/lib/html.mjs';
 
 const text = (markup) => String(markup).replace(/\s+/g, ' ').trim();
@@ -104,12 +104,35 @@ describe('renderOutput', () => {
 });
 
 describe('renderValue', () => {
-  it('shows nested values as JSON indented by two spaces', () => {
-    assert.equal(String(renderValue({ a: { b: 1, c: ['x'] } })), '<dl class="pairs"><dt>a</dt><dd><pre class="code">{\n  &quot;b&quot;: 1,\n  &quot;c&quot;: [\n    &quot;x&quot;\n  ]\n}</pre></dd></dl>');
+  it('shows a nested value as JSON that folds', () => {
+    assert.equal(String(renderValue({ a: { b: 1 } })), `<dl class="pairs"><dt>a</dt><dd>${renderJson({ b: 1 })}</dd></dl>`);
   });
 
-  it('indents the objects in a list the same way', () => {
-    assert.equal(String(renderValue(['plain', { b: 1 }])), '<ul><li>plain</li><li><pre class="code">{\n  &quot;b&quot;: 1\n}</pre></li></ul>');
+  it('shows the objects in a list the same way', () => {
+    assert.equal(String(renderValue(['plain', { b: 1 }])), `<ul><li>plain</li><li>${renderJson({ b: 1 })}</li></ul>`);
+  });
+});
+
+describe('renderJson', () => {
+  it('makes a fold of each object and list, a line of everything else', () => {
+    assert.equal(
+      String(renderJson({ b: 1, c: ['x', null], d: {} })),
+      '<div class="json"><details class="json-fold" open><summary data-folded=" … }">{</summary><div class="json-children">' +
+        '<div class="json-line">&quot;b&quot;: 1,</div>' +
+        '<details class="json-fold" open><summary data-folded=" … ],">&quot;c&quot;: [</summary><div class="json-children">' +
+        '<div class="json-line">&quot;x&quot;,</div><div class="json-line">null</div>' +
+        '</div><div class="json-line">],</div></details>' +
+        '<div class="json-line">&quot;d&quot;: {}</div>' +
+        '</div><div class="json-line">}</div></details></div>',
+    );
+  });
+
+  it('writes a plain value as JSON', () => {
+    assert.equal(String(renderJson('a "b"')), '<div class="json"><div class="json-line">&quot;a \\&quot;b\\&quot;&quot;</div></div>');
+  });
+
+  it('escapes HTML in keys and values', () => {
+    assert.equal(String(renderJson({ '<i>': '<b>' })), '<div class="json"><details class="json-fold" open><summary data-folded=" … }">{</summary><div class="json-children"><div class="json-line">&quot;&lt;i&gt;&quot;: &quot;&lt;b&gt;&quot;</div></div><div class="json-line">}</div></details></div>');
   });
 });
 

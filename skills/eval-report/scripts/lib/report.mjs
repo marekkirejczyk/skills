@@ -3,7 +3,7 @@
 import { createHash } from 'node:crypto';
 import { readFileSync } from 'node:fs';
 import { html, trusted } from './html.mjs';
-import { renderInput, renderOutput, summarizeValue } from './content.mjs';
+import { renderInput, renderJson, renderOutput, summarizeValue } from './content.mjs';
 import { countRuns } from './results.mjs';
 
 const asset = (name) => readFileSync(new URL(`../assets/${name}`, import.meta.url), 'utf8');
@@ -66,7 +66,7 @@ function mocksCell(mocks) {
       <span class="mono strong">${mock.tool}</span> <span class="muted">→</span> ${mock.summary ?? summarizeValue(mock.result)}
       ${mock.fake ? html`<div class="fake">fake: ${mock.fake}</div>` : ''}
     </div>`)}
-    <details class="raw"><summary>Arguments and results</summary><pre class="code">${JSON.stringify(details, null, 2)}</pre></details>`;
+    <details class="raw"><summary>Arguments and results</summary>${renderJson(details)}</details>`;
 }
 
 function runRow(run) {

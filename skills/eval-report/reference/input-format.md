@@ -84,7 +84,7 @@ The command's exit code is passed through, so CI stays red when evals fail. The 
 | `card` | `title`, `body`, `options` | A card, its options as chips |
 | `list` | `title`, `items`: strings or `{ label, value }` | A bulleted card |
 | `table` | `title`, `columns`, `rows` | A small table |
-| anything else | | Its JSON as key and value pairs, a nested value as JSON indented by two spaces |
+| anything else | | Its JSON as key and value pairs. A nested value is JSON indented by two spaces, where each object and list folds away with a click |
 
 ## Writing runs from a runner
 
