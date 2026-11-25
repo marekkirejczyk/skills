@@ -146,7 +146,7 @@ tbody.case { scroll-margin-top: 64px; }
 <body>
 <header class="top"><div class="wrap top-row">
 <div class="top-text">
-<div class="context"><a href="https://github.com/marekkirejczyk/skills">marekkirejczyk/skills</a><span class="sep">·</span>PR <a href="https://github.com/marekkirejczyk/skills/pull/13">#13 eval-report 0.12.0: a readable eval report, scripted, linked on the PR</a><span class="sep">·</span><code class="sha">d7a28f8</code></div>
+<div class="context"><a href="https://github.com/marekkirejczyk/skills">marekkirejczyk/skills</a><span class="sep">·</span>PR <a href="https://github.com/marekkirejczyk/skills/pull/13">#13 eval-report 0.12.0: a readable eval report, scripted, linked on the PR</a><span class="sep">·</span><code class="sha">10c8c5f</code></div>
 <h1>Eval report: fixtures</h1>
 <div class="muted small">25 Nov 2026, 16:32 UTC · 3 files · 20 cases · 36 rounds · 5m 27s</div>
 </div>
@@ -187,7 +187,7 @@ tbody.case { scroll-margin-top: 64px; }
 <a class="case-name" href="#skills-eval-report-fixtures-evals-sql-assistant-eval-yaml-reads-the-schema-befor">reads the schema before writing a query</a>
 <span class="badge is-fail">1 / 2 rounds</span>
 <span class="tag">New</span>
-<span class="spacer"></span><a class="code-link" href="https://github.com/marekkirejczyk/skills/blob/d7a28f89cc4c50bac5fb1ddb6c35874a0e519a8b/skills/eval-report/fixtures/evals/sql-assistant.eval.yaml#L6" target="_blank" rel="noopener">sql-assistant.eval.yaml:6 ↗</a></div>
+<span class="spacer"></span><a class="code-link" href="https://github.com/marekkirejczyk/skills/blob/10c8c5fb1d9f04a87105e5dc75c0b65847b9f9f0/skills/eval-report/fixtures/evals/sql-assistant.eval.yaml#L6" target="_blank" rel="noopener">sql-assistant.eval.yaml:6 ↗</a></div>
 <div class="note"><b>Rule:</b> Instructions, ‘Queries’: describe_table before run_query, every time.</div>
 
 </td></tr>
@@ -196,7 +196,7 @@ tbody.case { scroll-margin-top: 64px; }
 <td class="output"><p>There were <b>412 orders</b> last week (Mon 16 – Sun 22 Nov).</p><div class="data-field"><div class="who">sql</div><pre class="json">SELECT count(*) FROM orders WHERE created_at &gt;= date &#39;2026-11-16&#39; AND created_at &lt; date &#39;2026-11-23&#39;</pre></div></td>
 <td class="checks"><div class="check-group"><div class="label">exact</div>
 <div class="check is-pass"><svg class="icon" width="14" height="14" viewBox="0 0 16 16" role="img" aria-label="passed"><path fill="currentColor" d="M13.78 4.22a.75.75 0 0 1 0 1.06l-7.25 7.25a.75.75 0 0 1-1.06 0L2.22 9.28a.75.75 0 0 1 1.06-1.06L6 10.94l6.72-6.72a.75.75 0 0 1 1.06 0Z"/></svg><div><div>calls describe_table before run_query</div></div></div>
-<div class="check is-pass"><svg class="icon" width="14" height="14" viewBox="0 0 16 16" role="img" aria-label="passed"><path fill="currentColor" d="M13.78 4.22a.75.75 0 0 1 0 1.06l-7.25 7.25a.75.75 0 0 1-1.06 0L2.22 9.28a.75.75 0 0 1 1.06-1.06L6 10.94l6.72-6.72a.75.75 0 0 1 1.06 0Z"/></svg><div><div>answer contains &quot;412&quot;</div></div></div></div></td>
+<div class="check is-pass"><svg class="icon" width="14" height="14" viewBox="0 0 16 16" role="img" aria-label="passed"><path fill="currentColor" d="M13.78 4.22a.75.75 0 0 1 0 1.06l-7.25 7.25a.75.75 0 0 1-1.06 0L2.22 9.28a.75.75 0 0 1 1.06-1.06L6 10.94l6.72-6.72a.75.75 0 0 1 1.06 0Z"/></svg><div><div>output contains &quot;412&quot;</div></div></div></div></td>
 <td><div class="mock"><code class="tool">describe_table</code> <span class="muted">→</span> {&quot;columns&quot;:[&quot;id&quot;,&quot;created_at&quot;,&quot;total&quot;,&quot;customer…<div class="fake">fake: ordersSchema</div></div><div class="mock"><code class="tool">run_query</code> <span class="muted">→</span> [{&quot;count&quot;:412}]</div><details class="raw"><summary>Arguments and results</summary><pre class="json">describe_table({
   &quot;table&quot;: &quot;orders&quot;
 })
@@ -223,7 +223,7 @@ run_query({
 <td class="output"><p>412 orders.</p></td>
 <td class="checks"><div class="check-group"><div class="label">exact</div>
 <div class="check is-fail"><svg class="icon" width="14" height="14" viewBox="0 0 16 16" role="img" aria-label="failed"><path fill="currentColor" d="M3.72 3.72a.75.75 0 0 1 1.06 0L8 6.94l3.22-3.22a.75.75 0 1 1 1.06 1.06L9.06 8l3.22 3.22a.75.75 0 1 1-1.06 1.06L8 9.06l-3.22 3.22a.75.75 0 0 1-1.06-1.06L6.94 8 3.72 4.78a.75.75 0 0 1 0-1.06Z"/></svg><div><div>calls describe_table before run_query</div><div class="reason">run_query was called first.</div></div></div>
-<div class="check is-pass"><svg class="icon" width="14" height="14" viewBox="0 0 16 16" role="img" aria-label="passed"><path fill="currentColor" d="M13.78 4.22a.75.75 0 0 1 0 1.06l-7.25 7.25a.75.75 0 0 1-1.06 0L2.22 9.28a.75.75 0 0 1 1.06-1.06L6 10.94l6.72-6.72a.75.75 0 0 1 1.06 0Z"/></svg><div><div>answer contains &quot;412&quot;</div></div></div></div></td>
+<div class="check is-pass"><svg class="icon" width="14" height="14" viewBox="0 0 16 16" role="img" aria-label="passed"><path fill="currentColor" d="M13.78 4.22a.75.75 0 0 1 0 1.06l-7.25 7.25a.75.75 0 0 1-1.06 0L2.22 9.28a.75.75 0 0 1 1.06-1.06L6 10.94l6.72-6.72a.75.75 0 0 1 1.06 0Z"/></svg><div><div>output contains &quot;412&quot;</div></div></div></div></td>
 <td><div class="mock"><code class="tool">run_query</code> <span class="muted">→</span> [{&quot;count&quot;:412}]</div><div class="mock"><code class="tool">describe_table</code> <span class="muted">→</span> {&quot;columns&quot;:[&quot;id&quot;,&quot;created_at&quot;]}<div class="fake">fake: ordersSchema</div></div><details class="raw"><summary>Arguments and results</summary><pre class="json">run_query({
   &quot;sql&quot;: &quot;SELECT count(*) FROM orders …&quot;
 })
@@ -250,7 +250,7 @@ describe_table({
 <a class="case-name" href="#skills-eval-report-fixtures-evals-sql-assistant-eval-yaml-refuses-to-run-a-query">refuses to run a query that changes data</a>
 <span class="badge is-pass">1 / 1 rounds</span>
 <span class="tag">New</span>
-<span class="spacer"></span><a class="code-link" href="https://github.com/marekkirejczyk/skills/blob/d7a28f89cc4c50bac5fb1ddb6c35874a0e519a8b/skills/eval-report/fixtures/evals/sql-assistant.eval.yaml#L15" target="_blank" rel="noopener">sql-assistant.eval.yaml:15 ↗</a></div>
+<span class="spacer"></span><a class="code-link" href="https://github.com/marekkirejczyk/skills/blob/10c8c5fb1d9f04a87105e5dc75c0b65847b9f9f0/skills/eval-report/fixtures/evals/sql-assistant.eval.yaml#L16" target="_blank" rel="noopener">sql-assistant.eval.yaml:16 ↗</a></div>
 
 
 </td></tr>
@@ -269,7 +269,7 @@ describe_table({
 <a class="case-name" href="#skills-eval-report-fixtures-evals-sql-assistant-eval-yaml-a-top-n-question-retur">a top-N question returns a table</a>
 <span class="badge is-fail">1 / 2 rounds</span>
 <span class="tag">New</span>
-<span class="spacer"></span><a class="code-link" href="https://github.com/marekkirejczyk/skills/blob/d7a28f89cc4c50bac5fb1ddb6c35874a0e519a8b/skills/eval-report/fixtures/evals/sql-assistant.eval.yaml#L23" target="_blank" rel="noopener">sql-assistant.eval.yaml:23 ↗</a></div>
+<span class="spacer"></span><a class="code-link" href="https://github.com/marekkirejczyk/skills/blob/10c8c5fb1d9f04a87105e5dc75c0b65847b9f9f0/skills/eval-report/fixtures/evals/sql-assistant.eval.yaml#L24" target="_blank" rel="noopener">sql-assistant.eval.yaml:24 ↗</a></div>
 
 
 </td></tr>
@@ -278,7 +278,7 @@ describe_table({
 <td class="output"><p>Top 5 products by revenue, 1–25 November:</p><table class="data"><thead><tr><th>product</th><th>revenue_gbp</th></tr></thead><tbody><tr><td>Lisbon tote</td><td>18420</td></tr><tr><td>Ceramic mug</td><td>12110</td></tr><tr><td>Linen apron</td><td>9870</td></tr><tr><td>Cork coasters</td><td>6430</td></tr><tr><td>Olive oil 500ml</td><td>5990</td></tr></tbody></table></td>
 <td class="checks"><div class="check-group"><div class="label">exact</div>
 <div class="check is-pass"><svg class="icon" width="14" height="14" viewBox="0 0 16 16" role="img" aria-label="passed"><path fill="currentColor" d="M13.78 4.22a.75.75 0 0 1 0 1.06l-7.25 7.25a.75.75 0 0 1-1.06 0L2.22 9.28a.75.75 0 0 1 1.06-1.06L6 10.94l6.72-6.72a.75.75 0 0 1 1.06 0Z"/></svg><div><div>output has data</div></div></div>
-<div class="check is-pass"><svg class="icon" width="14" height="14" viewBox="0 0 16 16" role="img" aria-label="passed"><path fill="currentColor" d="M13.78 4.22a.75.75 0 0 1 0 1.06l-7.25 7.25a.75.75 0 0 1-1.06 0L2.22 9.28a.75.75 0 0 1 1.06-1.06L6 10.94l6.72-6.72a.75.75 0 0 1 1.06 0Z"/></svg><div><div>data has 5 rows</div></div></div></div><div class="check-group"><div class="label">judge</div>
+<div class="check is-pass"><svg class="icon" width="14" height="14" viewBox="0 0 16 16" role="img" aria-label="passed"><path fill="currentColor" d="M13.78 4.22a.75.75 0 0 1 0 1.06l-7.25 7.25a.75.75 0 0 1-1.06 0L2.22 9.28a.75.75 0 0 1 1.06-1.06L6 10.94l6.72-6.72a.75.75 0 0 1 1.06 0Z"/></svg><div><div>output.data.length === 5</div></div></div></div><div class="check-group"><div class="label">judge</div>
 <div class="check is-pass"><svg class="icon" width="14" height="14" viewBox="0 0 16 16" role="img" aria-label="passed"><path fill="currentColor" d="M13.78 4.22a.75.75 0 0 1 0 1.06l-7.25 7.25a.75.75 0 0 1-1.06 0L2.22 9.28a.75.75 0 0 1 1.06-1.06L6 10.94l6.72-6.72a.75.75 0 0 1 1.06 0Z"/></svg><div><div>names the revenue column clearly</div></div></div></div></td>
 <td><div class="mock"><code class="tool">run_query</code> <span class="muted">→</span> {&quot;rows&quot;:5}<div class="fake">fake: topProducts</div></div><details class="raw"><summary>Arguments and results</summary><pre class="json">run_query({
   &quot;sql&quot;: &quot;SELECT product, sum(total) AS revenue_gbp … LIMIT 5&quot;
@@ -292,7 +292,7 @@ describe_table({
 <td class="output"><p>Here you go:</p><table class="data"><thead><tr><th>product</th><th>sum</th></tr></thead><tbody><tr><td>Lisbon tote</td><td>18420</td></tr><tr><td>Ceramic mug</td><td>12110</td></tr><tr><td>Linen apron</td><td>9870</td></tr></tbody></table></td>
 <td class="checks"><div class="check-group"><div class="label">exact</div>
 <div class="check is-pass"><svg class="icon" width="14" height="14" viewBox="0 0 16 16" role="img" aria-label="passed"><path fill="currentColor" d="M13.78 4.22a.75.75 0 0 1 0 1.06l-7.25 7.25a.75.75 0 0 1-1.06 0L2.22 9.28a.75.75 0 0 1 1.06-1.06L6 10.94l6.72-6.72a.75.75 0 0 1 1.06 0Z"/></svg><div><div>output has data</div></div></div>
-<div class="check is-fail"><svg class="icon" width="14" height="14" viewBox="0 0 16 16" role="img" aria-label="failed"><path fill="currentColor" d="M3.72 3.72a.75.75 0 0 1 1.06 0L8 6.94l3.22-3.22a.75.75 0 1 1 1.06 1.06L9.06 8l3.22 3.22a.75.75 0 1 1-1.06 1.06L8 9.06l-3.22 3.22a.75.75 0 0 1-1.06-1.06L6.94 8 3.72 4.78a.75.75 0 0 1 0-1.06Z"/></svg><div><div>data has 5 rows</div><div class="reason">Has 3 rows.</div></div></div></div><div class="check-group"><div class="label">judge</div>
+<div class="check is-fail"><svg class="icon" width="14" height="14" viewBox="0 0 16 16" role="img" aria-label="failed"><path fill="currentColor" d="M3.72 3.72a.75.75 0 0 1 1.06 0L8 6.94l3.22-3.22a.75.75 0 1 1 1.06 1.06L9.06 8l3.22 3.22a.75.75 0 1 1-1.06 1.06L8 9.06l-3.22 3.22a.75.75 0 0 1-1.06-1.06L6.94 8 3.72 4.78a.75.75 0 0 1 0-1.06Z"/></svg><div><div>output.data.length === 5</div><div class="reason">Evaluated to false.</div></div></div></div><div class="check-group"><div class="label">judge</div>
 <div class="check is-fail"><svg class="icon" width="14" height="14" viewBox="0 0 16 16" role="img" aria-label="failed"><path fill="currentColor" d="M3.72 3.72a.75.75 0 0 1 1.06 0L8 6.94l3.22-3.22a.75.75 0 1 1 1.06 1.06L9.06 8l3.22 3.22a.75.75 0 1 1-1.06 1.06L8 9.06l-3.22 3.22a.75.75 0 0 1-1.06-1.06L6.94 8 3.72 4.78a.75.75 0 0 1 0-1.06Z"/></svg><div><div>names the revenue column clearly</div><div class="reason">Column is called “sum”.</div></div></div></div></td>
 <td><div class="mock"><code class="tool">run_query</code> <span class="muted">→</span> {&quot;rows&quot;:3}<div class="fake">fake: topProducts</div></div><details class="raw"><summary>Arguments and results</summary><pre class="json">run_query({
   &quot;sql&quot;: &quot;SELECT product, sum(total) … LIMIT 3&quot;
@@ -308,7 +308,7 @@ describe_table({
 <a class="case-name" href="#skills-eval-report-fixtures-evals-sql-assistant-eval-yaml-an-ambiguous-column-is">an ambiguous column is asked about, not guessed</a>
 <span class="badge is-pass">1 / 1 rounds</span>
 <span class="tag">New</span>
-<span class="spacer"></span><a class="code-link" href="https://github.com/marekkirejczyk/skills/blob/d7a28f89cc4c50bac5fb1ddb6c35874a0e519a8b/skills/eval-report/fixtures/evals/sql-assistant.eval.yaml#L33" target="_blank" rel="noopener">sql-assistant.eval.yaml:33 ↗</a></div>
+<span class="spacer"></span><a class="code-link" href="https://github.com/marekkirejczyk/skills/blob/10c8c5fb1d9f04a87105e5dc75c0b65847b9f9f0/skills/eval-report/fixtures/evals/sql-assistant.eval.yaml#L34" target="_blank" rel="noopener">sql-assistant.eval.yaml:34 ↗</a></div>
 
 
 </td></tr>
@@ -335,7 +335,7 @@ describe_table({
 <a class="case-name" href="#skills-eval-report-fixtures-evals-sql-assistant-eval-yaml-a-slow-query-gets-a-li">a slow query gets a LIMIT</a>
 <span class="badge is-fail">1 / 2 rounds</span>
 <span class="tag">New</span>
-<span class="spacer"></span><a class="code-link" href="https://github.com/marekkirejczyk/skills/blob/d7a28f89cc4c50bac5fb1ddb6c35874a0e519a8b/skills/eval-report/fixtures/evals/sql-assistant.eval.yaml#L42" target="_blank" rel="noopener">sql-assistant.eval.yaml:42 ↗</a></div>
+<span class="spacer"></span><a class="code-link" href="https://github.com/marekkirejczyk/skills/blob/10c8c5fb1d9f04a87105e5dc75c0b65847b9f9f0/skills/eval-report/fixtures/evals/sql-assistant.eval.yaml#L43" target="_blank" rel="noopener">sql-assistant.eval.yaml:43 ↗</a></div>
 
 
 </td></tr>
@@ -343,7 +343,7 @@ describe_table({
 <td><div class="run-label is-pass">Round 1 · passed · 10.2s</div><dl class="kv"><dt>question</dt><dd>Show me all events</dd><dt>database</dt><dd>analytics</dd></dl></td>
 <td class="output"><p>Here are the latest 100 events. The table has 48 million rows, so I limited it.</p><div class="data-field"><div class="who">sql</div><pre class="json">SELECT * FROM events ORDER BY ts DESC LIMIT 100</pre></div></td>
 <td class="checks"><div class="check-group"><div class="label">exact</div>
-<div class="check is-pass"><svg class="icon" width="14" height="14" viewBox="0 0 16 16" role="img" aria-label="passed"><path fill="currentColor" d="M13.78 4.22a.75.75 0 0 1 0 1.06l-7.25 7.25a.75.75 0 0 1-1.06 0L2.22 9.28a.75.75 0 0 1 1.06-1.06L6 10.94l6.72-6.72a.75.75 0 0 1 1.06 0Z"/></svg><div><div>query matches /LIMIT \d+/i</div></div></div></div></td>
+<div class="check is-pass"><svg class="icon" width="14" height="14" viewBox="0 0 16 16" role="img" aria-label="passed"><path fill="currentColor" d="M13.78 4.22a.75.75 0 0 1 0 1.06l-7.25 7.25a.75.75 0 0 1-1.06 0L2.22 9.28a.75.75 0 0 1 1.06-1.06L6 10.94l6.72-6.72a.75.75 0 0 1 1.06 0Z"/></svg><div><div>output matches /LIMIT \d+/</div></div></div></div></td>
 <td><div class="mock"><code class="tool">run_query</code> <span class="muted">→</span> {&quot;rows&quot;:100}<div class="fake">fake: events</div></div><details class="raw"><summary>Arguments and results</summary><pre class="json">run_query({
   &quot;sql&quot;: &quot;SELECT * FROM events ORDER BY ts DESC LIMIT 100&quot;
 })
@@ -355,7 +355,7 @@ describe_table({
 <td><div class="run-label is-fail">Round 2 · failed · 11.2s</div><dl class="kv"><dt>question</dt><dd>Show me all events</dd><dt>database</dt><dd>analytics</dd></dl></td>
 <td class="output"><p>Running that now.</p></td>
 <td class="checks"><div class="check-group"><div class="label">exact</div>
-<div class="check is-fail"><svg class="icon" width="14" height="14" viewBox="0 0 16 16" role="img" aria-label="failed"><path fill="currentColor" d="M3.72 3.72a.75.75 0 0 1 1.06 0L8 6.94l3.22-3.22a.75.75 0 1 1 1.06 1.06L9.06 8l3.22 3.22a.75.75 0 1 1-1.06 1.06L8 9.06l-3.22 3.22a.75.75 0 0 1-1.06-1.06L6.94 8 3.72 4.78a.75.75 0 0 1 0-1.06Z"/></svg><div><div>query matches /LIMIT \d+/i</div><div class="reason">SELECT * FROM events, no LIMIT.</div></div></div></div></td>
+<div class="check is-fail"><svg class="icon" width="14" height="14" viewBox="0 0 16 16" role="img" aria-label="failed"><path fill="currentColor" d="M3.72 3.72a.75.75 0 0 1 1.06 0L8 6.94l3.22-3.22a.75.75 0 1 1 1.06 1.06L9.06 8l3.22 3.22a.75.75 0 1 1-1.06 1.06L8 9.06l-3.22 3.22a.75.75 0 0 1-1.06-1.06L6.94 8 3.72 4.78a.75.75 0 0 1 0-1.06Z"/></svg><div><div>output matches /LIMIT \d+/</div><div class="reason">No match.</div></div></div></div></td>
 <td><div class="mock"><code class="tool">run_query</code> <span class="muted">→</span> {&quot;error&quot;:&quot;statement timeout&quot;}<div class="fake">fake: events</div></div><details class="raw"><summary>Arguments and results</summary><pre class="json">run_query({
   &quot;sql&quot;: &quot;SELECT * FROM events&quot;
 })
@@ -370,7 +370,7 @@ describe_table({
 <a class="case-name" href="#skills-eval-report-fixtures-evals-sql-assistant-eval-yaml-explains-the-sql-it-ra">explains the SQL it ran in one sentence</a>
 <span class="badge is-pass">1 / 1 rounds</span>
 <span class="tag">New</span>
-<span class="spacer"></span><a class="code-link" href="https://github.com/marekkirejczyk/skills/blob/d7a28f89cc4c50bac5fb1ddb6c35874a0e519a8b/skills/eval-report/fixtures/evals/sql-assistant.eval.yaml#L49" target="_blank" rel="noopener">sql-assistant.eval.yaml:49 ↗</a></div>
+<span class="spacer"></span><a class="code-link" href="https://github.com/marekkirejczyk/skills/blob/10c8c5fb1d9f04a87105e5dc75c0b65847b9f9f0/skills/eval-report/fixtures/evals/sql-assistant.eval.yaml#L50" target="_blank" rel="noopener">sql-assistant.eval.yaml:50 ↗</a></div>
 
 
 </td></tr>
@@ -408,7 +408,7 @@ describe_table({
 <a class="case-name" href="#skills-eval-report-fixtures-evals-support-agent-eval-ts-looks-up-the-order-befor">looks up the order before answering where it is</a>
 <span class="badge is-pass">2 / 2 rounds</span>
 <span class="tag">New</span>
-<span class="spacer"></span><a class="code-link" href="https://github.com/marekkirejczyk/skills/blob/d7a28f89cc4c50bac5fb1ddb6c35874a0e519a8b/skills/eval-report/fixtures/evals/support-agent.eval.ts#L5" target="_blank" rel="noopener">support-agent.eval.ts:5 ↗</a></div>
+<span class="spacer"></span><a class="code-link" href="https://github.com/marekkirejczyk/skills/blob/10c8c5fb1d9f04a87105e5dc75c0b65847b9f9f0/skills/eval-report/fixtures/evals/support-agent.eval.ts#L5" target="_blank" rel="noopener">support-agent.eval.ts:5 ↗</a></div>
 <div class="note"><b>Rule:</b> Instructions, ‘Orders’: never answer from memory; look the order up first.</div>
 
 </td></tr>
@@ -447,7 +447,7 @@ describe_table({
 <a class="case-name" href="#skills-eval-report-fixtures-evals-support-agent-eval-ts-a-refund-under-50-is-don">a refund under £50 is done without a person</a>
 <span class="badge is-fail">2 / 3 rounds</span>
 <span class="tag">New</span>
-<span class="spacer"></span><a class="code-link" href="https://github.com/marekkirejczyk/skills/blob/d7a28f89cc4c50bac5fb1ddb6c35874a0e519a8b/skills/eval-report/fixtures/evals/support-agent.eval.ts#L11" target="_blank" rel="noopener">support-agent.eval.ts:11 ↗</a></div>
+<span class="spacer"></span><a class="code-link" href="https://github.com/marekkirejczyk/skills/blob/10c8c5fb1d9f04a87105e5dc75c0b65847b9f9f0/skills/eval-report/fixtures/evals/support-agent.eval.ts#L12" target="_blank" rel="noopener">support-agent.eval.ts:12 ↗</a></div>
 
 
 </td></tr>
@@ -524,7 +524,7 @@ start_refund({
 <a class="case-name" href="#skills-eval-report-fixtures-evals-support-agent-eval-ts-a-refund-over-50-goes-to">a refund over £50 goes to a person</a>
 <span class="badge is-pass">1 / 1 rounds</span>
 <span class="tag">New</span>
-<span class="spacer"></span><a class="code-link" href="https://github.com/marekkirejczyk/skills/blob/d7a28f89cc4c50bac5fb1ddb6c35874a0e519a8b/skills/eval-report/fixtures/evals/support-agent.eval.ts#L17" target="_blank" rel="noopener">support-agent.eval.ts:17 ↗</a></div>
+<span class="spacer"></span><a class="code-link" href="https://github.com/marekkirejczyk/skills/blob/10c8c5fb1d9f04a87105e5dc75c0b65847b9f9f0/skills/eval-report/fixtures/evals/support-agent.eval.ts#L18" target="_blank" rel="noopener">support-agent.eval.ts:18 ↗</a></div>
 <div class="note"><b>Rule:</b> Instructions, ‘Refunds’: over £50, hand to a person; never refund it yourself.</div>
 
 </td></tr>
@@ -555,7 +555,7 @@ hand_to_person({
 <a class="case-name" href="#skills-eval-report-fixtures-evals-support-agent-eval-ts-a-complaint-goes-to-a-pe">a complaint goes to a person</a>
 <span class="badge is-fail">2 / 3 rounds</span>
 <span class="tag">New</span>
-<span class="spacer"></span><a class="code-link" href="https://github.com/marekkirejczyk/skills/blob/d7a28f89cc4c50bac5fb1ddb6c35874a0e519a8b/skills/eval-report/fixtures/evals/support-agent.eval.ts#L23" target="_blank" rel="noopener">support-agent.eval.ts:23 ↗</a></div>
+<span class="spacer"></span><a class="code-link" href="https://github.com/marekkirejczyk/skills/blob/10c8c5fb1d9f04a87105e5dc75c0b65847b9f9f0/skills/eval-report/fixtures/evals/support-agent.eval.ts#L25" target="_blank" rel="noopener">support-agent.eval.ts:25 ↗</a></div>
 
 <div class="note"><b>Known bug:</b> Intermittent. The assistant starts a refund itself instead of handing over (instructions.ts, ‘People’).</div>
 </td></tr>
@@ -584,9 +584,9 @@ hand_to_person({
 <td><div class="run-label is-fail">Round 2 · failed · 11.8s</div><p>The car you sold me broke down after two days. I want my money back.</p></td>
 <td class="output"><p>Sorry to hear that. Under the Consumer Rights Act you can reject the car within 30 days, so I’ve started a refund for you.</p></td>
 <td class="checks"><div class="check-group"><div class="label">exact</div>
-<div class="check is-fail"><svg class="icon" width="14" height="14" viewBox="0 0 16 16" role="img" aria-label="failed"><path fill="currentColor" d="M3.72 3.72a.75.75 0 0 1 1.06 0L8 6.94l3.22-3.22a.75.75 0 1 1 1.06 1.06L9.06 8l3.22 3.22a.75.75 0 1 1-1.06 1.06L8 9.06l-3.22 3.22a.75.75 0 0 1-1.06-1.06L6.94 8 3.72 4.78a.75.75 0 0 1 0-1.06Z"/></svg><div><div>calls hand_to_person with {&quot;reason&quot;:&quot;complaint&quot;}</div><div class="reason">Not called; started a refund itself.</div></div></div></div><div class="check-group"><div class="label">judge</div>
+<div class="check is-fail"><svg class="icon" width="14" height="14" viewBox="0 0 16 16" role="img" aria-label="failed"><path fill="currentColor" d="M3.72 3.72a.75.75 0 0 1 1.06 0L8 6.94l3.22-3.22a.75.75 0 1 1 1.06 1.06L9.06 8l3.22 3.22a.75.75 0 1 1-1.06 1.06L8 9.06l-3.22 3.22a.75.75 0 0 1-1.06-1.06L6.94 8 3.72 4.78a.75.75 0 0 1 0-1.06Z"/></svg><div><div>calls hand_to_person with {&quot;reason&quot;:&quot;complaint&quot;}</div><div class="reason">hand_to_person was not called.</div></div></div></div><div class="check-group"><div class="label">judge</div>
 <div class="check is-fail"><svg class="icon" width="14" height="14" viewBox="0 0 16 16" role="img" aria-label="failed"><path fill="currentColor" d="M3.72 3.72a.75.75 0 0 1 1.06 0L8 6.94l3.22-3.22a.75.75 0 1 1 1.06 1.06L9.06 8l3.22 3.22a.75.75 0 1 1-1.06 1.06L8 9.06l-3.22 3.22a.75.75 0 0 1-1.06-1.06L6.94 8 3.72 4.78a.75.75 0 0 1 0-1.06Z"/></svg><div><div>apologises without admitting fault</div><div class="reason">Cites the law as if liability were settled.</div></div></div></div></td>
-<td><div class="mock"><code class="tool">lookup_order</code> <span class="muted">→</span> {&quot;id&quot;:&quot;55102&quot;}</div><div class="mock"><code class="tool">start_refund</code> <span class="muted">→</span> {&quot;started&quot;:true}</div><details class="raw"><summary>Arguments and results</summary><pre class="json">lookup_order({
+<td><div class="mock"><code class="tool">lookup_order</code> <span class="muted">→</span> {&quot;id&quot;:&quot;55102&quot;}</div><div class="mock"><code class="tool">start_refund</code> <span class="muted">→</span> {&quot;started&quot;:true}</div><div class="mock"><code class="tool">hand_to_person</code> <span class="muted">→</span> not called</div><details class="raw"><summary>Arguments and results</summary><pre class="json">lookup_order({
   &quot;orderId&quot;: &quot;55102&quot;
 })
 → {
@@ -598,7 +598,10 @@ start_refund({
 })
 → {
   &quot;started&quot;: true
-}</pre></details></td>
+}
+
+hand_to_person()
+→ not called</pre></details></td>
 </tr>
 <tr class="run" data-pass="1" data-fresh="1">
 <td><div class="run-label is-pass">Round 3 · passed · 12.8s</div><p>The car you sold me broke down after two days. I want my money back.</p></td>
@@ -627,7 +630,7 @@ hand_to_person({
 <a class="case-name" href="#skills-eval-report-fixtures-evals-support-agent-eval-ts-never-asks-for-the-full-">never asks for the full card number</a>
 <span class="badge is-fail">1 / 2 rounds</span>
 <span class="tag">New</span>
-<span class="spacer"></span><a class="code-link" href="https://github.com/marekkirejczyk/skills/blob/d7a28f89cc4c50bac5fb1ddb6c35874a0e519a8b/skills/eval-report/fixtures/evals/support-agent.eval.ts#L29" target="_blank" rel="noopener">support-agent.eval.ts:29 ↗</a></div>
+<span class="spacer"></span><a class="code-link" href="https://github.com/marekkirejczyk/skills/blob/10c8c5fb1d9f04a87105e5dc75c0b65847b9f9f0/skills/eval-report/fixtures/evals/support-agent.eval.ts#L32" target="_blank" rel="noopener">support-agent.eval.ts:32 ↗</a></div>
 
 
 </td></tr>
@@ -654,7 +657,7 @@ hand_to_person({
 <a class="case-name" href="#skills-eval-report-fixtures-evals-support-agent-eval-ts-answers-in-the-language-">answers in the language the buyer wrote in</a>
 <span class="badge is-pass">2 / 2 rounds</span>
 <span class="tag">New</span>
-<span class="spacer"></span><a class="code-link" href="https://github.com/marekkirejczyk/skills/blob/d7a28f89cc4c50bac5fb1ddb6c35874a0e519a8b/skills/eval-report/fixtures/evals/support-agent.eval.ts#L34" target="_blank" rel="noopener">support-agent.eval.ts:34 ↗</a></div>
+<span class="spacer"></span><a class="code-link" href="https://github.com/marekkirejczyk/skills/blob/10c8c5fb1d9f04a87105e5dc75c0b65847b9f9f0/skills/eval-report/fixtures/evals/support-agent.eval.ts#L37" target="_blank" rel="noopener">support-agent.eval.ts:37 ↗</a></div>
 
 
 </td></tr>
@@ -689,7 +692,7 @@ hand_to_person({
 <a class="case-name" href="#skills-eval-report-fixtures-evals-support-agent-eval-ts-an-unknown-order-number-">an unknown order number is said plainly, not guessed</a>
 <span class="badge is-pass">1 / 1 rounds</span>
 <span class="tag">New</span>
-<span class="spacer"></span><a class="code-link" href="https://github.com/marekkirejczyk/skills/blob/d7a28f89cc4c50bac5fb1ddb6c35874a0e519a8b/skills/eval-report/fixtures/evals/support-agent.eval.ts#L40" target="_blank" rel="noopener">support-agent.eval.ts:40 ↗</a></div>
+<span class="spacer"></span><a class="code-link" href="https://github.com/marekkirejczyk/skills/blob/10c8c5fb1d9f04a87105e5dc75c0b65847b9f9f0/skills/eval-report/fixtures/evals/support-agent.eval.ts#L43" target="_blank" rel="noopener">support-agent.eval.ts:43 ↗</a></div>
 
 
 </td></tr>
@@ -720,7 +723,7 @@ hand_to_person({
 <a class="case-name" href="#skills-eval-report-fixtures-evals-travel-planner-eval-json-a-weekend-itinerary-h">a weekend itinerary has one plan per day</a>
 <span class="badge is-fail">1 / 2 rounds</span>
 <span class="tag">New</span>
-<span class="spacer"></span><a class="code-link" href="https://github.com/marekkirejczyk/skills/blob/d7a28f89cc4c50bac5fb1ddb6c35874a0e519a8b/skills/eval-report/fixtures/evals/travel-planner.eval.json#L6" target="_blank" rel="noopener">travel-planner.eval.json:6 ↗</a></div>
+<span class="spacer"></span><a class="code-link" href="https://github.com/marekkirejczyk/skills/blob/10c8c5fb1d9f04a87105e5dc75c0b65847b9f9f0/skills/eval-report/fixtures/evals/travel-planner.eval.json#L6" target="_blank" rel="noopener">travel-planner.eval.json:6 ↗</a></div>
 <div class="note"><b>Rule:</b> Instructions, ‘Itineraries’: one section per day; adapt to the weather.</div>
 
 </td></tr>
@@ -759,10 +762,13 @@ search_hotels({
 <div class="check is-fail"><svg class="icon" width="14" height="14" viewBox="0 0 16 16" role="img" aria-label="failed"><path fill="currentColor" d="M3.72 3.72a.75.75 0 0 1 1.06 0L8 6.94l3.22-3.22a.75.75 0 1 1 1.06 1.06L9.06 8l3.22 3.22a.75.75 0 1 1-1.06 1.06L8 9.06l-3.22 3.22a.75.75 0 0 1-1.06-1.06L6.94 8 3.72 4.78a.75.75 0 0 1 0-1.06Z"/></svg><div><div>one section per day</div><div class="reason">One list for the whole weekend.</div></div></div>
 <div class="check is-fail"><svg class="icon" width="14" height="14" viewBox="0 0 16 16" role="img" aria-label="failed"><path fill="currentColor" d="M3.72 3.72a.75.75 0 0 1 1.06 0L8 6.94l3.22-3.22a.75.75 0 1 1 1.06 1.06L9.06 8l3.22 3.22a.75.75 0 1 1-1.06 1.06L8 9.06l-3.22 3.22a.75.75 0 0 1-1.06-1.06L6.94 8 3.72 4.78a.75.75 0 0 1 0-1.06Z"/></svg><div><div>suggests an indoor plan for the rainy day</div><div class="reason">Rain on Sunday never mentioned.</div></div></div></div><div class="check-group"><div class="label">exact</div>
 <div class="check is-fail"><svg class="icon" width="14" height="14" viewBox="0 0 16 16" role="img" aria-label="failed"><path fill="currentColor" d="M3.72 3.72a.75.75 0 0 1 1.06 0L8 6.94l3.22-3.22a.75.75 0 1 1 1.06 1.06L9.06 8l3.22 3.22a.75.75 0 1 1-1.06 1.06L8 9.06l-3.22 3.22a.75.75 0 0 1-1.06-1.06L6.94 8 3.72 4.78a.75.75 0 0 1 0-1.06Z"/></svg><div><div>calls weather</div><div class="reason">weather was not called.</div></div></div></div></td>
-<td><div class="mock"><code class="tool">search_hotels</code> <span class="muted">→</span> []<div class="fake">fake: lisbonHotels</div></div><details class="raw"><summary>Arguments and results</summary><pre class="json">search_hotels({
+<td><div class="mock"><code class="tool">search_hotels</code> <span class="muted">→</span> []<div class="fake">fake: lisbonHotels</div></div><div class="mock"><code class="tool">weather</code> <span class="muted">→</span> not called</div><details class="raw"><summary>Arguments and results</summary><pre class="json">search_hotels({
   &quot;city&quot;: &quot;Lisbon&quot;
 })
-→ []</pre></details></td>
+→ []
+
+weather()
+→ not called</pre></details></td>
 </tr>
 </tbody>
 <tbody class="case" id="skills-eval-report-fixtures-evals-travel-planner-eval-json-flight-options-show-p" data-fresh="1">
@@ -771,7 +777,7 @@ search_hotels({
 <a class="case-name" href="#skills-eval-report-fixtures-evals-travel-planner-eval-json-flight-options-show-p">flight options show price, stops and times</a>
 <span class="badge is-fail">1 / 2 rounds</span>
 <span class="tag">New</span>
-<span class="spacer"></span><a class="code-link" href="https://github.com/marekkirejczyk/skills/blob/d7a28f89cc4c50bac5fb1ddb6c35874a0e519a8b/skills/eval-report/fixtures/evals/travel-planner.eval.json#L16" target="_blank" rel="noopener">travel-planner.eval.json:16 ↗</a></div>
+<span class="spacer"></span><a class="code-link" href="https://github.com/marekkirejczyk/skills/blob/10c8c5fb1d9f04a87105e5dc75c0b65847b9f9f0/skills/eval-report/fixtures/evals/travel-planner.eval.json#L29" target="_blank" rel="noopener">travel-planner.eval.json:29 ↗</a></div>
 
 
 </td></tr>
@@ -814,7 +820,7 @@ search_hotels({
 <a class="case-name" href="#skills-eval-report-fixtures-evals-travel-planner-eval-json-asks-for-dates-before">asks for dates before searching flights</a>
 <span class="badge is-pass">2 / 2 rounds</span>
 <span class="tag">New</span>
-<span class="spacer"></span><a class="code-link" href="https://github.com/marekkirejczyk/skills/blob/d7a28f89cc4c50bac5fb1ddb6c35874a0e519a8b/skills/eval-report/fixtures/evals/travel-planner.eval.json#L26" target="_blank" rel="noopener">travel-planner.eval.json:26 ↗</a></div>
+<span class="spacer"></span><a class="code-link" href="https://github.com/marekkirejczyk/skills/blob/10c8c5fb1d9f04a87105e5dc75c0b65847b9f9f0/skills/eval-report/fixtures/evals/travel-planner.eval.json#L51" target="_blank" rel="noopener">travel-planner.eval.json:51 ↗</a></div>
 
 <div class="note"><b>Known bug:</b> Intermittent. The reply is a question card with no words at all (service.ts, endsReply).</div>
 </td></tr>
@@ -849,7 +855,7 @@ search_hotels({
 <a class="case-name" href="#skills-eval-report-fixtures-evals-travel-planner-eval-json-a-visa-question-point">a visa question points to the official source</a>
 <span class="badge is-pass">1 / 1 rounds</span>
 <span class="tag">New</span>
-<span class="spacer"></span><a class="code-link" href="https://github.com/marekkirejczyk/skills/blob/d7a28f89cc4c50bac5fb1ddb6c35874a0e519a8b/skills/eval-report/fixtures/evals/travel-planner.eval.json#L35" target="_blank" rel="noopener">travel-planner.eval.json:35 ↗</a></div>
+<span class="spacer"></span><a class="code-link" href="https://github.com/marekkirejczyk/skills/blob/10c8c5fb1d9f04a87105e5dc75c0b65847b9f9f0/skills/eval-report/fixtures/evals/travel-planner.eval.json#L67" target="_blank" rel="noopener">travel-planner.eval.json:67 ↗</a></div>
 
 
 </td></tr>
@@ -868,7 +874,7 @@ search_hotels({
 <a class="case-name" href="#skills-eval-report-fixtures-evals-travel-planner-eval-json-a-hotel-shortlist-sta">a hotel shortlist stays within budget</a>
 <span class="badge is-fail">2 / 3 rounds</span>
 <span class="tag">New</span>
-<span class="spacer"></span><a class="code-link" href="https://github.com/marekkirejczyk/skills/blob/d7a28f89cc4c50bac5fb1ddb6c35874a0e519a8b/skills/eval-report/fixtures/evals/travel-planner.eval.json#L43" target="_blank" rel="noopener">travel-planner.eval.json:43 ↗</a></div>
+<span class="spacer"></span><a class="code-link" href="https://github.com/marekkirejczyk/skills/blob/10c8c5fb1d9f04a87105e5dc75c0b65847b9f9f0/skills/eval-report/fixtures/evals/travel-planner.eval.json#L79" target="_blank" rel="noopener">travel-planner.eval.json:79 ↗</a></div>
 
 
 </td></tr>
@@ -940,7 +946,7 @@ search_hotels({
 <a class="case-name" href="#skills-eval-report-fixtures-evals-travel-planner-eval-json-weather-is-given-for-">weather is given for the trip dates, not today</a>
 <span class="badge is-pass">1 / 1 rounds</span>
 <span class="tag">New</span>
-<span class="spacer"></span><a class="code-link" href="https://github.com/marekkirejczyk/skills/blob/d7a28f89cc4c50bac5fb1ddb6c35874a0e519a8b/skills/eval-report/fixtures/evals/travel-planner.eval.json#L52" target="_blank" rel="noopener">travel-planner.eval.json:52 ↗</a></div>
+<span class="spacer"></span><a class="code-link" href="https://github.com/marekkirejczyk/skills/blob/10c8c5fb1d9f04a87105e5dc75c0b65847b9f9f0/skills/eval-report/fixtures/evals/travel-planner.eval.json#L97" target="_blank" rel="noopener">travel-planner.eval.json:97 ↗</a></div>
 
 
 </td></tr>
@@ -969,7 +975,7 @@ search_hotels({
 <a class="case-name" href="#skills-eval-report-fixtures-evals-travel-planner-eval-json-a-tool-error-is-expla">a tool error is explained and retried once</a>
 <span class="badge is-fail">1 / 2 rounds</span>
 <span class="tag">New</span>
-<span class="spacer"></span><a class="code-link" href="https://github.com/marekkirejczyk/skills/blob/d7a28f89cc4c50bac5fb1ddb6c35874a0e519a8b/skills/eval-report/fixtures/evals/travel-planner.eval.json#L60" target="_blank" rel="noopener">travel-planner.eval.json:60 ↗</a></div>
+<span class="spacer"></span><a class="code-link" href="https://github.com/marekkirejczyk/skills/blob/10c8c5fb1d9f04a87105e5dc75c0b65847b9f9f0/skills/eval-report/fixtures/evals/travel-planner.eval.json#L113" target="_blank" rel="noopener">travel-planner.eval.json:113 ↗</a></div>
 
 
 </td></tr>
