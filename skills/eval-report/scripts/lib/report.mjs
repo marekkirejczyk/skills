@@ -111,7 +111,7 @@ function fileSection(file, codeUrl) {
     </summary>
     <div class="table-scroll"><table class="runs">
       <colgroup><col class="col-input"><col class="col-output"><col class="col-checks"><col class="col-mocks"></colgroup>
-      <thead><tr><th>Input</th><th>Output</th><th>Judges and checks</th><th>Mocks: tools run, what they gave</th></tr></thead>
+      <thead><tr><th>Input</th><th>Output</th><th>Judges and checks</th><th>Tool calls</th></tr></thead>
       ${file.cases.map((evalCase) => caseBody(evalCase, file, codeUrl))}
     </table></div>
   </details>`;
