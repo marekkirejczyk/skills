@@ -139,5 +139,6 @@ export function renderOutput(output, error) {
   if (typeof output === 'string') return html`${crash}${renderWords(output)}`;
   const isReply = typeof output === 'object' && !Array.isArray(output) && ('text' in output || 'blocks' in output);
   if (!isReply) return html`${crash}${renderValue(output)}`;
-  return html`${crash}${renderWords(output.text)}${(output.blocks ?? []).map(renderBlock)}`;
+  const blocks = (output.blocks ?? []).map(renderBlock);
+  return html`${crash}${renderWords(output.text)}${blocks.length ? html`<div class="blocks">${blocks}</div>` : ''}`;
 }

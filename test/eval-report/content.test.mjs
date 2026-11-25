@@ -81,6 +81,12 @@ describe('renderOutput', () => {
     assert.match(markup, /<div class="card-title">Question<\/div>.*<p>Which\?<\/p>.*<span class="chip">A<\/span><span class="chip">B<\/span>/);
   });
 
+  it('keeps a reply\'s blocks together, so a wide page can set them side by side', () => {
+    const markup = String(renderOutput({ text: 'Pick', blocks: [{ type: 'card', title: 'A' }, { type: 'card', title: 'B' }] }));
+    assert.match(markup, /^<p>Pick<\/p><div class="blocks"><div class="card">.*<\/div><div class="card">.*<\/div><\/div>$/s);
+    assert.doesNotMatch(String(renderOutput({ text: 'Pick', blocks: [] })), /class="blocks"/);
+  });
+
   it('renders a list of labelled values', () => {
     assert.match(text(renderOutput({ text: 'x', blocks: [{ type: 'list', items: [{ label: 'APR', value: '9.9%' }] }] })), /<li><strong>APR<\/strong> 9.9%<\/li>/);
   });

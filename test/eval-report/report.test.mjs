@@ -62,6 +62,13 @@ describe('eval-report.mjs run on the fixture evals', () => {
     assert.match(page, /<details class="raw"><summary>Arguments and results<\/summary><div class="json"><details class="json-fold" data-key="" open>/);
   });
 
+  it('lists every case under its file, each linked to where it is on the page', () => {
+    const links = [...page.matchAll(/<a href="#(case-\d+)" data-case-link>/g)].map((match) => match[1]);
+    assert.equal(links.length, 20);
+    assert.equal(page.match(/<div class="case-list-file">/g).length, 3);
+    for (const id of links) assert.ok(page.includes(`<tr class="case-head" id="${id}">`), id);
+  });
+
   it('loads nothing from the network', () => {
     assert.doesNotMatch(page, /<(script|link)[^>]+(src|href)="http/);
   });

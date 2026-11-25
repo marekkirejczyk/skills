@@ -85,6 +85,30 @@
     bubble.style.top = `${fits ? below : Math.max(8, box.top - 6 - bubble.offsetHeight)}px`;
   }
 
+  // ---- The list of files and cases beside the report, on a very wide screen ----
+  const caseLinks = all('[data-case-link]');
+  const caseHead = (link) => document.getElementById(link.hash.slice(1));
+  const besideReport = window.matchMedia('(min-width: 1920px)');
+
+  // The case being read: the last one whose heading has reached the top of the page.
+  function markCurrentCase() {
+    if (!besideReport.matches) return;
+    const line = (document.querySelector('.toolbar')?.offsetHeight ?? 0) + 80;
+    const onPage = caseLinks.filter((link) => !link.hidden && caseHead(link).getClientRects().length > 0);
+    const current = onPage.filter((link) => caseHead(link).getBoundingClientRect().top <= line).at(-1) ?? onPage[0];
+    for (const link of caseLinks) {
+      if (link === current) link.setAttribute('aria-current', 'true');
+      else link.removeAttribute('aria-current');
+    }
+  }
+
+  function showCase(link) {
+    const head = caseHead(link);
+    head.closest('details.file').open = true;
+    const covered = toolbar.offsetHeight + head.closest('table').querySelector('th').offsetHeight;
+    window.scrollTo({ top: head.getBoundingClientRect().top + window.scrollY - covered });
+  }
+
   // ---- Filters ----
   const filters = { status: 'all', scope: 'all', review: 'all' };
   const matchers = {
@@ -147,6 +171,14 @@
       select.value = filters[filter];
       select.classList.toggle('active', filters[filter] !== 'all');
     }
+    for (const link of caseLinks) {
+      const evalCase = caseHead(link).closest('tbody.case');
+      const rows = all('tr.run', evalCase);
+      link.hidden = evalCase.hidden;
+      link.querySelector('.case-list-tick').hidden = !rows.every(isReviewed);
+    }
+    for (const group of all('.case-list-file')) group.hidden = !group.querySelector('[data-case-link]:not([hidden])');
+    markCurrentCase();
     const done = runs.filter(isReviewed).length;
     document.querySelector('[data-reviewed-count]').textContent = done;
     document.querySelector('[data-reviewed-bar]').style.width = `${runs.length ? (100 * done) / runs.length : 0}%`;
@@ -171,6 +203,12 @@
 
   // ---- Events ----
   document.addEventListener('click', (event) => {
+    const caseLink = event.target.closest('[data-case-link]');
+    if (caseLink) {
+      // Not the link's own jump: that would replace the filters kept in the URL hash.
+      event.preventDefault();
+      showCase(caseLink);
+    }
     const about = event.target.closest('.about-button');
     if (about && about !== aboutButton) openAbout(about);
     else if (about || !event.target.closest('.about-bubble')) closeAbout();
@@ -215,6 +253,16 @@
   });
   window.addEventListener('scroll', closeAbout, { capture: true, passive: true });
   window.addEventListener('resize', closeAbout);
+  let marking = false;
+  window.addEventListener('scroll', () => {
+    if (marking) return;
+    marking = true;
+    requestAnimationFrame(() => {
+      marking = false;
+      markCurrentCase();
+    });
+  }, { passive: true });
+  besideReport.addEventListener('change', markCurrentCase);
   // `toggle` doesn't bubble, so it is caught on its way down.
   document.addEventListener('toggle', (event) => {
     const fold = event.target;

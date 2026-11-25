@@ -54,7 +54,9 @@ button { font: inherit; font-size: 13px; font-weight: 500; color: var(--fg); bac
 button.plain { border-radius: 6px; }
 .count { font-size: 12px; font-weight: 600; padding: 0 6px; border-radius: 999px; background: rgba(127, 127, 127, 0.18); }
 
-main.wrap { padding-top: 20px; padding-bottom: 64px; display: flex; flex-direction: column; gap: 16px; }
+.wrap.page { padding-top: 20px; padding-bottom: 64px; }
+.page > main { display: flex; flex-direction: column; gap: 16px; }
+.case-list { display: none; }
 .empty { border: 1px dashed var(--border); border-radius: 6px; padding: 32px; text-align: center; color: var(--muted); }
 /* clip, not hidden: it keeps the corners round without stopping the sticky column headers. */
 .file { border: 1px solid var(--border); border-radius: 6px; overflow: clip; }
@@ -135,6 +137,26 @@ button.theme svg { fill: currentColor; }
 .title-row { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
 .visually-hidden { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
 .dropdown, .header-theme, .passed-fold { display: none; }
+
+/* Very wide screens: the page grows, the files and cases are listed beside it, and a reply's cards sit two to a row. */
+@media (min-width: 1920px) {
+  .wrap { max-width: 2400px; }
+  .wrap.page { display: flex; gap: 24px; align-items: flex-start; }
+  .page > main { flex: 1 1 auto; min-width: 0; }
+  .col-input { width: 24%; } .col-output { width: 38%; } .col-checks { width: 20%; } .col-mocks { width: 18%; }
+  td.output > .blocks { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; align-items: start; }
+  td.output > .blocks > .card { margin-bottom: 0; }
+  .case-list { display: block; flex: none; width: 300px; box-sizing: border-box; position: sticky; top: calc(var(--toolbar-height, 0px) + 20px); max-height: calc(100vh - var(--toolbar-height, 0px) - 40px); overflow-y: auto; border: 1px solid var(--border); border-radius: 6px; padding: 8px 0 10px; font-size: 13px; line-height: 1.4; }
+  .case-list > .label { padding: 6px 12px 2px; }
+  .case-list-name { padding: 10px 12px 2px; display: flex; gap: 8px; align-items: center; }
+  .case-list-name .mono { min-width: 0; flex: 1 1 auto; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .case-list a { display: flex; gap: 8px; align-items: flex-start; padding: 6px 12px; min-height: 32px; box-sizing: border-box; color: var(--fg); }
+  .case-list a:hover { text-decoration: none; background: var(--subtle); }
+  .case-list a[aria-current="true"] { background: light-dark(#ddf4ff, #121d2f); font-weight: 600; }
+  .case-list a .icon { width: 14px; height: 14px; margin-top: 2px; }
+  .case-list-case { min-width: 0; flex: 1 1 auto; overflow-wrap: anywhere; }
+  .case-list-tick { flex: none; color: var(--link); font-size: 11px; font-weight: 600; }
+}
 
 /* Phones: one row of dropdowns, and each run as a card of labelled sections instead of a table row. */
 @media (max-width: 640px) {

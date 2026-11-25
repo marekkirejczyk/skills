@@ -84,12 +84,12 @@ function runRow(run) {
   </tr>`;
 }
 
-function caseBody(evalCase, file, codeUrl) {
+function caseBody(evalCase, file, codeUrl, id) {
   const runs = countRuns(evalCase.runs);
   const where = evalCase.line ? `${file.path.split('/').pop()}:${evalCase.line}` : file.path.split('/').pop();
   const url = codeUrl(file.path, evalCase.line);
   return html`<tbody class="case" data-fresh="${Boolean(evalCase.change)}">
-    <tr class="case-head"><td colspan="4">
+    <tr class="case-head" id="${id}"><td colspan="4">
       <div class="case-title">
         ${reviewBox('data-review-case', 'Mark every run of this case reviewed')}
         ${evalCase.passed ? PASS_ICON : FAIL_ICON}
@@ -106,7 +106,7 @@ function caseBody(evalCase, file, codeUrl) {
   </tbody>`;
 }
 
-function fileSection(file, codeUrl) {
+function fileSection(file, codeUrl, caseIds) {
   const count = countRuns(file.cases.flatMap((evalCase) => evalCase.runs));
   return html`<details class="file" open>
     <summary>
@@ -120,9 +120,24 @@ function fileSection(file, codeUrl) {
     <div class="table-scroll"><table class="runs">
       <colgroup><col class="col-input"><col class="col-output"><col class="col-checks"><col class="col-mocks"></colgroup>
       <thead><tr><th>Input</th><th>Output</th><th>Judges and checks</th><th>Tool calls</th></tr></thead>
-      ${file.cases.map((evalCase) => caseBody(evalCase, file, codeUrl))}
+      ${file.cases.map((evalCase) => caseBody(evalCase, file, codeUrl, caseIds.get(evalCase)))}
     </table></div>
   </details>`;
+}
+
+// Every file and its cases, each linked to where it is on the page: shown beside the
+// report on a very wide screen, where there is room for it.
+function caseList(files, caseIds) {
+  return html`<nav class="case-list" aria-label="Files and cases">
+    <div class="label">Files and cases</div>
+    ${files.map((file) => {
+      const count = countRuns(file.cases.flatMap((evalCase) => evalCase.runs));
+      return html`<div class="case-list-file">
+        <div class="case-list-name"><span class="mono strong">${file.path.split('/').pop()}</span><span class="badge ${tone(count)}">${count.passed} / ${count.total}</span></div>
+        ${file.cases.map((evalCase) => html`<a href="#${caseIds.get(evalCase)}" data-case-link>${evalCase.passed ? PASS_ICON : FAIL_ICON}<span class="case-list-case">${evalCase.name}</span><span class="case-list-tick" title="Reviewed" hidden>✓</span></a>`)}
+      </div>`;
+    })}
+  </nav>`;
 }
 
 // Each option is [value, button label, dropdown label]: wide screens show
@@ -186,6 +201,7 @@ export function renderReport({ files, summary, context, title = 'Eval report', g
     totalMs ? formatDuration(totalMs) + ' of runs' : '',
   ].filter(Boolean);
   const scopeName = summary.scope === 'pr' ? 'this PR' : 'this commit';
+  const caseIds = new Map(files.flatMap((file) => file.cases).map((evalCase, index) => [evalCase, `case-${index}`]));
   return `<!doctype html>
 ${html`<html lang="en">
 <head>
@@ -218,10 +234,13 @@ ${html`<html lang="en">
   <button type="button" class="plain wide-only" data-expand="false">Collapse all</button>
   ${themeButton('toolbar-theme')}
 </div></nav>
-<main class="wrap">
-  <p class="empty no-match" hidden>No runs match these filters.</p>
-  ${files.length ? files.map((file) => fileSection(file, codeUrl)) : html`<p class="empty">No eval runs were recorded.</p>`}
-</main>
+<div class="wrap page">
+  ${files.length ? caseList(files, caseIds) : ''}
+  <main>
+    <p class="empty no-match" hidden>No runs match these filters.</p>
+    ${files.length ? files.map((file) => fileSection(file, codeUrl, caseIds)) : html`<p class="empty">No eval runs were recorded.</p>`}
+  </main>
+</div>
 <script>${trusted(asset('report.js'))}</script>
 </body>
 </html>`}
