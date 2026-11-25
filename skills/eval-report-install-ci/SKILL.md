@@ -25,8 +25,8 @@ Look through `.github/workflows/` for a job that runs the evals.
 
 - `actions/checkout` gets `fetch-depth: 0`.
 - The step that runs the evals runs them through the script instead: `node .github/eval-report/eval-report.mjs run --scope pr`, keeping the step's `env`. With `.eval-report.json`'s `command` set to what the step ran before, the evals run exactly as they did.
-- After it, the publish and upload steps from `<skills>/eval-report/templates/eval-report.yml`, both `if: always()`, so failing evals still get a report.
-- The workflow, or the job, gets `permissions: contents: write, pull-requests: write`.
+- After it, the upload and link steps from `<skills>/eval-report/templates/eval-report.yml`, both `if: always()`, so failing evals still get a report.
+- The workflow, or the job, gets `permissions: pull-requests: write` (and `contents: write` only for Pages, below).
 
 If the job runs evals in several shards, have each write its own results (`EVAL_REPORT_FILE` per shard, uploaded as artifacts), then one job after them concatenates the files and runs `eval-report.mjs build --results <all> --scope pr` and `publish --pages`.
 
@@ -41,9 +41,11 @@ Write it once they agree.
 
 ## 4. Hosting
 
-`publish --pages` commits each report to the `gh-pages` branch under `eval-reports/pr-<number>/` and links `https://<owner>.github.io/<repo>/eval-reports/pr-<number>/`. GitHub Pages must serve the `gh-pages` branch: Settings → Pages → Deploy from a branch → `gh-pages`, `/ (root)`. That is the user's change to make, and on a private repository the pages may be public depending on the plan: say so and let them decide. Without Pages, drop `--pages` and pass `--url` to the run's artifact page instead; the report is then a zip download.
+The report is one self-contained HTML file. By default the template uploads it as an **unzipped artifact** (`actions/upload-artifact@v7`, `archive: false`) and links the artifact's URL from the PR. GitHub opens it in the browser for anyone who can read the repository, after they sign in, so it works the same on private and public repositories. It needs nothing turned on. Artifacts expire: the template keeps them 30 days (`retention-days`, up to the repository's limit).
 
-Fork PRs get no write token, so the publish step skips them; the uploaded artifact still has the report.
+**GitHub Pages** gives a link without a sign-in and keeps reports until the branch is cleaned up, but the site is public unless the repository is on GitHub Enterprise Cloud with Pages visibility set to private. Offer it only for public repositories (`gh repo view --json visibility`). To use it, swap the link step's `--url …` for `--pages`, give the job `contents: write`, and have the user turn on Settings → Pages → Deploy from a branch → `gh-pages`, `/ (root)`. Reports go to `eval-reports/pr-<number>/`. `publish --pages` refuses a private repository whose Pages site would be public.
+
+Fork PRs get no write token, so the link step skips them. The artifact is still on the run's page.
 
 ## 5. Hand over
 

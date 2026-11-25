@@ -7,7 +7,7 @@ disable-model-invocation: true
 
 # Eval report
 
-A script does all the work: it runs the evals, reads what they recorded and writes `eval-report/index.html` and `eval-report/summary.json`. Your part is to set it up once, run it, and hand over the link. **Spend no tokens on the results**: don't read the HTML, `results.ndjson` or the eval output. The script's last lines (the summary and the report path) are all you report.
+A script does all the work: it runs the evals, reads what they recorded and writes `eval-report/eval-report.html` and `eval-report/summary.json`. Your part is to set it up once, run it, and hand over the link. **Spend no tokens on the results**: don't read the HTML, `results.ndjson` or the eval output. The script's last lines (the summary and the report path) are all you report.
 
 The scripts are in `scripts/` next to this file; `<skill-dir>` below is this file's directory. The input format is in `reference/input-format.md`.
 
@@ -36,14 +36,14 @@ Run the command from the table. It prints the eval output, then:
 
 ```
 Evals: 21 / 28 runs passed · 13 / 20 cases
-Report: /abs/path/eval-report/index.html
+Report: /abs/path/eval-report/eval-report.html
 ```
 
 Exit code 2 is the script's own error, with the reason on stderr; fix the setup. Any other non-zero code is the eval command failing, which is normal when evals fail: the report is still written.
 
 ## 3. Hand it over
 
-- **Claude Code with artifacts**: publish `eval-report/index.html` with the Artifact tool, as it is.
+- **Claude Code with artifacts**: publish `eval-report/eval-report.html` with the Artifact tool, as it is.
 - **Otherwise**: give the file's absolute path.
 
 Then, when the branch has a pull request on GitHub and `gh` is signed in, ask whether to link it from the PR. On yes, run `node <skill-dir>/scripts/eval-report.mjs publish --url <the artifact or report URL>`. It puts a summary block at the top of the PR description and keeps one comment up to date, replacing earlier ones, so it is safe to run again. Add `--no-comment` to skip the comment.
@@ -52,4 +52,4 @@ Your reply: the summary line, the link, and the failed cases' names from `eval-r
 
 ## On CI
 
-`/eval-report-install-ci` sets this up in GitHub Actions, where it runs without an agent or tokens.
+`/eval-report-install-ci` sets this up in GitHub Actions, where it runs without an agent or tokens. There the report is an artifact that opens in the browser for people who can read the repository, so it works on private repositories too.

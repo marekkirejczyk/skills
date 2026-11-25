@@ -4,7 +4,7 @@
 //
 //   eval-report.mjs run     [--config .eval-report.json] [--scope all|commit|pr] [--only] [--out eval-report]
 //   eval-report.mjs build   --results <file> [--config ...] [--scope ...] [--out ...]
-//   eval-report.mjs publish [--out eval-report] [--pages | --url <url>] [--no-comment]
+//   eval-report.mjs publish [--out eval-report] [--url <url> | --pages] [--no-comment]
 //
 // Run it from the repository root. See ../reference/input-format.md.
 
@@ -21,6 +21,7 @@ import { bodyBlock, commentBody, summarize, summaryLine } from './lib/summary.mj
 import { publishToPages, updatePullRequestBody, upsertComment } from './lib/publish.mjs';
 
 const RESULTS_FILE = 'results.ndjson';
+const PAGE_FILE = 'eval-report.html';
 
 const OPTIONS = {
   config: { type: 'string', default: '.eval-report.json' },
@@ -48,9 +49,9 @@ function build({ resultsPath, scope, outDir, config, changes, context }) {
   if (changes) markChangedCases(files, changes);
   const summary = summarize(files, scope);
   mkdirSync(outDir, { recursive: true });
-  writeFileSync(join(outDir, 'index.html'), renderReport({ files, summary, context, title: config.title }));
+  writeFileSync(join(outDir, PAGE_FILE), renderReport({ files, summary, context, title: config.title }));
   writeFileSync(join(outDir, 'summary.json'), `${JSON.stringify(summary, null, 2)}\n`);
-  console.log(`${summaryLine(summary)}\nReport: ${resolve(outDir, 'index.html')}`);
+  console.log(`${summaryLine(summary)}\nReport: ${resolve(outDir, PAGE_FILE)}`);
   return summary;
 }
 
@@ -79,7 +80,7 @@ function publish(values, context) {
   if (!context.repo) throw new Error('not a GitHub repository: nothing to publish to');
   const pull = context.pullRequest;
   const url = values.pages
-    ? publishToPages({ reportDir: values.out, repo: context.repo, slug: pull ? `pr-${pull.number}` : `commit-${context.sha.slice(0, 7)}` })
+    ? publishToPages({ page: join(values.out, PAGE_FILE), repo: context.repo, slug: pull ? `pr-${pull.number}` : `commit-${context.sha.slice(0, 7)}` })
     : values.url;
   if (!url) throw new Error('say where the report is: --pages, or --url <url>');
   console.log(`Report URL: ${url}`);

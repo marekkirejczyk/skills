@@ -1,7 +1,7 @@
 // Hosting a report on GitHub Pages and putting its link on a pull request,
 // with git and gh only.
 
-import { cpSync, mkdirSync, mkdtempSync, rmSync, writeFileSync } from 'node:fs';
+import { copyFileSync, mkdirSync, mkdtempSync, rmSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { exec, tryExec } from './git.mjs';
@@ -16,8 +16,25 @@ function pagesUrl(repo) {
   return `https://${owner}.github.io/${name}/`;
 }
 
-// Commits the report folder to <branch>/<folder>/<slug>/ and returns its URL.
-export function publishToPages({ reportDir, repo, slug, branch = 'gh-pages', folder = 'eval-reports' }) {
+// Pages sites are public unless the repository is private and its Pages
+// visibility is set to private (GitHub Enterprise Cloud). Eval inputs and
+// outputs of a private repository must not end up on a public site.
+export function pagesExposePrivateRepo({ repoIsPrivate, pagesArePublic }) {
+  return repoIsPrivate && pagesArePublic;
+}
+
+function assertPagesKeepRepoPrivate(repo) {
+  const repoIsPrivate = exec('gh', ['api', `repos/${repo}`, '--jq', '.private']) === 'true';
+  // No Pages site yet, or a plan without the setting, means public.
+  const pagesArePublic = tryExec('gh', ['api', `repos/${repo}/pages`, '--jq', '.public']) !== 'false';
+  if (pagesExposePrivateRepo({ repoIsPrivate, pagesArePublic })) {
+    throw new Error(`${repo} is private but its GitHub Pages site would be public: link the uploaded artifact with --url instead (see the eval-report-install-ci skill)`);
+  }
+}
+
+// Commits the page to <branch>/<folder>/<slug>/index.html and returns its URL.
+export function publishToPages({ page, repo, slug, branch = 'gh-pages', folder = 'eval-reports' }) {
+  assertPagesKeepRepoPrivate(repo);
   const worktree = mkdtempSync(join(tmpdir(), 'eval-report-pages-'));
   const exists = tryExec('git', ['fetch', '--quiet', 'origin', branch]) !== null;
   try {
@@ -30,7 +47,7 @@ export function publishToPages({ reportDir, repo, slug, branch = 'gh-pages', fol
     const target = join(worktree, folder, slug);
     rmSync(target, { recursive: true, force: true });
     mkdirSync(target, { recursive: true });
-    cpSync(reportDir, target, { recursive: true, filter: (source) => !source.endsWith('.ndjson') });
+    copyFileSync(page, join(target, 'index.html'));
     exec('git', ['add', '--all'], { cwd: worktree });
     if (tryExec('git', ['diff', '--cached', '--quiet'], { cwd: worktree }) === null) {
       exec('git', [...BOT, 'commit', '--quiet', '-m', `eval report: ${slug}`], { cwd: worktree });

@@ -12,7 +12,7 @@ on:
       - '.github/workflows/evals.yml'
 
 permissions:
-  contents: write        # push the report to the gh-pages branch
+  contents: read
   pull-requests: write   # the summary block and the comment
 
 concurrency:
@@ -34,13 +34,18 @@ jobs:
       - name: Run the evals into a report
         env: {}   # the eval command's secrets, such as a model API key
         run: node .github/eval-report/eval-report.mjs run --scope pr
-      - name: Publish the report and link it from the PR
-        if: always() && github.event.pull_request.head.repo.full_name == github.repository
+      # One self-contained HTML file, uploaded unzipped: GitHub opens it in the
+      # browser, for people who can read the repository. Private repos stay private.
+      - name: Upload the report
+        id: report
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          path: eval-report/eval-report.html
+          archive: false
+          retention-days: 30
+      - name: Link the report from the PR
+        if: always() && steps.report.outputs.artifact-url && github.event.pull_request.head.repo.full_name == github.repository
         env:
           GH_TOKEN: ${{ github.token }}
-        run: node .github/eval-report/eval-report.mjs publish --pages
-      - uses: actions/upload-artifact@v4
-        if: always()
-        with:
-          name: eval-report
-          path: eval-report/
+        run: node .github/eval-report/eval-report.mjs publish --url "${{ steps.report.outputs.artifact-url }}"

@@ -1,5 +1,6 @@
 # Tests the eval-report skill and builds a report from its fixture evals, so a
-# PR that changes the report shows what the report looks like.
+# PR that changes the report shows what the report looks like. This repository
+# is public, so the report goes on GitHub Pages, linked without a sign-in.
 name: eval-report
 
 on:
@@ -37,8 +38,10 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
         run: node skills/eval-report/scripts/eval-report.mjs publish --pages
-      - uses: actions/upload-artifact@v4
+      # The same unzipped upload the template uses for private repositories.
+      - uses: actions/upload-artifact@v7
         if: always()
         with:
-          name: eval-report
-          path: eval-report/
+          path: eval-report/eval-report.html
+          archive: false
+          retention-days: 30

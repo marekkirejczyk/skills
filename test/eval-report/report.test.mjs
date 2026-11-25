@@ -19,7 +19,7 @@ describe('eval-report.mjs run on the fixture evals', () => {
   before(() => {
     out = mkdtempSync(join(tmpdir(), 'eval-report-test-'));
     execFileSync('node', [CLI, 'run', '--config', CONFIG, '--out', out], { encoding: 'utf8', env: { ...process.env, GITHUB_ACTIONS: 'true', GITHUB_EVENT_PATH: '', GITHUB_REPOSITORY: 'o/r', GITHUB_SHA: 'abc1234def' } });
-    page = readFileSync(join(out, 'index.html'), 'utf8');
+    page = readFileSync(join(out, 'eval-report.html'), 'utf8');
     summary = JSON.parse(readFileSync(join(out, 'summary.json'), 'utf8'));
   });
 

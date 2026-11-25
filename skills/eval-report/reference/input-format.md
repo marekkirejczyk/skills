@@ -6,7 +6,7 @@
 .eval-report.json ──► eval-report.mjs run ──► sh -c "<command>"  (EVAL_REPORT_FILE=…/results.ndjson)
                                                      │  your runner appends one line per run
                                                      ▼
-                         eval-report/index.html  ◄── results.ndjson
+                         eval-report/eval-report.html  ◄── results.ndjson
                          eval-report/summary.json
 ```
 

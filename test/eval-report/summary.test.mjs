@@ -3,6 +3,7 @@ import assert from 'node:assert/strict';
 import { BODY_END, BODY_START, bodyBlock, commentBody, summarize, summaryLine, upsertBodyBlock } from '../../skills/eval-report/scripts/lib/summary.mjs';
 import { commandFor } from '../../skills/eval-report/scripts/lib/command.mjs';
 import { formatDuration } from '../../skills/eval-report/scripts/lib/report.mjs';
+import { pagesExposePrivateRepo } from '../../skills/eval-report/scripts/lib/publish.mjs';
 
 const evalCase = (name, results, change = null) => ({ name, change, passed: results.every(Boolean), runs: results.map((passed) => ({ passed })) });
 const FILES = [
@@ -94,5 +95,19 @@ describe('commandFor', () => {
 describe('formatDuration', () => {
   it('uses ms, seconds or minutes', () => {
     assert.deepEqual([formatDuration(850), formatDuration(11200), formatDuration(161000), formatDuration(null)], ['850ms', '11.2s', '2m 41s', '']);
+  });
+});
+
+describe('pagesExposePrivateRepo', () => {
+  it('is true for a private repository with public pages', () => {
+    assert.equal(pagesExposePrivateRepo({ repoIsPrivate: true, pagesArePublic: true }), true);
+  });
+
+  it('is false when the pages are private too', () => {
+    assert.equal(pagesExposePrivateRepo({ repoIsPrivate: true, pagesArePublic: false }), false);
+  });
+
+  it('is false for a public repository', () => {
+    assert.equal(pagesExposePrivateRepo({ repoIsPrivate: false, pagesArePublic: true }), false);
   });
 });
