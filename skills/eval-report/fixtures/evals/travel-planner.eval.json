@@ -1,68 +1,130 @@
 {
-  "$comment": "Fixture evals for eval-report, defined as JSON data: rich outputs (cards, lists, links). Not run: ../results.json was written to look like a real run of them.",
+  "$comment": "Fixture evals for eval-report, defined as JSON data: rich outputs (cards, lists, links). ../runner/run.mjs runs them against a fake model (../outputs.json).",
   "suite": "travel planner",
   "cases": [
     {
       "name": "a weekend itinerary has one plan per day",
+      "rule": "Instructions, ‘Itineraries’: one section per day; adapt to the weather.",
       "input": "Plan a weekend in Lisbon for two, mid-range budget, we love food.",
-      "mocks": { "search_hotels": "fake: lisbonHotels", "weather": { "sat": "sunny", "sun": "rain" } },
+      "mocks": {
+        "search_hotels": "fake: lisbonHotels",
+        "weather": {
+          "sat": "sunny",
+          "sun": "rain"
+        }
+      },
       "checks": [
-        { "judge": "one section per day" },
-        { "judge": "suggests an indoor plan for the rainy day" },
-        { "calls": "weather" }
+        {
+          "judge": "one section per day"
+        },
+        {
+          "judge": "suggests an indoor plan for the rainy day"
+        },
+        {
+          "calls": "weather"
+        }
       ]
     },
     {
       "name": "flight options show price, stops and times",
       "input": "Cheapest flights London to Lisbon on 12 Dec, back 15 Dec.",
-      "mocks": { "search_flights": "fake: lonLisFlights" },
+      "mocks": {
+        "search_flights": "fake: lonLisFlights"
+      },
       "checks": [
-        { "calls": "search_flights", "with": { "from": "LON", "to": "LIS" } },
-        { "showsCard": "flight" },
-        { "judge": "says prices may change" }
+        {
+          "calls": "search_flights",
+          "with": {
+            "from": "LON",
+            "to": "LIS"
+          }
+        },
+        {
+          "showsCard": "flight"
+        },
+        {
+          "judge": "says prices may change"
+        }
       ]
     },
     {
       "name": "asks for dates before searching flights",
+      "knownBug": "Intermittent. The reply is a question card with no words at all (service.ts, endsReply).",
       "input": "Find me flights to Tokyo.",
       "checks": [
-        { "notCalls": "search_flights" },
-        { "showsCard": "question" },
-        { "judge": "asks for the dates once" }
+        {
+          "notCalls": "search_flights"
+        },
+        {
+          "showsCard": "question"
+        },
+        {
+          "judge": "asks for the dates once"
+        }
       ]
     },
     {
       "name": "a visa question points to the official source",
       "input": "Do I need a visa for Japan with a UK passport?",
       "checks": [
-        { "judge": "links the official government page" },
-        { "judge": "does not state rules as certain" }
+        {
+          "judge": "links the official government page"
+        },
+        {
+          "judge": "does not state rules as certain"
+        }
       ]
     },
     {
       "name": "a hotel shortlist stays within budget",
       "input": "Hotels in Porto under €120 a night, 3 nights from 20 Dec.",
-      "mocks": { "search_hotels": "fake: portoHotels" },
+      "mocks": {
+        "search_hotels": "fake: portoHotels"
+      },
       "checks": [
-        { "calls": "search_hotels", "with": { "maxPrice": 120 } },
-        { "judge": "every hotel shown is under €120" }
+        {
+          "calls": "search_hotels",
+          "with": {
+            "maxPrice": 120
+          }
+        },
+        {
+          "judge": "every hotel shown is under €120"
+        }
       ]
     },
     {
       "name": "weather is given for the trip dates, not today",
       "input": "What will the weather be like in Rome from 3 to 6 January?",
-      "mocks": { "weather": "fake: romeJanuary" },
+      "mocks": {
+        "weather": "fake: romeJanuary"
+      },
       "checks": [
-        { "calls": "weather", "with": { "from": "2027-01-03", "to": "2027-01-06" } }
+        {
+          "calls": "weather",
+          "with": {
+            "from": "2027-01-03",
+            "to": "2027-01-06"
+          }
+        }
       ]
     },
     {
       "name": "a tool error is explained and retried once",
       "input": "Book me the 9:40 to Lisbon on 12 Dec.",
-      "mocks": { "search_flights": { "error": "timeout" } },
+      "mocks": {
+        "search_flights": {
+          "error": "timeout"
+        }
+      },
       "checks": [
-        { "callCount": "search_flights", "times": 2 },
-        { "judge": "tells the buyer the search failed, without jargon" }
+        {
+          "callCount": "search_flights",
+          "times": 2
+        },
+        {
+          "judge": "tells the buyer the search failed, without jargon"
+        }
       ]
     }
   ]

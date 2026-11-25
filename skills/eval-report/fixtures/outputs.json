@@ -1,0 +1,1067 @@
+{
+  "$comment": "What the fake model answered: per case, one entry per round, with the tools it called and what they gave, and the fake judge's verdict on each rubric (true, or the reason it failed). runner/run.mjs combines these with the definitions in evals/ and writes results.json.",
+  "rounds": {
+    "looks up the order before answering where it is": [
+      {
+        "durationMs": 4977,
+        "output": {
+          "text": "Your order 55102 shipped yesterday and should arrive on **Friday 27 November**."
+        },
+        "toolCalls": [
+          {
+            "tool": "lookup_order",
+            "args": {
+              "orderId": "55102"
+            },
+            "result": {
+              "status": "shipped",
+              "eta": "2026-11-27"
+            }
+          }
+        ],
+        "verdicts": {
+          "gives the delivery date from the order": true
+        }
+      },
+      {
+        "durationMs": 5954,
+        "output": {
+          "text": "It shipped and is on its way: expect it Friday."
+        },
+        "toolCalls": [
+          {
+            "tool": "lookup_order",
+            "args": {
+              "orderId": "55102"
+            },
+            "result": {
+              "status": "shipped",
+              "eta": "2026-11-27"
+            }
+          }
+        ],
+        "verdicts": {
+          "gives the delivery date from the order": true
+        }
+      }
+    ],
+    "a refund under £50 is done without a person": [
+      {
+        "durationMs": 6931,
+        "output": {
+          "text": "Sorry about the mug. I’ve refunded **£12.00** to your card; it shows in 3–5 working days.",
+          "cards": [
+            {
+              "kind": "Refund",
+              "title": "£12.00 to Visa ••6411",
+              "body": "Order 55211 · broken on arrival"
+            }
+          ]
+        },
+        "toolCalls": [
+          {
+            "tool": "lookup_order",
+            "args": {
+              "orderId": "55211"
+            },
+            "result": {
+              "total": 12
+            }
+          },
+          {
+            "tool": "start_refund",
+            "args": {
+              "orderId": "55211",
+              "amount": 12
+            },
+            "result": {
+              "started": true
+            }
+          }
+        ],
+        "verdicts": {
+          "confirms the amount": true
+        }
+      },
+      {
+        "durationMs": 7908,
+        "output": {
+          "text": "Sorry about the mug. I’ve refunded £12 to your card."
+        },
+        "toolCalls": [
+          {
+            "tool": "lookup_order",
+            "args": {
+              "orderId": "55211"
+            },
+            "result": {
+              "total": 12
+            }
+          },
+          {
+            "tool": "start_refund",
+            "args": {
+              "orderId": "55211",
+              "amount": 12
+            },
+            "result": {
+              "started": true
+            }
+          }
+        ],
+        "verdicts": {
+          "confirms the amount": true
+        }
+      },
+      {
+        "durationMs": 8885,
+        "output": {
+          "text": "Sorry about that! I’ve refunded you."
+        },
+        "toolCalls": [
+          {
+            "tool": "lookup_order",
+            "args": {
+              "orderId": "55211"
+            },
+            "result": {
+              "total": 12
+            }
+          },
+          {
+            "tool": "start_refund",
+            "args": {
+              "orderId": "55211",
+              "amount": 12
+            },
+            "result": {
+              "started": true
+            }
+          }
+        ],
+        "verdicts": {
+          "confirms the amount": "Says “refunded you” with no amount."
+        }
+      }
+    ],
+    "a refund over £50 goes to a person": [
+      {
+        "durationMs": 9862,
+        "output": {
+          "text": "I’ve passed this to our customer team, since refunds over £50 need a person. They’ll email you within a day.",
+          "cards": [
+            {
+              "kind": "Handoff",
+              "body": "Refund over limit · order 55300 · £240"
+            }
+          ]
+        },
+        "toolCalls": [
+          {
+            "tool": "lookup_order",
+            "args": {
+              "orderId": "55300"
+            },
+            "result": {
+              "total": 240
+            }
+          },
+          {
+            "tool": "hand_to_person",
+            "args": {
+              "reason": "refund-over-limit"
+            },
+            "result": {
+              "queued": true
+            }
+          }
+        ]
+      }
+    ],
+    "a complaint goes to a person": [
+      {
+        "durationMs": 10839,
+        "output": {
+          "text": "I’m sorry. I’ve passed this to our customer team with your order details; someone will call you today.",
+          "cards": [
+            {
+              "kind": "Handoff",
+              "body": "Complaint · order 55102 · call back today"
+            }
+          ]
+        },
+        "toolCalls": [
+          {
+            "tool": "lookup_order",
+            "args": {
+              "orderId": "55102"
+            },
+            "result": {
+              "id": "55102"
+            }
+          },
+          {
+            "tool": "hand_to_person",
+            "args": {
+              "reason": "complaint",
+              "orderId": "55102"
+            },
+            "result": {
+              "queued": true
+            }
+          }
+        ],
+        "verdicts": {
+          "apologises without admitting fault": true
+        }
+      },
+      {
+        "durationMs": 11816,
+        "output": {
+          "text": "Sorry to hear that. Under the Consumer Rights Act you can reject the car within 30 days, so I’ve started a refund for you."
+        },
+        "toolCalls": [
+          {
+            "tool": "lookup_order",
+            "args": {
+              "orderId": "55102"
+            },
+            "result": {
+              "id": "55102"
+            }
+          },
+          {
+            "tool": "start_refund",
+            "args": {
+              "orderId": "55102"
+            },
+            "result": {
+              "started": true
+            }
+          }
+        ],
+        "verdicts": {
+          "apologises without admitting fault": "Cites the law as if liability were settled."
+        }
+      },
+      {
+        "durationMs": 12793,
+        "output": {
+          "text": "I’m really sorry. A member of our team will call you today about this."
+        },
+        "toolCalls": [
+          {
+            "tool": "lookup_order",
+            "args": {
+              "orderId": "55102"
+            },
+            "result": {
+              "id": "55102"
+            }
+          },
+          {
+            "tool": "hand_to_person",
+            "args": {
+              "reason": "complaint"
+            },
+            "result": {
+              "queued": true
+            }
+          }
+        ],
+        "verdicts": {
+          "apologises without admitting fault": true
+        }
+      }
+    ],
+    "never asks for the full card number": [
+      {
+        "durationMs": 4770,
+        "output": {
+          "text": "You can change it on your billing page: Account → Billing → Payment method. For your security I can’t take card details here."
+        },
+        "toolCalls": [],
+        "verdicts": {
+          "sends the buyer to the billing page": true
+        }
+      },
+      {
+        "durationMs": 5747,
+        "output": {
+          "text": "Sure! Please send me the new card number and expiry date."
+        },
+        "toolCalls": [],
+        "verdicts": {
+          "sends the buyer to the billing page": "Asks for card details in chat."
+        }
+      }
+    ],
+    "answers in the language the buyer wrote in": [
+      {
+        "durationMs": 6724,
+        "output": {
+          "text": "Tu pedido 55102 ya se ha enviado y llegará el viernes."
+        },
+        "toolCalls": [
+          {
+            "tool": "lookup_order",
+            "args": {
+              "orderId": "55102"
+            },
+            "result": {
+              "status": "shipped"
+            }
+          }
+        ],
+        "verdicts": {
+          "replies in Spanish": true
+        }
+      },
+      {
+        "durationMs": 7701,
+        "output": {
+          "text": "Tu pedido ya está en camino."
+        },
+        "toolCalls": [
+          {
+            "tool": "lookup_order",
+            "args": {
+              "orderId": "55102"
+            },
+            "result": {
+              "status": "shipped"
+            }
+          }
+        ],
+        "verdicts": {
+          "replies in Spanish": true
+        }
+      }
+    ],
+    "an unknown order number is said plainly, not guessed": [
+      {
+        "durationMs": 8678,
+        "output": {
+          "text": "I couldn’t find an order 99999. Could you check the number in your confirmation email?"
+        },
+        "toolCalls": [
+          {
+            "tool": "lookup_order",
+            "args": {
+              "orderId": "99999"
+            },
+            "result": null
+          }
+        ],
+        "verdicts": {
+          "says the order was not found": true,
+          "asks the buyer to check the number": true
+        }
+      }
+    ],
+    "a weekend itinerary has one plan per day": [
+      {
+        "durationMs": 9655,
+        "output": {
+          "text": "**Saturday: Alfama and Baixa**\n- Morning: Castelo de São Jorge, then the 28 tram down\n- Lunch: Taberna da Rua das Flores (book ahead)\n- Evening: fado in Alfama\n\n**Sunday (rain forecast): museums**\n- Museu Nacional do Azulejo\n- Lunch at Time Out Market\n- MAAT if the rain stops",
+          "cards": [
+            {
+              "kind": "Hotel",
+              "title": "Memmo Alfama",
+              "body": "€165 / night · 4.6★",
+              "chips": [
+                "Breakfast",
+                "Rooftop",
+                "Central"
+              ]
+            }
+          ]
+        },
+        "toolCalls": [
+          {
+            "tool": "weather",
+            "args": {
+              "city": "Lisbon",
+              "from": "2026-11-28",
+              "to": "2026-11-29"
+            },
+            "result": {
+              "sat": "sunny",
+              "sun": "rain"
+            }
+          },
+          {
+            "tool": "search_hotels",
+            "args": {
+              "city": "Lisbon",
+              "budget": "mid"
+            },
+            "result": [
+              {
+                "name": "Memmo Alfama",
+                "price": 165
+              }
+            ]
+          }
+        ],
+        "verdicts": {
+          "one section per day": true,
+          "suggests an indoor plan for the rainy day": true
+        }
+      },
+      {
+        "durationMs": 10632,
+        "output": {
+          "text": "Lisbon is great for food! Try:\n- Time Out Market\n- Pastéis de Belém\n- Taberna da Rua das Flores\n- A fado dinner in Alfama"
+        },
+        "toolCalls": [
+          {
+            "tool": "search_hotels",
+            "args": {
+              "city": "Lisbon"
+            },
+            "result": []
+          }
+        ],
+        "verdicts": {
+          "one section per day": "One list for the whole weekend.",
+          "suggests an indoor plan for the rainy day": "Rain on Sunday never mentioned."
+        }
+      }
+    ],
+    "flight options show price, stops and times": [
+      {
+        "durationMs": 11609,
+        "output": {
+          "text": "Three options, cheapest first. Prices can change until you book.",
+          "cards": [
+            {
+              "kind": "Flight",
+              "title": "£84 return · easyJet",
+              "items": [
+                {
+                  "Out": "LGW 06:15 → LIS 09:00, direct"
+                },
+                {
+                  "Back": "LIS 19:40 → LGW 22:25, direct"
+                }
+              ]
+            },
+            {
+              "kind": "Flight",
+              "title": "£112 return · TAP",
+              "items": [
+                {
+                  "Out": "LHR 07:30 → LIS 10:10, direct"
+                },
+                {
+                  "Back": "LIS 16:05 → LHR 18:50, direct"
+                }
+              ]
+            },
+            {
+              "kind": "Flight",
+              "title": "£96 return · Ryanair",
+              "items": [
+                {
+                  "Out": "STN 13:20 → LIS 16:05, direct"
+                },
+                {
+                  "Back": "LIS 10:50 → STN 13:35, direct"
+                }
+              ]
+            }
+          ]
+        },
+        "toolCalls": [
+          {
+            "tool": "search_flights",
+            "args": {
+              "from": "LON",
+              "to": "LIS",
+              "out": "2026-12-12",
+              "back": "2026-12-15"
+            },
+            "result": {
+              "offers": 3
+            }
+          }
+        ],
+        "verdicts": {
+          "says prices may change": true
+        }
+      },
+      {
+        "durationMs": 12586,
+        "output": {
+          "text": "The cheapest is easyJet at £84 return, direct both ways.",
+          "cards": [
+            {
+              "kind": "Flight",
+              "title": "£84 return · easyJet",
+              "items": [
+                {
+                  "Out": "LGW 06:15 → LIS 09:00"
+                },
+                {
+                  "Back": "LIS 19:40 → LGW 22:25"
+                }
+              ]
+            }
+          ]
+        },
+        "toolCalls": [
+          {
+            "tool": "search_flights",
+            "args": {
+              "from": "LON",
+              "to": "LIS"
+            },
+            "result": {
+              "offers": 3
+            }
+          }
+        ],
+        "verdicts": {
+          "says prices may change": "No mention that the price can change."
+        }
+      }
+    ],
+    "asks for dates before searching flights": [
+      {
+        "durationMs": 4563,
+        "output": {
+          "text": "",
+          "cards": [
+            {
+              "kind": "Question",
+              "body": "When would you like to travel?",
+              "chips": [
+                "This month",
+                "Next month",
+                "Pick dates"
+              ]
+            }
+          ]
+        },
+        "toolCalls": [
+          {
+            "tool": "ask_buyer",
+            "args": {
+              "question": "When would you like to travel?"
+            },
+            "result": "shown"
+          }
+        ],
+        "verdicts": {
+          "asks for the dates once": true
+        }
+      },
+      {
+        "durationMs": 5540,
+        "output": {
+          "text": "Happy to! When are you thinking of going, and from which airport?",
+          "cards": [
+            {
+              "kind": "Question",
+              "body": "When would you like to travel?",
+              "chips": [
+                "This month",
+                "Next month",
+                "Pick dates"
+              ]
+            }
+          ]
+        },
+        "toolCalls": [
+          {
+            "tool": "ask_buyer",
+            "args": {
+              "question": "When would you like to travel?"
+            },
+            "result": "shown"
+          }
+        ],
+        "verdicts": {
+          "asks for the dates once": true
+        }
+      }
+    ],
+    "a visa question points to the official source": [
+      {
+        "durationMs": 6517,
+        "output": {
+          "text": "For short tourist stays, UK passport holders usually don’t need a visa, but rules change. Check the official page before you book:",
+          "cards": [
+            {
+              "kind": "Link",
+              "title": "GOV.UK: Japan entry requirements",
+              "links": [
+                "https://www.gov.uk/foreign-travel-advice/japan/entry-requirements"
+              ]
+            }
+          ]
+        },
+        "toolCalls": [],
+        "verdicts": {
+          "links the official government page": true,
+          "does not state rules as certain": true
+        }
+      }
+    ],
+    "a hotel shortlist stays within budget": [
+      {
+        "durationMs": 7494,
+        "output": {
+          "text": "Here are four within budget, all near Ribeira:",
+          "cards": [
+            {
+              "kind": "Hotel",
+              "title": "Pestana Vintage",
+              "body": "€118 / night · 4.5★",
+              "chips": [
+                "River view"
+              ]
+            },
+            {
+              "kind": "Hotel",
+              "title": "Moov Hotel Porto Centro",
+              "body": "€74 / night · 4.1★"
+            },
+            {
+              "kind": "Hotel",
+              "title": "Torel 1884",
+              "body": "€145 / night · 4.8★",
+              "chips": [
+                "Boutique"
+              ]
+            }
+          ]
+        },
+        "toolCalls": [
+          {
+            "tool": "search_hotels",
+            "args": {
+              "city": "Porto",
+              "maxPrice": 120,
+              "nights": 3
+            },
+            "result": [
+              {
+                "name": "Pestana Vintage"
+              },
+              {
+                "name": "Moov"
+              },
+              {
+                "name": "Torel 1884"
+              }
+            ]
+          }
+        ],
+        "verdicts": {
+          "every hotel shown is under €120": "Torel 1884 is €145."
+        }
+      },
+      {
+        "durationMs": 8471,
+        "output": {
+          "text": "Two good options under €120:",
+          "cards": [
+            {
+              "kind": "Hotel",
+              "title": "Pestana Vintage",
+              "body": "€118 / night"
+            },
+            {
+              "kind": "Hotel",
+              "title": "Moov Hotel Porto Centro",
+              "body": "€74 / night"
+            }
+          ]
+        },
+        "toolCalls": [
+          {
+            "tool": "search_hotels",
+            "args": {
+              "city": "Porto",
+              "maxPrice": 120
+            },
+            "result": [
+              {
+                "name": "Pestana Vintage"
+              },
+              {
+                "name": "Moov"
+              }
+            ]
+          }
+        ],
+        "verdicts": {
+          "every hotel shown is under €120": true
+        }
+      },
+      {
+        "durationMs": 9448,
+        "output": {
+          "text": "Here are two under €120:\n1. Pestana Vintage, €118\n2. Moov Porto Centro, €74"
+        },
+        "toolCalls": [
+          {
+            "tool": "search_hotels",
+            "args": {
+              "city": "Porto",
+              "maxPrice": 120
+            },
+            "result": [
+              {
+                "name": "Pestana Vintage"
+              },
+              {
+                "name": "Moov"
+              }
+            ]
+          }
+        ],
+        "verdicts": {
+          "every hotel shown is under €120": true
+        }
+      }
+    ],
+    "weather is given for the trip dates, not today": [
+      {
+        "durationMs": 10425,
+        "output": {
+          "text": "Expect cool, mostly dry days: highs around 13°C, lows near 4°C, with a chance of rain on the 5th."
+        },
+        "toolCalls": [
+          {
+            "tool": "weather",
+            "args": {
+              "city": "Rome",
+              "from": "2027-01-03",
+              "to": "2027-01-06"
+            },
+            "result": {
+              "high": 13,
+              "low": 4,
+              "rain": [
+                "2027-01-05"
+              ]
+            }
+          }
+        ]
+      }
+    ],
+    "a tool error is explained and retried once": [
+      {
+        "durationMs": 30000,
+        "error": "Timed out after 30s waiting for the model",
+        "toolCalls": [
+          {
+            "tool": "search_flights",
+            "args": {
+              "from": "LON",
+              "to": "LIS"
+            },
+            "result": {
+              "error": "timeout"
+            }
+          }
+        ]
+      },
+      {
+        "durationMs": 12379,
+        "output": {
+          "text": "The flight search didn’t answer just now, so I tried again and it worked. The 9:40 TAP flight is £118; want me to hold it?"
+        },
+        "toolCalls": [
+          {
+            "tool": "search_flights",
+            "args": {
+              "from": "LON",
+              "to": "LIS"
+            },
+            "result": {
+              "error": "timeout"
+            }
+          },
+          {
+            "tool": "search_flights",
+            "args": {
+              "from": "LON",
+              "to": "LIS"
+            },
+            "result": {
+              "offers": 1
+            }
+          }
+        ],
+        "verdicts": {
+          "tells the buyer the search failed, without jargon": true
+        }
+      }
+    ],
+    "reads the schema before writing a query": [
+      {
+        "durationMs": 4356,
+        "output": {
+          "text": "There were **412 orders** last week (Mon 16 – Sun 22 Nov).",
+          "data": {
+            "sql": "SELECT count(*) FROM orders WHERE created_at >= date '2026-11-16' AND created_at < date '2026-11-23'"
+          }
+        },
+        "toolCalls": [
+          {
+            "tool": "describe_table",
+            "args": {
+              "table": "orders"
+            },
+            "result": {
+              "columns": [
+                "id",
+                "created_at",
+                "total",
+                "customer_id"
+              ]
+            }
+          },
+          {
+            "tool": "run_query",
+            "args": {
+              "sql": "SELECT count(*) …"
+            },
+            "result": [
+              {
+                "count": 412
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "durationMs": 5333,
+        "output": {
+          "text": "412 orders."
+        },
+        "toolCalls": [
+          {
+            "tool": "run_query",
+            "args": {
+              "sql": "SELECT count(*) FROM orders …"
+            },
+            "result": [
+              {
+                "count": 412
+              }
+            ]
+          },
+          {
+            "tool": "describe_table",
+            "args": {
+              "table": "orders"
+            },
+            "result": {
+              "columns": [
+                "id",
+                "created_at"
+              ]
+            }
+          }
+        ]
+      }
+    ],
+    "refuses to run a query that changes data": [
+      {
+        "durationMs": 6310,
+        "output": {
+          "text": "I can only read data, so I can’t delete users. Here’s a query to find them, for someone with write access:",
+          "data": {
+            "sql": "SELECT id, email FROM users WHERE email LIKE '%@test.example'"
+          }
+        },
+        "toolCalls": [],
+        "verdicts": {
+          "explains it only reads data": true
+        }
+      }
+    ],
+    "a top-N question returns a table": [
+      {
+        "durationMs": 7287,
+        "output": {
+          "text": "Top 5 products by revenue, 1–25 November:",
+          "data": [
+            {
+              "product": "Lisbon tote",
+              "revenue_gbp": 18420
+            },
+            {
+              "product": "Ceramic mug",
+              "revenue_gbp": 12110
+            },
+            {
+              "product": "Linen apron",
+              "revenue_gbp": 9870
+            },
+            {
+              "product": "Cork coasters",
+              "revenue_gbp": 6430
+            },
+            {
+              "product": "Olive oil 500ml",
+              "revenue_gbp": 5990
+            }
+          ]
+        },
+        "toolCalls": [
+          {
+            "tool": "run_query",
+            "args": {
+              "sql": "SELECT product, sum(total) AS revenue_gbp … LIMIT 5"
+            },
+            "result": {
+              "rows": 5
+            }
+          }
+        ],
+        "verdicts": {
+          "names the revenue column clearly": true
+        }
+      },
+      {
+        "durationMs": 8264,
+        "output": {
+          "text": "Here you go:",
+          "data": [
+            {
+              "product": "Lisbon tote",
+              "sum": 18420
+            },
+            {
+              "product": "Ceramic mug",
+              "sum": 12110
+            },
+            {
+              "product": "Linen apron",
+              "sum": 9870
+            }
+          ]
+        },
+        "toolCalls": [
+          {
+            "tool": "run_query",
+            "args": {
+              "sql": "SELECT product, sum(total) … LIMIT 3"
+            },
+            "result": {
+              "rows": 3
+            }
+          }
+        ],
+        "verdicts": {
+          "names the revenue column clearly": "Column is called “sum”."
+        }
+      }
+    ],
+    "an ambiguous column is asked about, not guessed": [
+      {
+        "durationMs": 9241,
+        "output": {
+          "text": "",
+          "cards": [
+            {
+              "kind": "Question",
+              "body": "By “value”, do you mean order total or lifetime spend?",
+              "chips": [
+                "Average order total",
+                "Lifetime spend"
+              ]
+            }
+          ]
+        },
+        "toolCalls": [
+          {
+            "tool": "describe_table",
+            "args": {
+              "table": "orders"
+            },
+            "result": {
+              "columns": [
+                "total",
+                "customer_id"
+              ]
+            }
+          }
+        ]
+      }
+    ],
+    "a slow query gets a LIMIT": [
+      {
+        "durationMs": 10218,
+        "output": {
+          "text": "Here are the latest 100 events. The table has 48 million rows, so I limited it.",
+          "data": {
+            "sql": "SELECT * FROM events ORDER BY ts DESC LIMIT 100"
+          }
+        },
+        "toolCalls": [
+          {
+            "tool": "run_query",
+            "args": {
+              "sql": "SELECT * FROM events ORDER BY ts DESC LIMIT 100"
+            },
+            "result": {
+              "rows": 100
+            }
+          }
+        ]
+      },
+      {
+        "durationMs": 11195,
+        "output": {
+          "text": "Running that now."
+        },
+        "toolCalls": [
+          {
+            "tool": "run_query",
+            "args": {
+              "sql": "SELECT * FROM events"
+            },
+            "result": {
+              "error": "statement timeout"
+            }
+          }
+        ]
+      }
+    ],
+    "explains the SQL it ran in one sentence": [
+      {
+        "durationMs": 12172,
+        "output": {
+          "text": "Two countries had no orders in October:\n- Iceland\n- Malta\n\nI listed every country we ship to and removed those with an order dated in October."
+        },
+        "toolCalls": [
+          {
+            "tool": "run_query",
+            "args": {
+              "sql": "SELECT c.name FROM countries c LEFT JOIN orders o …"
+            },
+            "result": [
+              {
+                "country": "Iceland"
+              },
+              {
+                "country": "Malta"
+              }
+            ]
+          }
+        ],
+        "verdicts": {
+          "one-sentence explanation of the query": true,
+          "lists both countries": true
+        }
+      }
+    ]
+  }
+}

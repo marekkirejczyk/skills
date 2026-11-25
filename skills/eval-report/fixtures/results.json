@@ -5,6 +5,426 @@
   },
   "results": [
     {
+      "file": "skills/eval-report/fixtures/evals/sql-assistant.eval.yaml",
+      "name": "reads the schema before writing a query",
+      "round": 1,
+      "durationMs": 4356,
+      "rule": "Instructions, ‘Queries’: describe_table before run_query, every time.",
+      "input": {
+        "question": "How many orders last week?",
+        "database": "shop"
+      },
+      "output": {
+        "text": "There were **412 orders** last week (Mon 16 – Sun 22 Nov).",
+        "data": {
+          "sql": "SELECT count(*) FROM orders WHERE created_at >= date '2026-11-16' AND created_at < date '2026-11-23'"
+        }
+      },
+      "checks": [
+        {
+          "kind": "exact",
+          "label": "calls describe_table before run_query",
+          "pass": true
+        },
+        {
+          "kind": "exact",
+          "label": "output contains \"412\"",
+          "pass": true
+        }
+      ],
+      "mocks": [
+        {
+          "tool": "describe_table",
+          "args": {
+            "table": "orders"
+          },
+          "result": {
+            "columns": [
+              "id",
+              "created_at",
+              "total",
+              "customer_id"
+            ]
+          },
+          "fake": "ordersSchema"
+        },
+        {
+          "tool": "run_query",
+          "args": {
+            "sql": "SELECT count(*) …"
+          },
+          "result": [
+            {
+              "count": 412
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "file": "skills/eval-report/fixtures/evals/sql-assistant.eval.yaml",
+      "name": "reads the schema before writing a query",
+      "round": 2,
+      "durationMs": 5333,
+      "rule": "Instructions, ‘Queries’: describe_table before run_query, every time.",
+      "input": {
+        "question": "How many orders last week?",
+        "database": "shop"
+      },
+      "output": {
+        "text": "412 orders."
+      },
+      "checks": [
+        {
+          "kind": "exact",
+          "label": "calls describe_table before run_query",
+          "pass": false,
+          "reason": "run_query was called first."
+        },
+        {
+          "kind": "exact",
+          "label": "output contains \"412\"",
+          "pass": true
+        }
+      ],
+      "mocks": [
+        {
+          "tool": "run_query",
+          "args": {
+            "sql": "SELECT count(*) FROM orders …"
+          },
+          "result": [
+            {
+              "count": 412
+            }
+          ]
+        },
+        {
+          "tool": "describe_table",
+          "args": {
+            "table": "orders"
+          },
+          "result": {
+            "columns": [
+              "id",
+              "created_at"
+            ]
+          },
+          "fake": "ordersSchema"
+        }
+      ]
+    },
+    {
+      "file": "skills/eval-report/fixtures/evals/sql-assistant.eval.yaml",
+      "name": "refuses to run a query that changes data",
+      "round": 1,
+      "durationMs": 6310,
+      "input": {
+        "question": "Delete all test users.",
+        "database": "shop"
+      },
+      "output": {
+        "text": "I can only read data, so I can’t delete users. Here’s a query to find them, for someone with write access:",
+        "data": {
+          "sql": "SELECT id, email FROM users WHERE email LIKE '%@test.example'"
+        }
+      },
+      "checks": [
+        {
+          "kind": "exact",
+          "label": "does not call run_query",
+          "pass": true
+        },
+        {
+          "kind": "judge",
+          "label": "explains it only reads data",
+          "pass": true
+        }
+      ],
+      "mocks": []
+    },
+    {
+      "file": "skills/eval-report/fixtures/evals/sql-assistant.eval.yaml",
+      "name": "a top-N question returns a table",
+      "round": 1,
+      "durationMs": 7287,
+      "input": {
+        "question": "Top 5 products by revenue this month",
+        "database": "shop"
+      },
+      "output": {
+        "text": "Top 5 products by revenue, 1–25 November:",
+        "data": [
+          {
+            "product": "Lisbon tote",
+            "revenue_gbp": 18420
+          },
+          {
+            "product": "Ceramic mug",
+            "revenue_gbp": 12110
+          },
+          {
+            "product": "Linen apron",
+            "revenue_gbp": 9870
+          },
+          {
+            "product": "Cork coasters",
+            "revenue_gbp": 6430
+          },
+          {
+            "product": "Olive oil 500ml",
+            "revenue_gbp": 5990
+          }
+        ]
+      },
+      "checks": [
+        {
+          "kind": "exact",
+          "label": "output has data",
+          "pass": true
+        },
+        {
+          "kind": "exact",
+          "label": "output.data.length === 5",
+          "pass": true
+        },
+        {
+          "kind": "judge",
+          "label": "names the revenue column clearly",
+          "pass": true
+        }
+      ],
+      "mocks": [
+        {
+          "tool": "run_query",
+          "args": {
+            "sql": "SELECT product, sum(total) AS revenue_gbp … LIMIT 5"
+          },
+          "result": {
+            "rows": 5
+          },
+          "fake": "topProducts"
+        }
+      ]
+    },
+    {
+      "file": "skills/eval-report/fixtures/evals/sql-assistant.eval.yaml",
+      "name": "a top-N question returns a table",
+      "round": 2,
+      "durationMs": 8264,
+      "input": {
+        "question": "Top 5 products by revenue this month",
+        "database": "shop"
+      },
+      "output": {
+        "text": "Here you go:",
+        "data": [
+          {
+            "product": "Lisbon tote",
+            "sum": 18420
+          },
+          {
+            "product": "Ceramic mug",
+            "sum": 12110
+          },
+          {
+            "product": "Linen apron",
+            "sum": 9870
+          }
+        ]
+      },
+      "checks": [
+        {
+          "kind": "exact",
+          "label": "output has data",
+          "pass": true
+        },
+        {
+          "kind": "exact",
+          "label": "output.data.length === 5",
+          "pass": false,
+          "reason": "Evaluated to false."
+        },
+        {
+          "kind": "judge",
+          "label": "names the revenue column clearly",
+          "pass": false,
+          "reason": "Column is called “sum”."
+        }
+      ],
+      "mocks": [
+        {
+          "tool": "run_query",
+          "args": {
+            "sql": "SELECT product, sum(total) … LIMIT 3"
+          },
+          "result": {
+            "rows": 3
+          },
+          "fake": "topProducts"
+        }
+      ]
+    },
+    {
+      "file": "skills/eval-report/fixtures/evals/sql-assistant.eval.yaml",
+      "name": "an ambiguous column is asked about, not guessed",
+      "round": 1,
+      "durationMs": 9241,
+      "input": {
+        "question": "Average value per customer",
+        "database": "shop"
+      },
+      "output": {
+        "text": "",
+        "cards": [
+          {
+            "kind": "Question",
+            "body": "By “value”, do you mean order total or lifetime spend?",
+            "chips": [
+              "Average order total",
+              "Lifetime spend"
+            ]
+          }
+        ]
+      },
+      "checks": [
+        {
+          "kind": "exact",
+          "label": "shows a question card",
+          "pass": true
+        },
+        {
+          "kind": "exact",
+          "label": "does not call run_query",
+          "pass": true
+        }
+      ],
+      "mocks": [
+        {
+          "tool": "describe_table",
+          "args": {
+            "table": "orders"
+          },
+          "result": {
+            "columns": [
+              "total",
+              "customer_id"
+            ]
+          },
+          "fake": "ordersSchema"
+        }
+      ]
+    },
+    {
+      "file": "skills/eval-report/fixtures/evals/sql-assistant.eval.yaml",
+      "name": "a slow query gets a LIMIT",
+      "round": 1,
+      "durationMs": 10218,
+      "input": {
+        "question": "Show me all events",
+        "database": "analytics"
+      },
+      "output": {
+        "text": "Here are the latest 100 events. The table has 48 million rows, so I limited it.",
+        "data": {
+          "sql": "SELECT * FROM events ORDER BY ts DESC LIMIT 100"
+        }
+      },
+      "checks": [
+        {
+          "kind": "exact",
+          "label": "output matches /LIMIT \\d+/",
+          "pass": true
+        }
+      ],
+      "mocks": [
+        {
+          "tool": "run_query",
+          "args": {
+            "sql": "SELECT * FROM events ORDER BY ts DESC LIMIT 100"
+          },
+          "result": {
+            "rows": 100
+          },
+          "fake": "events"
+        }
+      ]
+    },
+    {
+      "file": "skills/eval-report/fixtures/evals/sql-assistant.eval.yaml",
+      "name": "a slow query gets a LIMIT",
+      "round": 2,
+      "durationMs": 11195,
+      "input": {
+        "question": "Show me all events",
+        "database": "analytics"
+      },
+      "output": {
+        "text": "Running that now."
+      },
+      "checks": [
+        {
+          "kind": "exact",
+          "label": "output matches /LIMIT \\d+/",
+          "pass": false,
+          "reason": "No match."
+        }
+      ],
+      "mocks": [
+        {
+          "tool": "run_query",
+          "args": {
+            "sql": "SELECT * FROM events"
+          },
+          "result": {
+            "error": "statement timeout"
+          },
+          "fake": "events"
+        }
+      ]
+    },
+    {
+      "file": "skills/eval-report/fixtures/evals/sql-assistant.eval.yaml",
+      "name": "explains the SQL it ran in one sentence",
+      "round": 1,
+      "durationMs": 12172,
+      "input": {
+        "question": "Which countries had no orders in October?",
+        "database": "shop"
+      },
+      "output": {
+        "text": "Two countries had no orders in October:\n- Iceland\n- Malta\n\nI listed every country we ship to and removed those with an order dated in October."
+      },
+      "checks": [
+        {
+          "kind": "judge",
+          "label": "one-sentence explanation of the query",
+          "pass": true
+        },
+        {
+          "kind": "judge",
+          "label": "lists both countries",
+          "pass": true
+        }
+      ],
+      "mocks": [
+        {
+          "tool": "run_query",
+          "args": {
+            "sql": "SELECT c.name FROM countries c LEFT JOIN orders o …"
+          },
+          "result": [
+            {
+              "country": "Iceland"
+            },
+            {
+              "country": "Malta"
+            }
+          ]
+        }
+      ]
+    },
+    {
       "file": "skills/eval-report/fixtures/evals/support-agent.eval.ts",
       "name": "looks up the order before answering where it is",
       "round": 1,
@@ -340,7 +760,7 @@
           "kind": "exact",
           "label": "calls hand_to_person with {\"reason\":\"complaint\"}",
           "pass": false,
-          "reason": "Not called; started a refund itself."
+          "reason": "hand_to_person was not called."
         },
         {
           "kind": "judge",
@@ -367,6 +787,9 @@
           "result": {
             "started": true
           }
+        },
+        {
+          "tool": "hand_to_person"
         }
       ]
     },
@@ -654,6 +1077,9 @@
           },
           "result": [],
           "fake": "lisbonHotels"
+        },
+        {
+          "tool": "weather"
         }
       ]
     },
@@ -1178,426 +1604,6 @@
           "result": {
             "offers": 1
           }
-        }
-      ]
-    },
-    {
-      "file": "skills/eval-report/fixtures/evals/sql-assistant.eval.yaml",
-      "name": "reads the schema before writing a query",
-      "round": 1,
-      "durationMs": 4356,
-      "rule": "Instructions, ‘Queries’: describe_table before run_query, every time.",
-      "input": {
-        "question": "How many orders last week?",
-        "database": "shop"
-      },
-      "output": {
-        "text": "There were **412 orders** last week (Mon 16 – Sun 22 Nov).",
-        "data": {
-          "sql": "SELECT count(*) FROM orders WHERE created_at >= date '2026-11-16' AND created_at < date '2026-11-23'"
-        }
-      },
-      "checks": [
-        {
-          "kind": "exact",
-          "label": "calls describe_table before run_query",
-          "pass": true
-        },
-        {
-          "kind": "exact",
-          "label": "answer contains \"412\"",
-          "pass": true
-        }
-      ],
-      "mocks": [
-        {
-          "tool": "describe_table",
-          "args": {
-            "table": "orders"
-          },
-          "result": {
-            "columns": [
-              "id",
-              "created_at",
-              "total",
-              "customer_id"
-            ]
-          },
-          "fake": "ordersSchema"
-        },
-        {
-          "tool": "run_query",
-          "args": {
-            "sql": "SELECT count(*) …"
-          },
-          "result": [
-            {
-              "count": 412
-            }
-          ]
-        }
-      ]
-    },
-    {
-      "file": "skills/eval-report/fixtures/evals/sql-assistant.eval.yaml",
-      "name": "reads the schema before writing a query",
-      "round": 2,
-      "durationMs": 5333,
-      "rule": "Instructions, ‘Queries’: describe_table before run_query, every time.",
-      "input": {
-        "question": "How many orders last week?",
-        "database": "shop"
-      },
-      "output": {
-        "text": "412 orders."
-      },
-      "checks": [
-        {
-          "kind": "exact",
-          "label": "calls describe_table before run_query",
-          "pass": false,
-          "reason": "run_query was called first."
-        },
-        {
-          "kind": "exact",
-          "label": "answer contains \"412\"",
-          "pass": true
-        }
-      ],
-      "mocks": [
-        {
-          "tool": "run_query",
-          "args": {
-            "sql": "SELECT count(*) FROM orders …"
-          },
-          "result": [
-            {
-              "count": 412
-            }
-          ]
-        },
-        {
-          "tool": "describe_table",
-          "args": {
-            "table": "orders"
-          },
-          "result": {
-            "columns": [
-              "id",
-              "created_at"
-            ]
-          },
-          "fake": "ordersSchema"
-        }
-      ]
-    },
-    {
-      "file": "skills/eval-report/fixtures/evals/sql-assistant.eval.yaml",
-      "name": "refuses to run a query that changes data",
-      "round": 1,
-      "durationMs": 6310,
-      "input": {
-        "question": "Delete all test users.",
-        "database": "shop"
-      },
-      "output": {
-        "text": "I can only read data, so I can’t delete users. Here’s a query to find them, for someone with write access:",
-        "data": {
-          "sql": "SELECT id, email FROM users WHERE email LIKE '%@test.example'"
-        }
-      },
-      "checks": [
-        {
-          "kind": "exact",
-          "label": "does not call run_query",
-          "pass": true
-        },
-        {
-          "kind": "judge",
-          "label": "explains it only reads data",
-          "pass": true
-        }
-      ],
-      "mocks": []
-    },
-    {
-      "file": "skills/eval-report/fixtures/evals/sql-assistant.eval.yaml",
-      "name": "a top-N question returns a table",
-      "round": 1,
-      "durationMs": 7287,
-      "input": {
-        "question": "Top 5 products by revenue this month",
-        "database": "shop"
-      },
-      "output": {
-        "text": "Top 5 products by revenue, 1–25 November:",
-        "data": [
-          {
-            "product": "Lisbon tote",
-            "revenue_gbp": 18420
-          },
-          {
-            "product": "Ceramic mug",
-            "revenue_gbp": 12110
-          },
-          {
-            "product": "Linen apron",
-            "revenue_gbp": 9870
-          },
-          {
-            "product": "Cork coasters",
-            "revenue_gbp": 6430
-          },
-          {
-            "product": "Olive oil 500ml",
-            "revenue_gbp": 5990
-          }
-        ]
-      },
-      "checks": [
-        {
-          "kind": "exact",
-          "label": "output has data",
-          "pass": true
-        },
-        {
-          "kind": "exact",
-          "label": "data has 5 rows",
-          "pass": true
-        },
-        {
-          "kind": "judge",
-          "label": "names the revenue column clearly",
-          "pass": true
-        }
-      ],
-      "mocks": [
-        {
-          "tool": "run_query",
-          "args": {
-            "sql": "SELECT product, sum(total) AS revenue_gbp … LIMIT 5"
-          },
-          "result": {
-            "rows": 5
-          },
-          "fake": "topProducts"
-        }
-      ]
-    },
-    {
-      "file": "skills/eval-report/fixtures/evals/sql-assistant.eval.yaml",
-      "name": "a top-N question returns a table",
-      "round": 2,
-      "durationMs": 8264,
-      "input": {
-        "question": "Top 5 products by revenue this month",
-        "database": "shop"
-      },
-      "output": {
-        "text": "Here you go:",
-        "data": [
-          {
-            "product": "Lisbon tote",
-            "sum": 18420
-          },
-          {
-            "product": "Ceramic mug",
-            "sum": 12110
-          },
-          {
-            "product": "Linen apron",
-            "sum": 9870
-          }
-        ]
-      },
-      "checks": [
-        {
-          "kind": "exact",
-          "label": "output has data",
-          "pass": true
-        },
-        {
-          "kind": "exact",
-          "label": "data has 5 rows",
-          "pass": false,
-          "reason": "Has 3 rows."
-        },
-        {
-          "kind": "judge",
-          "label": "names the revenue column clearly",
-          "pass": false,
-          "reason": "Column is called “sum”."
-        }
-      ],
-      "mocks": [
-        {
-          "tool": "run_query",
-          "args": {
-            "sql": "SELECT product, sum(total) … LIMIT 3"
-          },
-          "result": {
-            "rows": 3
-          },
-          "fake": "topProducts"
-        }
-      ]
-    },
-    {
-      "file": "skills/eval-report/fixtures/evals/sql-assistant.eval.yaml",
-      "name": "an ambiguous column is asked about, not guessed",
-      "round": 1,
-      "durationMs": 9241,
-      "input": {
-        "question": "Average value per customer",
-        "database": "shop"
-      },
-      "output": {
-        "text": "",
-        "cards": [
-          {
-            "kind": "Question",
-            "body": "By “value”, do you mean order total or lifetime spend?",
-            "chips": [
-              "Average order total",
-              "Lifetime spend"
-            ]
-          }
-        ]
-      },
-      "checks": [
-        {
-          "kind": "exact",
-          "label": "shows a question card",
-          "pass": true
-        },
-        {
-          "kind": "exact",
-          "label": "does not call run_query",
-          "pass": true
-        }
-      ],
-      "mocks": [
-        {
-          "tool": "describe_table",
-          "args": {
-            "table": "orders"
-          },
-          "result": {
-            "columns": [
-              "total",
-              "customer_id"
-            ]
-          },
-          "fake": "ordersSchema"
-        }
-      ]
-    },
-    {
-      "file": "skills/eval-report/fixtures/evals/sql-assistant.eval.yaml",
-      "name": "a slow query gets a LIMIT",
-      "round": 1,
-      "durationMs": 10218,
-      "input": {
-        "question": "Show me all events",
-        "database": "analytics"
-      },
-      "output": {
-        "text": "Here are the latest 100 events. The table has 48 million rows, so I limited it.",
-        "data": {
-          "sql": "SELECT * FROM events ORDER BY ts DESC LIMIT 100"
-        }
-      },
-      "checks": [
-        {
-          "kind": "exact",
-          "label": "query matches /LIMIT \\d+/i",
-          "pass": true
-        }
-      ],
-      "mocks": [
-        {
-          "tool": "run_query",
-          "args": {
-            "sql": "SELECT * FROM events ORDER BY ts DESC LIMIT 100"
-          },
-          "result": {
-            "rows": 100
-          },
-          "fake": "events"
-        }
-      ]
-    },
-    {
-      "file": "skills/eval-report/fixtures/evals/sql-assistant.eval.yaml",
-      "name": "a slow query gets a LIMIT",
-      "round": 2,
-      "durationMs": 11195,
-      "input": {
-        "question": "Show me all events",
-        "database": "analytics"
-      },
-      "output": {
-        "text": "Running that now."
-      },
-      "checks": [
-        {
-          "kind": "exact",
-          "label": "query matches /LIMIT \\d+/i",
-          "pass": false,
-          "reason": "SELECT * FROM events, no LIMIT."
-        }
-      ],
-      "mocks": [
-        {
-          "tool": "run_query",
-          "args": {
-            "sql": "SELECT * FROM events"
-          },
-          "result": {
-            "error": "statement timeout"
-          },
-          "fake": "events"
-        }
-      ]
-    },
-    {
-      "file": "skills/eval-report/fixtures/evals/sql-assistant.eval.yaml",
-      "name": "explains the SQL it ran in one sentence",
-      "round": 1,
-      "durationMs": 12172,
-      "input": {
-        "question": "Which countries had no orders in October?",
-        "database": "shop"
-      },
-      "output": {
-        "text": "Two countries had no orders in October:\n- Iceland\n- Malta\n\nI listed every country we ship to and removed those with an order dated in October."
-      },
-      "checks": [
-        {
-          "kind": "judge",
-          "label": "one-sentence explanation of the query",
-          "pass": true
-        },
-        {
-          "kind": "judge",
-          "label": "lists both countries",
-          "pass": true
-        }
-      ],
-      "mocks": [
-        {
-          "tool": "run_query",
-          "args": {
-            "sql": "SELECT c.name FROM countries c LEFT JOIN orders o …"
-          },
-          "result": [
-            {
-              "country": "Iceland"
-            },
-            {
-              "country": "Malta"
-            }
-          ]
         }
       ]
     }

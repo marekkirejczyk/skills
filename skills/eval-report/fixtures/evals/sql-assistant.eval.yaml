@@ -1,9 +1,10 @@
 # Fixture evals for eval-report, defined as data (promptfoo-style) rather than
-# code: structured inputs and data outputs. Not run: ../results.json was
-# written to look like a real run of them.
+# code: structured inputs and data outputs. ../runner/run.mjs runs them against
+# a fake model (../outputs.json).
 description: SQL assistant
 tests:
   - description: reads the schema before writing a query
+    rule: "Instructions, ‘Queries’: describe_table before run_query, every time."
     vars: { question: How many orders last week?, database: shop }
     mocks: { describe_table: "fake: ordersSchema", run_query: [{ count: 412 }] }
     assert:

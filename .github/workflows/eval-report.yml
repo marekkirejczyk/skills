@@ -1,6 +1,6 @@
-# eval-report's own CI: tests the script, then builds a report from the
-# fixture evals and links it on the PR, the same way an installed repo does.
-# No model calls.
+# eval-report's own CI: tests the script, runs the fixture evals with a fake
+# model, then reports on them and links the report on the PR, the same way an
+# installed repo does. No model calls.
 name: eval-report
 on:
   pull_request:
@@ -27,8 +27,10 @@ jobs:
           node-version: 22
       - name: Test
         run: node --test 'skills/eval-report/tests/*.test.mjs'
-      - name: Report from the fixture evals
-        run: bash skills/eval-report/scripts/ci.sh skills/eval-report/fixtures/results.json
+      - name: Run the fixture evals (fake model, no model calls)
+        run: node skills/eval-report/fixtures/runner/run.mjs --out eval-results.json
+      - name: Report
+        run: bash skills/eval-report/scripts/ci.sh eval-results.json
         env:
           GH_TOKEN: ${{ github.token }}
           EVAL_REPORT_SHA: ${{ github.event.pull_request.head.sha || github.sha }}
