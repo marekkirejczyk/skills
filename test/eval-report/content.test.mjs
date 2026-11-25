@@ -44,6 +44,23 @@ describe('renderInput', () => {
     assert.match(markup, /<div class="who">buyer<\/div><p>Hi<\/p>.*<div class="who">assistant<\/div><p>Hello<\/p>/);
   });
 
+  it('shows the blocks a message came with under its words', () => {
+    const question = { type: 'card', title: 'Question', body: 'Which?', options: ['A', 'B'] };
+    const markup = text(renderInput([{ role: 'buyer', text: 'Hi' }, { role: 'assistant', text: 'Pick one', blocks: [question] }]));
+    assert.match(markup, /<div class="who">assistant<\/div><p>Pick one<\/p>\s*<div class="card">.*<div class="card-title">Question<\/div>.*<span class="chip">A<\/span><span class="chip">B<\/span>/);
+  });
+
+  it('says "no words" for a message of blocks alone, or of nothing', () => {
+    const cardOnly = text(renderInput([{ role: 'assistant', text: '', blocks: [{ type: 'card', title: 'Question' }] }]));
+    assert.match(cardOnly, /<div class="who">assistant<\/div><p class="muted no-words">\(no words\)<\/p>\s*<div class="card">.*Question/);
+    assert.match(text(renderInput([{ role: 'assistant', blocks: [{ type: 'card', title: 'Question' }] }])), /\(no words\).*Question/);
+    assert.equal(text(renderInput([{ role: 'assistant', text: ' ' }])), '<div class="message"><div class="who">assistant</div><p class="muted no-words">(no words)</p></div>');
+  });
+
+  it('shows a message that is JSON as key and value pairs', () => {
+    assert.match(text(renderInput([{ role: 'tool', content: { shown: 3 } }])), /<div class="who">tool<\/div><dl class="pairs"><dt>shown<\/dt><dd>3<\/dd><\/dl>/);
+  });
+
   it('shows an object as key and value pairs', () => {
     assert.equal(text(renderInput({ make: 'Skoda', year: 2020 })), '<dl class="pairs"><dt>make</dt><dd>Skoda</dd><dt>year</dt><dd>2020</dd></dl>');
   });

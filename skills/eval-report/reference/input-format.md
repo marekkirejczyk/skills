@@ -69,7 +69,7 @@ The command's exit code is passed through, so CI stays red when evals fail. The 
 | `rule` | no | What the case checks, in a line: shown under its name. |
 | `note` | no | Anything else a reviewer should know, such as a known intermittent bug. |
 | `change` | no | `"new"` or `"changed"`, to override what git says. |
-| `input` | no | A string (light markdown), a conversation `[{ "role", "text" }]`, or any JSON. |
+| `input` | no | A string (light markdown), a conversation `[{ "role", "text", "blocks"? }]`, or any JSON. A message's `blocks` are what it showed beside its words, as a reply's; one with no text shows as *(no words)*. |
 | `output` | no | A string (light markdown), a reply `{ "text", "blocks" }`, or any JSON. An empty text shows as *(no words)*. |
 | `error` | no | The run crashed: shown in red above the output. |
 | `checks` | no | `{ kind, name, passed, reason? }`. Grouped by `kind` (judge, exact, or any word); `reason` is shown when it failed. |
@@ -77,7 +77,7 @@ The command's exit code is passed through, so CI stays red when evals fail. The 
 
 **Light markdown**: paragraphs, `-` and `1.` lists, `**bold**`, `` `code` `` and code fences. Everything else is escaped.
 
-**Blocks** in a reply's `blocks`:
+**Blocks** in a reply's `blocks`, or a conversation message's:
 
 | `type` | Fields | Shown as |
 | ------ | ------ | -------- |

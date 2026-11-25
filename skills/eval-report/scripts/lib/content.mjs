@@ -66,14 +66,21 @@ export function renderValue(value) {
   return html`<dl class="pairs">${entries}</dl>`;
 }
 
-const isMessage = (item) => item && typeof item === 'object' && 'role' in item && ('text' in item || 'content' in item);
+const isMessage = (item) => item && typeof item === 'object' && 'role' in item && ('text' in item || 'content' in item || 'blocks' in item);
+
+const NO_WORDS = html`<p class="muted no-words">(no words)</p>`;
+
+const renderWords = (text) => (String(text ?? '').trim() === '' ? NO_WORDS : renderMarkdown(text));
+
+// A message of a conversation: its words, then the blocks it came with, as a reply's.
+function renderMessage(message) {
+  const said = message.text ?? message.content;
+  const words = said === undefined || said === null || typeof said === 'string' ? renderWords(said) : renderValue(said);
+  return html`<div class="message"><div class="who">${message.role}</div>${words}${(message.blocks ?? []).map(renderBlock)}</div>`;
+}
 
 export function renderInput(input) {
-  if (Array.isArray(input) && input.length > 0 && input.every(isMessage)) {
-    return html`${input.map(
-      (message) => html`<div class="message"><div class="who">${message.role}</div>${renderValue(message.text ?? message.content)}</div>`,
-    )}`;
-  }
+  if (Array.isArray(input) && input.length > 0 && input.every(isMessage)) return html`${input.map(renderMessage)}`;
   return renderValue(input);
 }
 
@@ -103,14 +110,11 @@ function renderBlock(block) {
   }
 }
 
-const NO_WORDS = html`<p class="muted no-words">(no words)</p>`;
-
 export function renderOutput(output, error) {
   const crash = error ? html`<div class="crash"><strong>Error</strong> ${error}</div>` : '';
   if (output === undefined || output === null) return error ? crash : NO_WORDS;
-  if (typeof output === 'string') return html`${crash}${output.trim() === '' ? NO_WORDS : renderMarkdown(output)}`;
+  if (typeof output === 'string') return html`${crash}${renderWords(output)}`;
   const isReply = typeof output === 'object' && !Array.isArray(output) && ('text' in output || 'blocks' in output);
   if (!isReply) return html`${crash}${renderValue(output)}`;
-  const text = String(output.text ?? '').trim();
-  return html`${crash}${text === '' ? NO_WORDS : renderMarkdown(text)}${(output.blocks ?? []).map(renderBlock)}`;
+  return html`${crash}${renderWords(output.text)}${(output.blocks ?? []).map(renderBlock)}`;
 }
