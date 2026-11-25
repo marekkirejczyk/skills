@@ -104,8 +104,12 @@ describe('renderOutput', () => {
 });
 
 describe('renderValue', () => {
-  it('shows nested values as compact JSON', () => {
-    assert.match(text(renderValue({ a: { b: 1 } })), /<code>\{&quot;b&quot;:1\}<\/code>/);
+  it('shows nested values as JSON indented by two spaces', () => {
+    assert.equal(String(renderValue({ a: { b: 1, c: ['x'] } })), '<dl class="pairs"><dt>a</dt><dd><pre class="code">{\n  &quot;b&quot;: 1,\n  &quot;c&quot;: [\n    &quot;x&quot;\n  ]\n}</pre></dd></dl>');
+  });
+
+  it('indents the objects in a list the same way', () => {
+    assert.equal(String(renderValue(['plain', { b: 1 }])), '<ul><li>plain</li><li><pre class="code">{\n  &quot;b&quot;: 1\n}</pre></li></ul>');
   });
 });
 

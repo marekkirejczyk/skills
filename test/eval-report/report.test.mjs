@@ -48,6 +48,11 @@ describe('eval-report.mjs run on the fixture evals', () => {
     assert.match(page, /data-key="test\/eval-report\/fixtures\/evals\/cars-search.eval.mjs::a full postcode and distance go into the searches#2"/);
   });
 
+  it('says what a check means when the pointer rests on it', () => {
+    assert.match(page, /<div class="check pass has-about" title="The reply ended normally, with no error\.">/);
+    assert.match(page, /<div class="check pass">/);
+  });
+
   it('loads nothing from the network', () => {
     assert.doesNotMatch(page, /<(script|link)[^>]+(src|href)="http/);
   });
@@ -62,6 +67,10 @@ describe('runFingerprint', () => {
 
   it('ignores how long the round took', () => {
     assert.equal(runFingerprint(run), runFingerprint({ ...run, durationMs: 99 }));
+  });
+
+  it('ignores what a check says it means', () => {
+    assert.equal(runFingerprint(run), runFingerprint({ ...run, checks: [{ name: 'a', passed: true, about: 'What a means.' }] }));
   });
 
   it('changes when the output changes', () => {

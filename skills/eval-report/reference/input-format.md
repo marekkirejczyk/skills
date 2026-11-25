@@ -49,7 +49,7 @@ The command's exit code is passed through, so CI stays red when evals fail. The 
     ]
   },
   "checks": [
-    { "kind": "judge", "name": "Doesn't ask for the postcode again", "passed": true },
+    { "kind": "judge", "name": "Doesn't ask for the postcode again", "passed": true, "about": "A second model reads the conversation and marks this true or false." },
     { "kind": "exact", "name": "calls search_links with radiusMiles 30", "passed": false, "reason": "radiusMiles was 10" }
   ],
   "mocks": [
@@ -72,7 +72,7 @@ The command's exit code is passed through, so CI stays red when evals fail. The 
 | `input` | no | A string (light markdown), a conversation `[{ "role", "text", "blocks"? }]`, or any JSON. A message's `blocks` are what it showed beside its words, as a reply's; one with no text shows as *(no words)*. |
 | `output` | no | A string (light markdown), a reply `{ "text", "blocks" }`, or any JSON. An empty text shows as *(no words)*. |
 | `error` | no | The run crashed: shown in red above the output. |
-| `checks` | no | `{ kind, name, passed, reason? }`. Grouped by `kind` (judge, exact, or any word); `reason` is shown when it failed. |
+| `checks` | no | `{ kind, name, passed, reason?, about? }`. Grouped by `kind` (judge, exact, or any word); `reason` is shown when it failed. `about` says what the check means, for a reader who doesn't know the runner: it shows when the pointer rests on the check. |
 | `mocks` | no | Tools the run called: `{ tool, args?, result?, summary?, fake? }`. `summary` is the short "what it gave"; without it, `result` is shortened. `fake` names the fake data behind it. |
 
 **Light markdown**: paragraphs, `-` and `1.` lists, `**bold**`, `` `code` `` and code fences. Everything else is escaped.
@@ -84,7 +84,7 @@ The command's exit code is passed through, so CI stays red when evals fail. The 
 | `card` | `title`, `body`, `options` | A card, its options as chips |
 | `list` | `title`, `items`: strings or `{ label, value }` | A bulleted card |
 | `table` | `title`, `columns`, `rows` | A small table |
-| anything else | | Its JSON as key and value pairs |
+| anything else | | Its JSON as key and value pairs, a nested value as JSON indented by two spaces |
 
 ## Writing runs from a runner
 

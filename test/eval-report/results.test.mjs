@@ -49,6 +49,14 @@ describe('normalizeRun', () => {
     assert.equal(run({ passed: true, error: 'timeout' }).passed, false);
   });
 
+  it('keeps what a check means, and nothing when it does not say', () => {
+    const { checks } = run({ checks: [{ kind: 'exact', name: 'ends "done"', passed: true, about: 'The reply ended normally.' }, { name: 'b', passed: false, reason: 'no' }] });
+    assert.deepEqual(checks, [
+      { kind: 'exact', name: 'ends "done"', passed: true, reason: '', about: 'The reply ended normally.' },
+      { kind: 'checks', name: 'b', passed: false, reason: 'no', about: '' },
+    ]);
+  });
+
   it('drops a leading ./ from the file', () => {
     assert.equal(run({ file: './evals/a.eval.ts' }).file, 'evals/a.eval.ts');
   });
