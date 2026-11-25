@@ -49,7 +49,9 @@ Show the user the filled-in workflow and the secrets it needs, and create it onl
 
 ## 4. GitHub Pages
 
-The report is published to the `gh-pages` branch. Check whether Pages is on:
+A Pages site is public on every GitHub plan except Enterprise Cloud, where it can be limited to people with access to the repository. So CI publishes to Pages only for a **public** repository. For a private one, the comment links to the run, and the report is in the run's `eval-report` artifact, which only people with access to the repository can download. If the organization is on Enterprise Cloud with Pages visibility set to private, or the user accepts a public page, set `EVAL_REPORT_PAGES: always` on the report step. Ask the user; never set it on your own.
+
+For a public repository, the report is published to the `gh-pages` branch. Check whether Pages is on:
 
 ```bash
 gh api repos/{owner}/{repo}/pages

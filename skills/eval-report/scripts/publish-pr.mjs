@@ -18,8 +18,16 @@ if (!args.pr || !args.summary || !args.headline) {
 }
 const repo = args.repo || process.env.GITHUB_REPOSITORY || gh(['repo', 'view', '--json', 'nameWithOwner', '-q', '.nameWithOwner']).trim();
 
+// GitHub sometimes answers 5xx with an empty body: try again before giving up.
 function gh(argv, input) {
-  return execFileSync('gh', argv, { encoding: 'utf8', input, stdio: ['pipe', 'pipe', 'inherit'] });
+  for (let attempt = 1; ; attempt++) {
+    try {
+      return execFileSync('gh', argv, { encoding: 'utf8', input, stdio: ['pipe', 'pipe', 'inherit'] });
+    } catch (error) {
+      if (attempt >= 4) throw error;
+      execFileSync('sleep', [String(attempt * 5)]);
+    }
+  }
 }
 function api(method, path, body) {
   const argv = ['api', '-X', method, path];

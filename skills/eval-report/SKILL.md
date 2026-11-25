@@ -48,7 +48,7 @@ The evals themselves may call models: that is their cost, not the report's. A fa
 
 ## 3. Publish, for `pr` only
 
-When the scope is `pr`, the branch has an open PR (`gh pr view`), and `gh` is signed in, link the report on the PR:
+When the scope is `pr`, the branch has an open PR (`gh pr view`), and `gh` is signed in, link the report on the PR. A Pages site is public, except on GitHub Enterprise Cloud with private Pages. So for a private repository (`gh repo view --json isPrivate`), skip this step and hand over the local path, unless the user says a public page is fine.
 
 ```bash
 url=$(bash <skill>/scripts/publish-pages.sh .eval-report/index.html eval-reports/pr-<number>)

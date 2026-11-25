@@ -37,6 +37,7 @@ jobs:
           GH_TOKEN: ${{ github.token }}
           EVAL_REPORT_SHA: ${{ github.event.pull_request.head.sha }}
           EVAL_REPORT_COMMENT: __COMMENT__
+          EVAL_REPORT_PAGES: auto   # public repos only; see the install-ci skill
       - uses: actions/upload-artifact@v4
         if: always()
         with:
