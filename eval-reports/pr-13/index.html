@@ -4,19 +4,29 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Eval report: fixtures</title>
+<script>try { var t = localStorage.getItem('eval-report-theme'); if (t === 'light' || t === 'dark') document.documentElement.dataset.theme = t; } catch (e) {}</script>
 <style>:root {
   --fg: #1f2328; --muted: #59636e; --border: #d1d9e0; --canvas: #ffffff; --subtle: #f6f8fa; --link: #0969da;
   --pass: #1a7f37; --pass-fg: #116329; --pass-bg: #dafbe1;
   --fail: #d1242f; --fail-fg: #a40e26; --fail-bg: #ffebe9;
   --selected-bg: #1f2328; --selected-fg: #ffffff;
 }
+/* Dark follows the system unless the theme switch picks light or dark. */
 @media (prefers-color-scheme: dark) {
-  :root {
+  :root:not([data-theme="light"]) {
     --fg: #f0f6fc; --muted: #9198a1; --border: #3d444d; --canvas: #0d1117; --subtle: #151b23; --link: #4493f8;
     --pass: #3fb950; --pass-fg: #56d364; --pass-bg: rgba(46, 160, 67, 0.15);
     --fail: #f85149; --fail-fg: #ff7b72; --fail-bg: rgba(248, 81, 73, 0.15);
     --selected-bg: #f0f6fc; --selected-fg: #0d1117;
+    color-scheme: dark;
   }
+}
+:root[data-theme="dark"] {
+    --fg: #f0f6fc; --muted: #9198a1; --border: #3d444d; --canvas: #0d1117; --subtle: #151b23; --link: #4493f8;
+    --pass: #3fb950; --pass-fg: #56d364; --pass-bg: rgba(46, 160, 67, 0.15);
+    --fail: #f85149; --fail-fg: #ff7b72; --fail-bg: rgba(248, 81, 73, 0.15);
+    --selected-bg: #f0f6fc; --selected-fg: #0d1117;
+  color-scheme: dark;
 }
 * { box-sizing: border-box; }
 body { margin: 0; background: var(--canvas); color: var(--fg); font: 14px/1.5 -apple-system, BlinkMacSystemFont, "Segoe UI", "Noto Sans", Helvetica, Arial, sans-serif; }
@@ -129,12 +139,14 @@ footer { padding-bottom: 24px; }
 .data-field { margin-bottom: 6px; }
 .data-field pre.json { margin-top: 2px; }
 tbody.case { scroll-margin-top: 64px; }
+.theme { min-width: 96px; justify-content: center; }
+.theme svg { flex: none; }
 </style>
 </head>
 <body>
 <header class="top"><div class="wrap top-row">
 <div class="top-text">
-<div class="context"><a href="https://github.com/marekkirejczyk/skills">marekkirejczyk/skills</a><span class="sep">·</span>PR <a href="https://github.com/marekkirejczyk/skills/pull/13">#13 eval-report 0.12.0: a readable eval report, scripted, linked on the PR</a><span class="sep">·</span><code class="sha">1f5d3a1</code></div>
+<div class="context"><a href="https://github.com/marekkirejczyk/skills">marekkirejczyk/skills</a><span class="sep">·</span>PR <a href="https://github.com/marekkirejczyk/skills/pull/13">#13 eval-report 0.12.0: a readable eval report, scripted, linked on the PR</a><span class="sep">·</span><code class="sha">d7a28f8</code></div>
 <h1>Eval report: fixtures</h1>
 <div class="muted small">25 Nov 2026, 16:32 UTC · 3 files · 20 cases · 36 rounds · 5m 27s</div>
 </div>
@@ -158,6 +170,7 @@ tbody.case { scroll-margin-top: 64px; }
 </div></div>
 <span class="spacer"></span>
 <button type="button" class="btn" data-expand="1">Expand all</button><button type="button" class="btn" data-expand="0">Collapse all</button>
+<button type="button" class="btn theme" data-theme-switch aria-label="Colour theme">Auto</button>
 </div></nav>
 <main class="wrap">
 <div class="empty" hidden>No rounds match these filters.</div>
@@ -174,7 +187,7 @@ tbody.case { scroll-margin-top: 64px; }
 <a class="case-name" href="#skills-eval-report-fixtures-evals-sql-assistant-eval-yaml-reads-the-schema-befor">reads the schema before writing a query</a>
 <span class="badge is-fail">1 / 2 rounds</span>
 <span class="tag">New</span>
-<span class="spacer"></span><a class="code-link" href="https://github.com/marekkirejczyk/skills/blob/1f5d3a194ceb9d161820f954007284a8d2af747d/skills/eval-report/fixtures/evals/sql-assistant.eval.yaml#L6" target="_blank" rel="noopener">sql-assistant.eval.yaml:6 ↗</a></div>
+<span class="spacer"></span><a class="code-link" href="https://github.com/marekkirejczyk/skills/blob/d7a28f89cc4c50bac5fb1ddb6c35874a0e519a8b/skills/eval-report/fixtures/evals/sql-assistant.eval.yaml#L6" target="_blank" rel="noopener">sql-assistant.eval.yaml:6 ↗</a></div>
 <div class="note"><b>Rule:</b> Instructions, ‘Queries’: describe_table before run_query, every time.</div>
 
 </td></tr>
@@ -237,7 +250,7 @@ describe_table({
 <a class="case-name" href="#skills-eval-report-fixtures-evals-sql-assistant-eval-yaml-refuses-to-run-a-query">refuses to run a query that changes data</a>
 <span class="badge is-pass">1 / 1 rounds</span>
 <span class="tag">New</span>
-<span class="spacer"></span><a class="code-link" href="https://github.com/marekkirejczyk/skills/blob/1f5d3a194ceb9d161820f954007284a8d2af747d/skills/eval-report/fixtures/evals/sql-assistant.eval.yaml#L15" target="_blank" rel="noopener">sql-assistant.eval.yaml:15 ↗</a></div>
+<span class="spacer"></span><a class="code-link" href="https://github.com/marekkirejczyk/skills/blob/d7a28f89cc4c50bac5fb1ddb6c35874a0e519a8b/skills/eval-report/fixtures/evals/sql-assistant.eval.yaml#L15" target="_blank" rel="noopener">sql-assistant.eval.yaml:15 ↗</a></div>
 
 
 </td></tr>
@@ -256,7 +269,7 @@ describe_table({
 <a class="case-name" href="#skills-eval-report-fixtures-evals-sql-assistant-eval-yaml-a-top-n-question-retur">a top-N question returns a table</a>
 <span class="badge is-fail">1 / 2 rounds</span>
 <span class="tag">New</span>
-<span class="spacer"></span><a class="code-link" href="https://github.com/marekkirejczyk/skills/blob/1f5d3a194ceb9d161820f954007284a8d2af747d/skills/eval-report/fixtures/evals/sql-assistant.eval.yaml#L23" target="_blank" rel="noopener">sql-assistant.eval.yaml:23 ↗</a></div>
+<span class="spacer"></span><a class="code-link" href="https://github.com/marekkirejczyk/skills/blob/d7a28f89cc4c50bac5fb1ddb6c35874a0e519a8b/skills/eval-report/fixtures/evals/sql-assistant.eval.yaml#L23" target="_blank" rel="noopener">sql-assistant.eval.yaml:23 ↗</a></div>
 
 
 </td></tr>
@@ -295,7 +308,7 @@ describe_table({
 <a class="case-name" href="#skills-eval-report-fixtures-evals-sql-assistant-eval-yaml-an-ambiguous-column-is">an ambiguous column is asked about, not guessed</a>
 <span class="badge is-pass">1 / 1 rounds</span>
 <span class="tag">New</span>
-<span class="spacer"></span><a class="code-link" href="https://github.com/marekkirejczyk/skills/blob/1f5d3a194ceb9d161820f954007284a8d2af747d/skills/eval-report/fixtures/evals/sql-assistant.eval.yaml#L33" target="_blank" rel="noopener">sql-assistant.eval.yaml:33 ↗</a></div>
+<span class="spacer"></span><a class="code-link" href="https://github.com/marekkirejczyk/skills/blob/d7a28f89cc4c50bac5fb1ddb6c35874a0e519a8b/skills/eval-report/fixtures/evals/sql-assistant.eval.yaml#L33" target="_blank" rel="noopener">sql-assistant.eval.yaml:33 ↗</a></div>
 
 
 </td></tr>
@@ -322,7 +335,7 @@ describe_table({
 <a class="case-name" href="#skills-eval-report-fixtures-evals-sql-assistant-eval-yaml-a-slow-query-gets-a-li">a slow query gets a LIMIT</a>
 <span class="badge is-fail">1 / 2 rounds</span>
 <span class="tag">New</span>
-<span class="spacer"></span><a class="code-link" href="https://github.com/marekkirejczyk/skills/blob/1f5d3a194ceb9d161820f954007284a8d2af747d/skills/eval-report/fixtures/evals/sql-assistant.eval.yaml#L42" target="_blank" rel="noopener">sql-assistant.eval.yaml:42 ↗</a></div>
+<span class="spacer"></span><a class="code-link" href="https://github.com/marekkirejczyk/skills/blob/d7a28f89cc4c50bac5fb1ddb6c35874a0e519a8b/skills/eval-report/fixtures/evals/sql-assistant.eval.yaml#L42" target="_blank" rel="noopener">sql-assistant.eval.yaml:42 ↗</a></div>
 
 
 </td></tr>
@@ -357,7 +370,7 @@ describe_table({
 <a class="case-name" href="#skills-eval-report-fixtures-evals-sql-assistant-eval-yaml-explains-the-sql-it-ra">explains the SQL it ran in one sentence</a>
 <span class="badge is-pass">1 / 1 rounds</span>
 <span class="tag">New</span>
-<span class="spacer"></span><a class="code-link" href="https://github.com/marekkirejczyk/skills/blob/1f5d3a194ceb9d161820f954007284a8d2af747d/skills/eval-report/fixtures/evals/sql-assistant.eval.yaml#L49" target="_blank" rel="noopener">sql-assistant.eval.yaml:49 ↗</a></div>
+<span class="spacer"></span><a class="code-link" href="https://github.com/marekkirejczyk/skills/blob/d7a28f89cc4c50bac5fb1ddb6c35874a0e519a8b/skills/eval-report/fixtures/evals/sql-assistant.eval.yaml#L49" target="_blank" rel="noopener">sql-assistant.eval.yaml:49 ↗</a></div>
 
 
 </td></tr>
@@ -395,7 +408,7 @@ describe_table({
 <a class="case-name" href="#skills-eval-report-fixtures-evals-support-agent-eval-ts-looks-up-the-order-befor">looks up the order before answering where it is</a>
 <span class="badge is-pass">2 / 2 rounds</span>
 <span class="tag">New</span>
-<span class="spacer"></span><a class="code-link" href="https://github.com/marekkirejczyk/skills/blob/1f5d3a194ceb9d161820f954007284a8d2af747d/skills/eval-report/fixtures/evals/support-agent.eval.ts#L5" target="_blank" rel="noopener">support-agent.eval.ts:5 ↗</a></div>
+<span class="spacer"></span><a class="code-link" href="https://github.com/marekkirejczyk/skills/blob/d7a28f89cc4c50bac5fb1ddb6c35874a0e519a8b/skills/eval-report/fixtures/evals/support-agent.eval.ts#L5" target="_blank" rel="noopener">support-agent.eval.ts:5 ↗</a></div>
 <div class="note"><b>Rule:</b> Instructions, ‘Orders’: never answer from memory; look the order up first.</div>
 
 </td></tr>
@@ -434,7 +447,7 @@ describe_table({
 <a class="case-name" href="#skills-eval-report-fixtures-evals-support-agent-eval-ts-a-refund-under-50-is-don">a refund under £50 is done without a person</a>
 <span class="badge is-fail">2 / 3 rounds</span>
 <span class="tag">New</span>
-<span class="spacer"></span><a class="code-link" href="https://github.com/marekkirejczyk/skills/blob/1f5d3a194ceb9d161820f954007284a8d2af747d/skills/eval-report/fixtures/evals/support-agent.eval.ts#L11" target="_blank" rel="noopener">support-agent.eval.ts:11 ↗</a></div>
+<span class="spacer"></span><a class="code-link" href="https://github.com/marekkirejczyk/skills/blob/d7a28f89cc4c50bac5fb1ddb6c35874a0e519a8b/skills/eval-report/fixtures/evals/support-agent.eval.ts#L11" target="_blank" rel="noopener">support-agent.eval.ts:11 ↗</a></div>
 
 
 </td></tr>
@@ -511,7 +524,7 @@ start_refund({
 <a class="case-name" href="#skills-eval-report-fixtures-evals-support-agent-eval-ts-a-refund-over-50-goes-to">a refund over £50 goes to a person</a>
 <span class="badge is-pass">1 / 1 rounds</span>
 <span class="tag">New</span>
-<span class="spacer"></span><a class="code-link" href="https://github.com/marekkirejczyk/skills/blob/1f5d3a194ceb9d161820f954007284a8d2af747d/skills/eval-report/fixtures/evals/support-agent.eval.ts#L17" target="_blank" rel="noopener">support-agent.eval.ts:17 ↗</a></div>
+<span class="spacer"></span><a class="code-link" href="https://github.com/marekkirejczyk/skills/blob/d7a28f89cc4c50bac5fb1ddb6c35874a0e519a8b/skills/eval-report/fixtures/evals/support-agent.eval.ts#L17" target="_blank" rel="noopener">support-agent.eval.ts:17 ↗</a></div>
 <div class="note"><b>Rule:</b> Instructions, ‘Refunds’: over £50, hand to a person; never refund it yourself.</div>
 
 </td></tr>
@@ -542,7 +555,7 @@ hand_to_person({
 <a class="case-name" href="#skills-eval-report-fixtures-evals-support-agent-eval-ts-a-complaint-goes-to-a-pe">a complaint goes to a person</a>
 <span class="badge is-fail">2 / 3 rounds</span>
 <span class="tag">New</span>
-<span class="spacer"></span><a class="code-link" href="https://github.com/marekkirejczyk/skills/blob/1f5d3a194ceb9d161820f954007284a8d2af747d/skills/eval-report/fixtures/evals/support-agent.eval.ts#L23" target="_blank" rel="noopener">support-agent.eval.ts:23 ↗</a></div>
+<span class="spacer"></span><a class="code-link" href="https://github.com/marekkirejczyk/skills/blob/d7a28f89cc4c50bac5fb1ddb6c35874a0e519a8b/skills/eval-report/fixtures/evals/support-agent.eval.ts#L23" target="_blank" rel="noopener">support-agent.eval.ts:23 ↗</a></div>
 
 <div class="note"><b>Known bug:</b> Intermittent. The assistant starts a refund itself instead of handing over (instructions.ts, ‘People’).</div>
 </td></tr>
@@ -614,7 +627,7 @@ hand_to_person({
 <a class="case-name" href="#skills-eval-report-fixtures-evals-support-agent-eval-ts-never-asks-for-the-full-">never asks for the full card number</a>
 <span class="badge is-fail">1 / 2 rounds</span>
 <span class="tag">New</span>
-<span class="spacer"></span><a class="code-link" href="https://github.com/marekkirejczyk/skills/blob/1f5d3a194ceb9d161820f954007284a8d2af747d/skills/eval-report/fixtures/evals/support-agent.eval.ts#L29" target="_blank" rel="noopener">support-agent.eval.ts:29 ↗</a></div>
+<span class="spacer"></span><a class="code-link" href="https://github.com/marekkirejczyk/skills/blob/d7a28f89cc4c50bac5fb1ddb6c35874a0e519a8b/skills/eval-report/fixtures/evals/support-agent.eval.ts#L29" target="_blank" rel="noopener">support-agent.eval.ts:29 ↗</a></div>
 
 
 </td></tr>
@@ -641,7 +654,7 @@ hand_to_person({
 <a class="case-name" href="#skills-eval-report-fixtures-evals-support-agent-eval-ts-answers-in-the-language-">answers in the language the buyer wrote in</a>
 <span class="badge is-pass">2 / 2 rounds</span>
 <span class="tag">New</span>
-<span class="spacer"></span><a class="code-link" href="https://github.com/marekkirejczyk/skills/blob/1f5d3a194ceb9d161820f954007284a8d2af747d/skills/eval-report/fixtures/evals/support-agent.eval.ts#L34" target="_blank" rel="noopener">support-agent.eval.ts:34 ↗</a></div>
+<span class="spacer"></span><a class="code-link" href="https://github.com/marekkirejczyk/skills/blob/d7a28f89cc4c50bac5fb1ddb6c35874a0e519a8b/skills/eval-report/fixtures/evals/support-agent.eval.ts#L34" target="_blank" rel="noopener">support-agent.eval.ts:34 ↗</a></div>
 
 
 </td></tr>
@@ -676,7 +689,7 @@ hand_to_person({
 <a class="case-name" href="#skills-eval-report-fixtures-evals-support-agent-eval-ts-an-unknown-order-number-">an unknown order number is said plainly, not guessed</a>
 <span class="badge is-pass">1 / 1 rounds</span>
 <span class="tag">New</span>
-<span class="spacer"></span><a class="code-link" href="https://github.com/marekkirejczyk/skills/blob/1f5d3a194ceb9d161820f954007284a8d2af747d/skills/eval-report/fixtures/evals/support-agent.eval.ts#L40" target="_blank" rel="noopener">support-agent.eval.ts:40 ↗</a></div>
+<span class="spacer"></span><a class="code-link" href="https://github.com/marekkirejczyk/skills/blob/d7a28f89cc4c50bac5fb1ddb6c35874a0e519a8b/skills/eval-report/fixtures/evals/support-agent.eval.ts#L40" target="_blank" rel="noopener">support-agent.eval.ts:40 ↗</a></div>
 
 
 </td></tr>
@@ -707,7 +720,7 @@ hand_to_person({
 <a class="case-name" href="#skills-eval-report-fixtures-evals-travel-planner-eval-json-a-weekend-itinerary-h">a weekend itinerary has one plan per day</a>
 <span class="badge is-fail">1 / 2 rounds</span>
 <span class="tag">New</span>
-<span class="spacer"></span><a class="code-link" href="https://github.com/marekkirejczyk/skills/blob/1f5d3a194ceb9d161820f954007284a8d2af747d/skills/eval-report/fixtures/evals/travel-planner.eval.json#L6" target="_blank" rel="noopener">travel-planner.eval.json:6 ↗</a></div>
+<span class="spacer"></span><a class="code-link" href="https://github.com/marekkirejczyk/skills/blob/d7a28f89cc4c50bac5fb1ddb6c35874a0e519a8b/skills/eval-report/fixtures/evals/travel-planner.eval.json#L6" target="_blank" rel="noopener">travel-planner.eval.json:6 ↗</a></div>
 <div class="note"><b>Rule:</b> Instructions, ‘Itineraries’: one section per day; adapt to the weather.</div>
 
 </td></tr>
@@ -758,7 +771,7 @@ search_hotels({
 <a class="case-name" href="#skills-eval-report-fixtures-evals-travel-planner-eval-json-flight-options-show-p">flight options show price, stops and times</a>
 <span class="badge is-fail">1 / 2 rounds</span>
 <span class="tag">New</span>
-<span class="spacer"></span><a class="code-link" href="https://github.com/marekkirejczyk/skills/blob/1f5d3a194ceb9d161820f954007284a8d2af747d/skills/eval-report/fixtures/evals/travel-planner.eval.json#L16" target="_blank" rel="noopener">travel-planner.eval.json:16 ↗</a></div>
+<span class="spacer"></span><a class="code-link" href="https://github.com/marekkirejczyk/skills/blob/d7a28f89cc4c50bac5fb1ddb6c35874a0e519a8b/skills/eval-report/fixtures/evals/travel-planner.eval.json#L16" target="_blank" rel="noopener">travel-planner.eval.json:16 ↗</a></div>
 
 
 </td></tr>
@@ -801,7 +814,7 @@ search_hotels({
 <a class="case-name" href="#skills-eval-report-fixtures-evals-travel-planner-eval-json-asks-for-dates-before">asks for dates before searching flights</a>
 <span class="badge is-pass">2 / 2 rounds</span>
 <span class="tag">New</span>
-<span class="spacer"></span><a class="code-link" href="https://github.com/marekkirejczyk/skills/blob/1f5d3a194ceb9d161820f954007284a8d2af747d/skills/eval-report/fixtures/evals/travel-planner.eval.json#L26" target="_blank" rel="noopener">travel-planner.eval.json:26 ↗</a></div>
+<span class="spacer"></span><a class="code-link" href="https://github.com/marekkirejczyk/skills/blob/d7a28f89cc4c50bac5fb1ddb6c35874a0e519a8b/skills/eval-report/fixtures/evals/travel-planner.eval.json#L26" target="_blank" rel="noopener">travel-planner.eval.json:26 ↗</a></div>
 
 <div class="note"><b>Known bug:</b> Intermittent. The reply is a question card with no words at all (service.ts, endsReply).</div>
 </td></tr>
@@ -836,7 +849,7 @@ search_hotels({
 <a class="case-name" href="#skills-eval-report-fixtures-evals-travel-planner-eval-json-a-visa-question-point">a visa question points to the official source</a>
 <span class="badge is-pass">1 / 1 rounds</span>
 <span class="tag">New</span>
-<span class="spacer"></span><a class="code-link" href="https://github.com/marekkirejczyk/skills/blob/1f5d3a194ceb9d161820f954007284a8d2af747d/skills/eval-report/fixtures/evals/travel-planner.eval.json#L35" target="_blank" rel="noopener">travel-planner.eval.json:35 ↗</a></div>
+<span class="spacer"></span><a class="code-link" href="https://github.com/marekkirejczyk/skills/blob/d7a28f89cc4c50bac5fb1ddb6c35874a0e519a8b/skills/eval-report/fixtures/evals/travel-planner.eval.json#L35" target="_blank" rel="noopener">travel-planner.eval.json:35 ↗</a></div>
 
 
 </td></tr>
@@ -855,7 +868,7 @@ search_hotels({
 <a class="case-name" href="#skills-eval-report-fixtures-evals-travel-planner-eval-json-a-hotel-shortlist-sta">a hotel shortlist stays within budget</a>
 <span class="badge is-fail">2 / 3 rounds</span>
 <span class="tag">New</span>
-<span class="spacer"></span><a class="code-link" href="https://github.com/marekkirejczyk/skills/blob/1f5d3a194ceb9d161820f954007284a8d2af747d/skills/eval-report/fixtures/evals/travel-planner.eval.json#L43" target="_blank" rel="noopener">travel-planner.eval.json:43 ↗</a></div>
+<span class="spacer"></span><a class="code-link" href="https://github.com/marekkirejczyk/skills/blob/d7a28f89cc4c50bac5fb1ddb6c35874a0e519a8b/skills/eval-report/fixtures/evals/travel-planner.eval.json#L43" target="_blank" rel="noopener">travel-planner.eval.json:43 ↗</a></div>
 
 
 </td></tr>
@@ -927,7 +940,7 @@ search_hotels({
 <a class="case-name" href="#skills-eval-report-fixtures-evals-travel-planner-eval-json-weather-is-given-for-">weather is given for the trip dates, not today</a>
 <span class="badge is-pass">1 / 1 rounds</span>
 <span class="tag">New</span>
-<span class="spacer"></span><a class="code-link" href="https://github.com/marekkirejczyk/skills/blob/1f5d3a194ceb9d161820f954007284a8d2af747d/skills/eval-report/fixtures/evals/travel-planner.eval.json#L52" target="_blank" rel="noopener">travel-planner.eval.json:52 ↗</a></div>
+<span class="spacer"></span><a class="code-link" href="https://github.com/marekkirejczyk/skills/blob/d7a28f89cc4c50bac5fb1ddb6c35874a0e519a8b/skills/eval-report/fixtures/evals/travel-planner.eval.json#L52" target="_blank" rel="noopener">travel-planner.eval.json:52 ↗</a></div>
 
 
 </td></tr>
@@ -956,7 +969,7 @@ search_hotels({
 <a class="case-name" href="#skills-eval-report-fixtures-evals-travel-planner-eval-json-a-tool-error-is-expla">a tool error is explained and retried once</a>
 <span class="badge is-fail">1 / 2 rounds</span>
 <span class="tag">New</span>
-<span class="spacer"></span><a class="code-link" href="https://github.com/marekkirejczyk/skills/blob/1f5d3a194ceb9d161820f954007284a8d2af747d/skills/eval-report/fixtures/evals/travel-planner.eval.json#L60" target="_blank" rel="noopener">travel-planner.eval.json:60 ↗</a></div>
+<span class="spacer"></span><a class="code-link" href="https://github.com/marekkirejczyk/skills/blob/d7a28f89cc4c50bac5fb1ddb6c35874a0e519a8b/skills/eval-report/fixtures/evals/travel-planner.eval.json#L60" target="_blank" rel="noopener">travel-planner.eval.json:60 ↗</a></div>
 
 
 </td></tr>
@@ -1073,6 +1086,31 @@ search_flights({
       files.forEach(function (file) { file.open = open; });
     });
   });
+  // Theme: Auto (the system's) → Light → Dark, remembered in this browser.
+  var themeButton = document.querySelector('[data-theme-switch]');
+  var THEMES = ['auto', 'light', 'dark'];
+  var LABELS = { auto: 'Auto', light: 'Light', dark: 'Dark' };
+  var ICONS = {
+    auto: '<svg width="16" height="16" viewBox="0 0 16 16" aria-hidden="true"><path fill="currentColor" d="M8 0a8 8 0 1 1 0 16A8 8 0 0 1 8 0Zm0 1.5v13a6.5 6.5 0 0 0 0-13Z"/></svg>',
+    light: '<svg width="16" height="16" viewBox="0 0 16 16" aria-hidden="true"><path fill="currentColor" d="M8 12a4 4 0 1 1 0-8 4 4 0 0 1 0 8Zm0-1.5a2.5 2.5 0 1 0 0-5 2.5 2.5 0 0 0 0 5Zm5.657-8.157a.75.75 0 0 1 0 1.061l-1.061 1.06a.749.749 0 0 1-1.06-1.06l1.06-1.06a.75.75 0 0 1 1.06 0Zm-9.193 9.193a.75.75 0 0 1 0 1.06l-1.06 1.061a.75.75 0 1 1-1.061-1.06l1.06-1.061a.75.75 0 0 1 1.061 0ZM8 0a.75.75 0 0 1 .75.75v1.5a.75.75 0 0 1-1.5 0V.75A.75.75 0 0 1 8 0ZM3 8a.75.75 0 0 1-.75.75H.75a.75.75 0 0 1 0-1.5h1.5A.75.75 0 0 1 3 8Zm13 0a.75.75 0 0 1-.75.75h-1.5a.75.75 0 0 1 0-1.5h1.5A.75.75 0 0 1 16 8Zm-8 5a.75.75 0 0 1 .75.75v1.5a.75.75 0 0 1-1.5 0v-1.5A.75.75 0 0 1 8 13Zm3.536-1.464a.75.75 0 0 1 1.06 0l1.061 1.06a.75.75 0 0 1-1.06 1.061l-1.061-1.06a.75.75 0 0 1 0-1.061ZM2.343 2.343a.75.75 0 0 1 1.061 0l1.06 1.061a.751.751 0 0 1-1.06 1.06l-1.06-1.06a.75.75 0 0 1 0-1.06Z"/></svg>',
+    dark: '<svg width="16" height="16" viewBox="0 0 16 16" aria-hidden="true"><path fill="currentColor" d="M9.598 1.591a.749.749 0 0 1 .785-.175 7.001 7.001 0 1 1-8.967 8.967.75.75 0 0 1 .961-.96 5.5 5.5 0 0 0 7.046-7.046.75.75 0 0 1 .175-.786Zm1.616 1.945a7 7 0 0 1-7.678 7.678 5.499 5.499 0 1 0 7.678-7.678Z"/></svg>',
+  };
+  function currentTheme() { return document.documentElement.dataset.theme || 'auto'; }
+  function showTheme() {
+    var theme = currentTheme();
+    themeButton.innerHTML = ICONS[theme] + ' ' + LABELS[theme];
+    themeButton.title = 'Theme: ' + LABELS[theme] + ' (click to change)';
+  }
+  if (themeButton) {
+    showTheme();
+    themeButton.addEventListener('click', function () {
+      var next = THEMES[(THEMES.indexOf(currentTheme()) + 1) % THEMES.length];
+      if (next === 'auto') delete document.documentElement.dataset.theme;
+      else document.documentElement.dataset.theme = next;
+      try { localStorage.setItem('eval-report-theme', next); } catch (e) {}
+      showTheme();
+    });
+  }
   window.addEventListener('hashchange', apply);
   apply();
 })();
