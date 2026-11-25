@@ -51,6 +51,12 @@ function checkGroups(checks) {
   </div>`);
 }
 
+// On phones, passed checks fold into one line under the failed ones.
+function passedFold(checks) {
+  const passed = checks.filter((check) => check.passed).length;
+  return passed ? html`<button type="button" class="passed-fold" data-passed-fold>${CHECK_PASS} ${passed} passed</button>` : '';
+}
+
 function mocksCell(mocks) {
   if (mocks.length === 0) return html`<span class="muted">No tools run</span>`;
   const details = mocks.map((mock) => ({ tool: mock.tool, args: mock.args, result: mock.result }));
@@ -65,14 +71,14 @@ function runRow(run) {
   const status = run.passed ? 'passed' : 'failed';
   const label = [`Run ${run.round}`, status, formatDuration(run.durationMs)].filter(Boolean).join(' · ');
   return html`<tr class="run" data-passed="${run.passed}" data-key="${run.file}::${run.case}#${run.round}" data-fingerprint="${runFingerprint(run)}">
-    <td>
+    <td class="input" data-label="Input">
       <div class="run-label ${run.passed ? 'pass' : 'fail'}"><span>${label}</span><label class="review">${reviewBox('data-review-run', 'Reviewed')} Reviewed</label></div>
       <div class="changed-since" hidden>Changed since you reviewed it</div>
       ${renderInput(run.input)}
     </td>
-    <td class="output">${renderOutput(run.output, run.error)}</td>
-    <td class="checks">${run.checks.length ? checkGroups(run.checks) : html`<span class="muted">No checks</span>`}</td>
-    <td>${mocksCell(run.mocks)}</td>
+    <td class="output" data-label="Output">${renderOutput(run.output, run.error)}</td>
+    <td class="checks" data-label="Judges and checks">${run.checks.length ? html`${checkGroups(run.checks)}${passedFold(run.checks)}` : html`<span class="muted">No checks</span>`}</td>
+    <td data-label="Tool calls">${mocksCell(run.mocks)}</td>
   </tr>`;
 }
 
@@ -117,11 +123,18 @@ function fileSection(file, codeUrl) {
   </details>`;
 }
 
-function filterButtons(name, label, options) {
-  return html`<div class="filter"><span class="label">${label}</span><div class="segmented" role="group" aria-label="${name}">
-    ${options.map(([value, label]) => html`<button type="button" data-filter="${name}" data-value="${value}" aria-pressed="${value === 'all'}">${label} <span class="count"></span></button>`)}
-  </div></div>`;
+// Each option is [value, button label, dropdown label]: wide screens show
+// segmented buttons, phones one dropdown per filter, named after it while it filters nothing.
+function filterControl(name, label, options) {
+  return html`<div class="filter"><span class="label">${label}</span><div class="segmented" role="group" aria-label="${label}">
+    ${options.map(([value, buttonLabel]) => html`<button type="button" data-filter="${name}" data-value="${value}" aria-pressed="${value === 'all'}">${buttonLabel} <span class="count"></span></button>`)}
+  </div>
+  <label class="dropdown"><span class="visually-hidden">${label}</span><select data-filter-select="${name}">
+    ${options.map(([value, , dropdownLabel]) => html`<option value="${value}" data-label="${dropdownLabel}">${dropdownLabel}</option>`)}
+  </select></label></div>`;
 }
+
+const themeButton = (place) => html`<button type="button" class="plain theme ${place}" data-theme-switch aria-label="Colour theme: system">${THEME_ICON}</button>`;
 
 function statTile(label, count, hint) {
   const percent = count.total === 0 ? 0 : Math.round((100 * count.passed) / count.total);
@@ -184,7 +197,7 @@ ${html`<html lang="en">
 <header class="top"><div class="wrap top-inner">
   <div class="heading">
     ${contextLine(context)}
-    <h1>${title}</h1>
+    <div class="title-row"><h1>${title}</h1>${themeButton('header-theme')}</div>
     <div class="muted small">${facts.join(' · ')}</div>
   </div>
   <div class="stats">
@@ -195,13 +208,13 @@ ${html`<html lang="en">
   </div>
 </div></header>
 <nav class="toolbar"><div class="wrap toolbar-inner">
-  ${filterButtons('status', 'Status', [['all', 'All'], ['passed', 'Passed'], ['failed', 'Failed']])}
-  ${summary.fresh ? filterButtons('scope', 'Scope', [['all', 'All'], ['changed', 'New or changed']]) : ''}
-  ${filterButtons('review', 'Review', [['all', 'All'], ['todo', 'To review'], ['done', 'Reviewed']])}
+  ${filterControl('status', 'Status', [['all', 'All', 'Status'], ['passed', 'Passed', 'Passed'], ['failed', 'Failed', 'Failed']])}
+  ${summary.fresh ? filterControl('scope', 'Scope', [['all', 'All', 'Scope'], ['changed', 'New or changed', 'New or changed']]) : ''}
+  ${filterControl('review', 'Review', [['all', 'All', 'Review'], ['todo', 'To review', 'To review'], ['done', 'Reviewed', 'Reviewed']])}
   <span class="spacer"></span>
-  <button type="button" class="plain" data-expand="true">Expand all</button>
-  <button type="button" class="plain" data-expand="false">Collapse all</button>
-  <button type="button" class="plain theme" data-theme-switch aria-label="Colour theme: system">${THEME_ICON}</button>
+  <button type="button" class="plain wide-only" data-expand="true">Expand all</button>
+  <button type="button" class="plain wide-only" data-expand="false">Collapse all</button>
+  ${themeButton('toolbar-theme')}
 </div></nav>
 <main class="wrap">
   <p class="empty no-match" hidden>No runs match these filters.</p>

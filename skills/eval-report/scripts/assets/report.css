@@ -80,7 +80,7 @@ table.runs td.checks { padding: 10px 12px; }
 .case-name { font-size: 15px; font-weight: 600; }
 .case-note { font-size: 13px; color: var(--muted); margin-top: 4px; }
 .case-note strong { color: var(--fg); }
-.run-label { font-size: 12px; font-weight: 600; margin-bottom: 6px; display: flex; justify-content: space-between; gap: 8px; align-items: center; }
+.run-label { font-size: 12px; font-weight: 600; margin-bottom: 6px; display: flex; justify-content: space-between; flex-wrap: wrap; gap: 2px 8px; align-items: center; }
 .run-label.pass { color: var(--pass-text); }
 .run-label.fail { color: var(--fail-text); }
 .message { margin-bottom: 8px; }
@@ -109,7 +109,7 @@ dl.pairs dd { margin: 0; }
 details.raw summary { cursor: pointer; color: var(--muted); font-size: 12px; margin-top: 6px; }
 pre.code { white-space: pre-wrap; background: var(--subtle); border: 1px solid var(--border); border-radius: 6px; padding: 8px; margin: 6px 0 8px; }
 input.review-box { width: 16px; height: 16px; margin: 0; flex: none; cursor: pointer; accent-color: var(--link); }
-.review { display: inline-flex; gap: 4px; align-items: center; color: var(--muted); font-weight: 500; cursor: pointer; }
+.review { white-space: nowrap; display: inline-flex; gap: 4px; align-items: center; color: var(--muted); font-weight: 500; cursor: pointer; }
 tr.run.is-reviewed > td { opacity: 0.55; }
 .changed-since { font-size: 12px; color: var(--link); margin-bottom: 6px; }
 .review-bar { background: var(--border); }
@@ -118,4 +118,59 @@ button.theme { padding: 4px 8px; }
 button.theme svg { fill: currentColor; }
 [hidden] { display: none !important; }
 @media (max-width: 1100px) { table.runs th { position: static; } }
-@media (max-width: 640px) { .wrap { padding: 0 16px; } .toolbar { position: static; } }
+
+.title-row { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+.visually-hidden { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+.dropdown, .header-theme, .passed-fold { display: none; }
+
+/* Phones: one row of dropdowns, and each run as a card of labelled sections instead of a table row. */
+@media (max-width: 640px) {
+  .wrap { padding: 0 16px; }
+  .top-inner { padding-top: 16px; padding-bottom: 16px; }
+  h1 { font-size: 20px; }
+  .header-theme { display: inline-flex; min-width: 44px; min-height: 44px; justify-content: center; }
+  .toolbar-theme, .wide-only, .filter .label, .segmented { display: none; }
+  .stats { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; width: 100%; }
+  .stat { min-width: 0; padding: 8px 10px; gap: 4px; }
+  .stat-value span:first-child { font-size: 22px; }
+
+  .toolbar-inner { flex-wrap: nowrap; overflow-x: auto; gap: 6px; padding-top: 8px; padding-bottom: 8px; }
+  .filter { flex: none; }
+  .dropdown { display: flex; position: relative; align-items: center; }
+  .dropdown::after { content: ""; position: absolute; right: 11px; width: 6px; height: 6px; border: solid currentColor; border-width: 0 1.5px 1.5px 0; transform: translateY(-2px) rotate(45deg); pointer-events: none; color: var(--fg); }
+  .dropdown:has(select.active)::after { color: var(--canvas); }
+  .dropdown select { appearance: none; -webkit-appearance: none; font: inherit; font-size: 13px; font-weight: 500; min-height: 36px; padding: 0 26px 0 10px; border-radius: 999px; border: 1px solid var(--border); background: var(--subtle); color: var(--fg); }
+  .dropdown select.active { background: var(--fg); color: var(--canvas); border-color: var(--fg); }
+
+  main.wrap { padding-top: 12px; gap: 12px; }
+  .file > summary { padding: 10px 12px; flex-wrap: wrap; row-gap: 0; }
+  .file > summary .spacer { display: none; }
+  /* One line, cut at the start so the file name stays visible. */
+  .file-path { flex: 1 1 0; min-width: 0; font-size: 13px; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; direction: rtl; text-align: left; }
+  .file > summary > .muted.small { flex-basis: 100%; order: 5; padding-left: 52px; }
+  .case-name { flex: 1 1 calc(100% - 64px); min-width: 0; line-height: 1.35; }
+  .table-scroll { overflow: visible; }
+  table.runs, table.runs tbody, table.runs tr, table.runs td { display: block; width: auto; min-width: 0; }
+  table.runs colgroup, table.runs thead { display: none; }
+  table.runs td { border-top: 0; padding: 0 12px 10px; }
+  .case-head td { border-top: 1px solid var(--border); padding: 10px 12px; }
+  tr.run { border-top: 1px solid var(--border); padding-top: 12px; }
+  table.runs td.input { display: flex; flex-direction: column; }
+  .run-label { order: -1; font-size: 13px; min-height: 44px; margin-bottom: 4px; cursor: pointer; }
+  .review { min-height: 44px; }
+  input.review-box { width: 20px; height: 20px; }
+  table.runs td[data-label]::before { content: attr(data-label); display: block; font-size: 11px; font-weight: 600; color: var(--muted); text-transform: uppercase; letter-spacing: 0.04em; margin-bottom: 2px; }
+  table.runs td.checks { padding: 0 12px 10px; }
+  .check-group .label { margin-left: 0; }
+
+  /* Failed checks in full; passed ones fold into one green line. */
+  .passed-fold { display: flex; gap: 8px; align-items: center; width: 100%; min-height: 32px; border: 0; border-radius: 6px; background: var(--pass-bg); color: var(--pass-text); font-size: 13px; text-align: left; }
+  td.checks:not(.show-passed) .check.pass, td.checks:not(.show-passed) .check-group:not(:has(.check.fail)) { display: none; }
+  td.checks.show-passed .passed-fold { display: none; }
+
+  /* A reviewed run folds to its status line until tapped. */
+  tr.run.is-reviewed:not(.open) > td:not(.input), tr.run.is-reviewed:not(.open) > td.input > :not(.run-label) { display: none; }
+  tr.run.is-reviewed:not(.open) > td.input::before { display: none; }
+  tr.run.is-reviewed > td { opacity: 1; }
+  tr.run.is-reviewed .run-label { opacity: 0.6; margin-bottom: 0; }
+}

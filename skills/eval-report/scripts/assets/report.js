@@ -88,10 +88,17 @@
       setGroupBox(file.querySelector('[data-review-file]'), rows);
       file.querySelector('[data-file-reviewed]').textContent = rows.filter(isReviewed).length;
     }
+    const countFor = (filter, value) => runs.filter((run) => matchesOthers(run, filter) && matchers[filter](run, value)).length;
     for (const button of all('button[data-filter]')) {
       const { filter, value } = button.dataset;
       button.setAttribute('aria-pressed', String(filters[filter] === value));
-      button.querySelector('.count').textContent = runs.filter((run) => matchesOthers(run, filter) && matchers[filter](run, value)).length;
+      button.querySelector('.count').textContent = countFor(filter, value);
+    }
+    for (const select of all('select[data-filter-select]')) {
+      const filter = select.dataset.filterSelect;
+      for (const option of select.options) option.textContent = `${option.dataset.label} ${countFor(filter, option.value)}`;
+      select.value = filters[filter];
+      select.classList.toggle('active', filters[filter] !== 'all');
     }
     const done = runs.filter(isReviewed).length;
     document.querySelector('[data-reviewed-count]').textContent = done;
@@ -106,12 +113,13 @@
 
   // ---- Theme: the system's → light → dark ----
   const themes = ['system', 'light', 'dark'];
-  const themeButton = document.querySelector('[data-theme-switch]');
   const currentTheme = () => document.documentElement.dataset.theme ?? 'system';
   function showTheme() {
     const label = `Colour theme: ${currentTheme()}`;
-    themeButton.title = `${label} (click to change)`;
-    themeButton.setAttribute('aria-label', label);
+    for (const button of all('[data-theme-switch]')) {
+      button.title = `${label} (click to change)`;
+      button.setAttribute('aria-label', label);
+    }
   }
 
   // ---- Events ----
@@ -122,6 +130,11 @@
       apply();
       writeHash();
     }
+    const fold = event.target.closest('[data-passed-fold]');
+    if (fold) fold.closest('td.checks').classList.toggle('show-passed');
+    // On phones a reviewed run folds to its status line; tapping the line opens it.
+    const runLabel = event.target.closest('.run-label');
+    if (runLabel && !event.target.closest('label')) runLabel.closest('tr.run').classList.toggle('open');
     const expandButton = event.target.closest('button[data-expand]');
     if (expandButton) for (const file of all('details.file')) file.open = expandButton.dataset.expand === 'true';
     if (event.target.closest('[data-theme-switch]')) {
@@ -134,6 +147,12 @@
   });
   document.addEventListener('change', (event) => {
     const box = event.target;
+    if (box.matches('select[data-filter-select]')) {
+      filters[box.dataset.filterSelect] = box.value;
+      apply();
+      writeHash();
+      return;
+    }
     if (box.matches('[data-review-run]')) markReviewed([box.closest('tr.run')], box.checked);
     else if (box.matches('[data-review-case]')) markReviewed(all('tr.run', box.closest('tbody.case')), box.checked);
     else if (box.matches('[data-review-file]')) markReviewed(all('tr.run', box.closest('details.file')), box.checked);
