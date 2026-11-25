@@ -1,0 +1,5 @@
+{
+  "title": "Eval report: fixture evals",
+  "command": "node test/eval-report/fixtures/run-evals.mjs {files}",
+  "evals": ["test/eval-report/fixtures/evals/*.eval.mjs"]
+}

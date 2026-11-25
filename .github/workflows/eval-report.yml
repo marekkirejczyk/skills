@@ -1,0 +1,44 @@
+# Tests the eval-report skill and builds a report from its fixture evals, so a
+# PR that changes the report shows what the report looks like.
+name: eval-report
+
+on:
+  pull_request:
+    paths:
+      - 'skills/eval-report/**'
+      - 'test/eval-report/**'
+      - '.github/workflows/eval-report.yml'
+
+permissions:
+  contents: write
+  pull-requests: write
+
+concurrency:
+  group: eval-report-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+
+jobs:
+  report:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Test
+        run: node --test 'test/eval-report/*.test.mjs'
+      - name: Run the fixture evals into a report
+        run: node skills/eval-report/scripts/eval-report.mjs run --config test/eval-report/fixtures/eval-report.json --scope pr
+      - name: Publish the report and link it from the PR
+        if: always() && github.event.pull_request.head.repo.full_name == github.repository
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: node skills/eval-report/scripts/eval-report.mjs publish --pages
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: eval-report
+          path: eval-report/
