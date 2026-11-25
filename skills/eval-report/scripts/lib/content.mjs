@@ -53,8 +53,26 @@ export function summarizeValue(value, maxLength = 60) {
 
 const isPlain = (value) => value === null || ['string', 'number', 'boolean'].includes(typeof value);
 
-// A value inside a list or a pair: plain as it is, anything else as indented JSON.
-const renderNested = (value) => (isPlain(value) ? String(value) : html`<pre class="code">${JSON.stringify(value, null, 2)}</pre>`);
+// One value of the JSON: a line for a plain one, a fold for an object or a list with
+// anything in it. `label` is the key it sits under, `comma` what follows it.
+function jsonNode(value, label, comma) {
+  if (value === null || typeof value !== 'object') return html`<div class="json-line">${label}${JSON.stringify(value) ?? 'null'}${comma}</div>`;
+  const isList = Array.isArray(value);
+  const [opening, closing] = isList ? ['[', ']'] : ['{', '}'];
+  const entries = isList ? value.map((item) => ['', item]) : Object.entries(value).map(([key, item]) => [`${JSON.stringify(key)}: `, item]);
+  if (entries.length === 0) return html`<div class="json-line">${label}${opening}${closing}${comma}</div>`;
+  const children = entries.map(([childLabel, item], index) => jsonNode(item, childLabel, index < entries.length - 1 ? ',' : ''));
+  return html`<details class="json-fold" open><summary data-folded=" … ${closing}${comma}">${label}${opening}</summary><div class="json-children">${children}</div><div class="json-line">${closing}${comma}</div></details>`;
+}
+
+// JSON as it is written, indented by two spaces, where each object and list folds
+// away under its first line. The indent is the stylesheet's, not spaces.
+export function renderJson(value) {
+  return html`<div class="json">${jsonNode(value, '', '')}</div>`;
+}
+
+// A value inside a list or a pair: plain as it is, anything else as JSON.
+const renderNested = (value) => (isPlain(value) ? String(value) : renderJson(value));
 
 export function renderValue(value) {
   if (value === undefined) return html`<span class="muted">(none)</span>`;
