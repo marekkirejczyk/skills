@@ -18,7 +18,9 @@ const THEME_ICON = trusted('<svg width="16" height="16" viewBox="0 0 16 16" aria
 // A review tick belongs to one round as it ran: when its input, output,
 // checks or tools differ in a later report, the tick no longer applies.
 export function runFingerprint(run) {
-  const { input, output, error, checks, mocks } = run;
+  const { input, output, error, mocks } = run;
+  // What a check means is an explanation, not a result: rewording it keeps the tick.
+  const checks = run.checks.map(({ about, ...check }) => check);
   return createHash('sha1').update(JSON.stringify({ input, output, error, checks, mocks })).digest('hex').slice(0, 12);
 }
 
@@ -44,7 +46,7 @@ function checkGroups(checks) {
   }
   return [...groups].map(([kind, items]) => html`<div class="check-group">
     <div class="label">${capitalize(kind)}</div>
-    ${items.map((check) => html`<div class="check ${check.passed ? 'pass' : 'fail'}">
+    ${items.map((check) => html`<div class="check ${check.passed ? 'pass' : 'fail'}${check.about ? ' has-about' : ''}"${check.about ? html` title="${check.about}"` : ''}>
       ${check.passed ? CHECK_PASS : CHECK_FAIL}
       <div><div>${check.name}</div>${check.reason ? html`<div class="why">${check.reason}</div>` : ''}</div>
     </div>`)}

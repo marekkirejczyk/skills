@@ -2,6 +2,7 @@
 
 import { assistant, buyer, EVERY_REPLY, exact, judge, mock } from '../checks.mjs';
 
+const ENDS_DONE = exact('ends "done"', true, undefined, 'The reply ended normally, with no error.');
 const SEARCHES = 'Instructions, ‘Searches on listing sites’';
 const SITES = 'autotrader.co.uk, gumtree.com, ebay.co.uk';
 const searchCards = (body) => ({ type: 'card', title: '3 search cards', body: `${body} → ${SITES}` });
@@ -26,7 +27,7 @@ export default [
       checks: [
         judge('The reply says the cards are searches for the buyer to open', round === 1, round === 2 ? 'Calls them cars it found.' : undefined),
         judge('The reply doesn’t claim to have found or checked the cars', round === 1, round === 2 ? '“I found 14 …” claims cars behind the links.' : undefined),
-        exact('ends "done"'),
+        ENDS_DONE,
         exact('calls search_links with {"make":"Skoda","model":"Octavia","fuel":"diesel","maxPrice":12000}'),
         EVERY_REPLY,
       ],
@@ -47,7 +48,7 @@ export default [
         ],
       },
       checks: [
-        exact('ends "done"'),
+        ENDS_DONE,
         exact('calls search_links with {"postcode":"LS1 4AP","radiusMiles":30}'),
         exact('never says /what(\'s| is) your (full )?postcode/'),
         EVERY_REPLY,

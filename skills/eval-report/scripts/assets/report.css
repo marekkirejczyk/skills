@@ -95,7 +95,8 @@ table.mini { border-collapse: collapse; width: 100%; font-size: 12px; }
 table.mini th, table.mini td { border: 1px solid var(--border); padding: 3px 6px; text-align: left; }
 dl.pairs { display: grid; grid-template-columns: max-content 1fr; gap: 2px 10px; }
 dl.pairs dt { font-weight: 600; color: var(--muted); }
-dl.pairs dd { margin: 0; }
+dl.pairs dd { margin: 0; min-width: 0; }
+dl.pairs pre.code, li > pre.code { margin: 2px 0 4px; }
 .crash { background: var(--fail-bg); color: var(--fail-text); border-radius: 6px; padding: 6px 8px; margin-bottom: 8px; }
 .check-group { margin-bottom: 6px; }
 .check-group .label { margin: 2px 0 4px 8px; }
@@ -103,11 +104,12 @@ dl.pairs dd { margin: 0; }
 .check .icon { margin-top: 2px; }
 .check.pass { background: var(--pass-bg); }
 .check.fail { background: var(--fail-bg); }
+.check.has-about { cursor: help; }
 .why { font-size: 12px; color: var(--fail-text); margin-top: 2px; }
 .mock { font-size: 13px; margin-bottom: 4px; }
 .fake { font-size: 12px; color: var(--muted); font-style: italic; }
 details.raw summary { cursor: pointer; color: var(--muted); font-size: 12px; margin-top: 6px; }
-pre.code { white-space: pre-wrap; background: var(--subtle); border: 1px solid var(--border); border-radius: 6px; padding: 8px; margin: 6px 0 8px; }
+pre.code { white-space: pre-wrap; overflow-wrap: anywhere; background: var(--subtle); border: 1px solid var(--border); border-radius: 6px; padding: 8px; margin: 6px 0 8px; }
 input.review-box { width: 16px; height: 16px; margin: 0; flex: none; cursor: pointer; accent-color: var(--link); }
 .review { white-space: nowrap; display: inline-flex; gap: 4px; align-items: center; color: var(--muted); font-weight: 500; cursor: pointer; }
 tr.run.is-reviewed > td { opacity: 0.55; }

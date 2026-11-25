@@ -53,15 +53,18 @@ export function summarizeValue(value, maxLength = 60) {
 
 const isPlain = (value) => value === null || ['string', 'number', 'boolean'].includes(typeof value);
 
+// A value inside a list or a pair: plain as it is, anything else as indented JSON.
+const renderNested = (value) => (isPlain(value) ? String(value) : html`<pre class="code">${JSON.stringify(value, null, 2)}</pre>`);
+
 export function renderValue(value) {
   if (value === undefined) return html`<span class="muted">(none)</span>`;
   if (typeof value === 'string') return renderMarkdown(value);
   if (isPlain(value)) return html`<code>${String(value)}</code>`;
   if (Array.isArray(value)) {
-    return html`<ul>${value.map((item) => html`<li>${isPlain(item) ? String(item) : html`<code>${JSON.stringify(item)}</code>`}</li>`)}</ul>`;
+    return html`<ul>${value.map((item) => html`<li>${renderNested(item)}</li>`)}</ul>`;
   }
   const entries = Object.entries(value).map(
-    ([key, item]) => html`<dt>${key}</dt><dd>${isPlain(item) ? String(item) : html`<code>${JSON.stringify(item)}</code>`}</dd>`,
+    ([key, item]) => html`<dt>${key}</dt><dd>${renderNested(item)}</dd>`,
   );
   return html`<dl class="pairs">${entries}</dl>`;
 }

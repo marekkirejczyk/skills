@@ -35,6 +35,7 @@ export function normalizeRun(record, index) {
     name: String(check.name ?? ''),
     passed: Boolean(check.passed),
     reason: check.reason ?? '',
+    about: check.about ? String(check.about) : '',
   }));
   const error = record.error ? String(record.error) : '';
   const passedByChecks = checks.length > 0 && checks.every((check) => check.passed);
