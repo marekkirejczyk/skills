@@ -1,0 +1,1605 @@
+{
+  "meta": {
+    "title": "Eval report: fixtures",
+    "runAt": "2026-11-25T16:32:00Z"
+  },
+  "results": [
+    {
+      "file": "skills/eval-report/fixtures/evals/support-agent.eval.ts",
+      "name": "looks up the order before answering where it is",
+      "round": 1,
+      "durationMs": 4977,
+      "rule": "Instructions, ‘Orders’: never answer from memory; look the order up first.",
+      "input": "Where is my order 55102?",
+      "output": {
+        "text": "Your order 55102 shipped yesterday and should arrive on **Friday 27 November**."
+      },
+      "checks": [
+        {
+          "kind": "exact",
+          "label": "calls lookup_order with {\"orderId\":\"55102\"}",
+          "pass": true
+        },
+        {
+          "kind": "judge",
+          "label": "gives the delivery date from the order",
+          "pass": true
+        }
+      ],
+      "mocks": [
+        {
+          "tool": "lookup_order",
+          "args": {
+            "orderId": "55102"
+          },
+          "result": {
+            "status": "shipped",
+            "eta": "2026-11-27"
+          }
+        }
+      ]
+    },
+    {
+      "file": "skills/eval-report/fixtures/evals/support-agent.eval.ts",
+      "name": "looks up the order before answering where it is",
+      "round": 2,
+      "durationMs": 5954,
+      "rule": "Instructions, ‘Orders’: never answer from memory; look the order up first.",
+      "input": "Where is my order 55102?",
+      "output": {
+        "text": "It shipped and is on its way: expect it Friday."
+      },
+      "checks": [
+        {
+          "kind": "exact",
+          "label": "calls lookup_order with {\"orderId\":\"55102\"}",
+          "pass": true
+        },
+        {
+          "kind": "judge",
+          "label": "gives the delivery date from the order",
+          "pass": true
+        }
+      ],
+      "mocks": [
+        {
+          "tool": "lookup_order",
+          "args": {
+            "orderId": "55102"
+          },
+          "result": {
+            "status": "shipped",
+            "eta": "2026-11-27"
+          }
+        }
+      ]
+    },
+    {
+      "file": "skills/eval-report/fixtures/evals/support-agent.eval.ts",
+      "name": "a refund under £50 is done without a person",
+      "round": 1,
+      "durationMs": 6931,
+      "input": "The mug arrived broken, can I get my £12 back?",
+      "output": {
+        "text": "Sorry about the mug. I’ve refunded **£12.00** to your card; it shows in 3–5 working days.",
+        "cards": [
+          {
+            "kind": "Refund",
+            "title": "£12.00 to Visa ••6411",
+            "body": "Order 55211 · broken on arrival"
+          }
+        ]
+      },
+      "checks": [
+        {
+          "kind": "exact",
+          "label": "calls start_refund",
+          "pass": true
+        },
+        {
+          "kind": "exact",
+          "label": "does not call hand_to_person",
+          "pass": true
+        },
+        {
+          "kind": "judge",
+          "label": "confirms the amount",
+          "pass": true
+        }
+      ],
+      "mocks": [
+        {
+          "tool": "lookup_order",
+          "args": {
+            "orderId": "55211"
+          },
+          "result": {
+            "total": 12
+          }
+        },
+        {
+          "tool": "start_refund",
+          "args": {
+            "orderId": "55211",
+            "amount": 12
+          },
+          "result": {
+            "started": true
+          }
+        }
+      ]
+    },
+    {
+      "file": "skills/eval-report/fixtures/evals/support-agent.eval.ts",
+      "name": "a refund under £50 is done without a person",
+      "round": 2,
+      "durationMs": 7908,
+      "input": "The mug arrived broken, can I get my £12 back?",
+      "output": {
+        "text": "Sorry about the mug. I’ve refunded £12 to your card."
+      },
+      "checks": [
+        {
+          "kind": "exact",
+          "label": "calls start_refund",
+          "pass": true
+        },
+        {
+          "kind": "exact",
+          "label": "does not call hand_to_person",
+          "pass": true
+        },
+        {
+          "kind": "judge",
+          "label": "confirms the amount",
+          "pass": true
+        }
+      ],
+      "mocks": [
+        {
+          "tool": "lookup_order",
+          "args": {
+            "orderId": "55211"
+          },
+          "result": {
+            "total": 12
+          }
+        },
+        {
+          "tool": "start_refund",
+          "args": {
+            "orderId": "55211",
+            "amount": 12
+          },
+          "result": {
+            "started": true
+          }
+        }
+      ]
+    },
+    {
+      "file": "skills/eval-report/fixtures/evals/support-agent.eval.ts",
+      "name": "a refund under £50 is done without a person",
+      "round": 3,
+      "durationMs": 8885,
+      "input": "The mug arrived broken, can I get my £12 back?",
+      "output": {
+        "text": "Sorry about that! I’ve refunded you."
+      },
+      "checks": [
+        {
+          "kind": "exact",
+          "label": "calls start_refund",
+          "pass": true
+        },
+        {
+          "kind": "exact",
+          "label": "does not call hand_to_person",
+          "pass": true
+        },
+        {
+          "kind": "judge",
+          "label": "confirms the amount",
+          "pass": false,
+          "reason": "Says “refunded you” with no amount."
+        }
+      ],
+      "mocks": [
+        {
+          "tool": "lookup_order",
+          "args": {
+            "orderId": "55211"
+          },
+          "result": {
+            "total": 12
+          }
+        },
+        {
+          "tool": "start_refund",
+          "args": {
+            "orderId": "55211",
+            "amount": 12
+          },
+          "result": {
+            "started": true
+          }
+        }
+      ]
+    },
+    {
+      "file": "skills/eval-report/fixtures/evals/support-agent.eval.ts",
+      "name": "a refund over £50 goes to a person",
+      "round": 1,
+      "durationMs": 9862,
+      "rule": "Instructions, ‘Refunds’: over £50, hand to a person; never refund it yourself.",
+      "input": "I want a refund for the £240 jacket.",
+      "output": {
+        "text": "I’ve passed this to our customer team, since refunds over £50 need a person. They’ll email you within a day.",
+        "cards": [
+          {
+            "kind": "Handoff",
+            "body": "Refund over limit · order 55300 · £240"
+          }
+        ]
+      },
+      "checks": [
+        {
+          "kind": "exact",
+          "label": "calls hand_to_person with {\"reason\":\"refund-over-limit\"}",
+          "pass": true
+        },
+        {
+          "kind": "exact",
+          "label": "does not call start_refund",
+          "pass": true
+        }
+      ],
+      "mocks": [
+        {
+          "tool": "lookup_order",
+          "args": {
+            "orderId": "55300"
+          },
+          "result": {
+            "total": 240
+          }
+        },
+        {
+          "tool": "hand_to_person",
+          "args": {
+            "reason": "refund-over-limit"
+          },
+          "result": {
+            "queued": true
+          }
+        }
+      ]
+    },
+    {
+      "file": "skills/eval-report/fixtures/evals/support-agent.eval.ts",
+      "name": "a complaint goes to a person",
+      "round": 1,
+      "durationMs": 10839,
+      "knownBug": "Intermittent. The assistant starts a refund itself instead of handing over (instructions.ts, ‘People’).",
+      "input": "The car you sold me broke down after two days. I want my money back.",
+      "output": {
+        "text": "I’m sorry. I’ve passed this to our customer team with your order details; someone will call you today.",
+        "cards": [
+          {
+            "kind": "Handoff",
+            "body": "Complaint · order 55102 · call back today"
+          }
+        ]
+      },
+      "checks": [
+        {
+          "kind": "exact",
+          "label": "calls hand_to_person with {\"reason\":\"complaint\"}",
+          "pass": true
+        },
+        {
+          "kind": "judge",
+          "label": "apologises without admitting fault",
+          "pass": true
+        }
+      ],
+      "mocks": [
+        {
+          "tool": "lookup_order",
+          "args": {
+            "orderId": "55102"
+          },
+          "result": {
+            "id": "55102"
+          }
+        },
+        {
+          "tool": "hand_to_person",
+          "args": {
+            "reason": "complaint",
+            "orderId": "55102"
+          },
+          "result": {
+            "queued": true
+          }
+        }
+      ]
+    },
+    {
+      "file": "skills/eval-report/fixtures/evals/support-agent.eval.ts",
+      "name": "a complaint goes to a person",
+      "round": 2,
+      "durationMs": 11816,
+      "knownBug": "Intermittent. The assistant starts a refund itself instead of handing over (instructions.ts, ‘People’).",
+      "input": "The car you sold me broke down after two days. I want my money back.",
+      "output": {
+        "text": "Sorry to hear that. Under the Consumer Rights Act you can reject the car within 30 days, so I’ve started a refund for you."
+      },
+      "checks": [
+        {
+          "kind": "exact",
+          "label": "calls hand_to_person with {\"reason\":\"complaint\"}",
+          "pass": false,
+          "reason": "Not called; started a refund itself."
+        },
+        {
+          "kind": "judge",
+          "label": "apologises without admitting fault",
+          "pass": false,
+          "reason": "Cites the law as if liability were settled."
+        }
+      ],
+      "mocks": [
+        {
+          "tool": "lookup_order",
+          "args": {
+            "orderId": "55102"
+          },
+          "result": {
+            "id": "55102"
+          }
+        },
+        {
+          "tool": "start_refund",
+          "args": {
+            "orderId": "55102"
+          },
+          "result": {
+            "started": true
+          }
+        }
+      ]
+    },
+    {
+      "file": "skills/eval-report/fixtures/evals/support-agent.eval.ts",
+      "name": "a complaint goes to a person",
+      "round": 3,
+      "durationMs": 12793,
+      "knownBug": "Intermittent. The assistant starts a refund itself instead of handing over (instructions.ts, ‘People’).",
+      "input": "The car you sold me broke down after two days. I want my money back.",
+      "output": {
+        "text": "I’m really sorry. A member of our team will call you today about this."
+      },
+      "checks": [
+        {
+          "kind": "exact",
+          "label": "calls hand_to_person with {\"reason\":\"complaint\"}",
+          "pass": true
+        },
+        {
+          "kind": "judge",
+          "label": "apologises without admitting fault",
+          "pass": true
+        }
+      ],
+      "mocks": [
+        {
+          "tool": "lookup_order",
+          "args": {
+            "orderId": "55102"
+          },
+          "result": {
+            "id": "55102"
+          }
+        },
+        {
+          "tool": "hand_to_person",
+          "args": {
+            "reason": "complaint"
+          },
+          "result": {
+            "queued": true
+          }
+        }
+      ]
+    },
+    {
+      "file": "skills/eval-report/fixtures/evals/support-agent.eval.ts",
+      "name": "never asks for the full card number",
+      "round": 1,
+      "durationMs": 4770,
+      "input": "I need to change the card on my subscription.",
+      "output": {
+        "text": "You can change it on your billing page: Account → Billing → Payment method. For your security I can’t take card details here."
+      },
+      "checks": [
+        {
+          "kind": "exact",
+          "label": "never says /card number/i",
+          "pass": true
+        },
+        {
+          "kind": "judge",
+          "label": "sends the buyer to the billing page",
+          "pass": true
+        }
+      ],
+      "mocks": []
+    },
+    {
+      "file": "skills/eval-report/fixtures/evals/support-agent.eval.ts",
+      "name": "never asks for the full card number",
+      "round": 2,
+      "durationMs": 5747,
+      "input": "I need to change the card on my subscription.",
+      "output": {
+        "text": "Sure! Please send me the new card number and expiry date."
+      },
+      "checks": [
+        {
+          "kind": "exact",
+          "label": "never says /card number/i",
+          "pass": false,
+          "reason": "Matched “card number”."
+        },
+        {
+          "kind": "judge",
+          "label": "sends the buyer to the billing page",
+          "pass": false,
+          "reason": "Asks for card details in chat."
+        }
+      ],
+      "mocks": []
+    },
+    {
+      "file": "skills/eval-report/fixtures/evals/support-agent.eval.ts",
+      "name": "answers in the language the buyer wrote in",
+      "round": 1,
+      "durationMs": 6724,
+      "input": "Hola, ¿dónde está mi pedido 55102?",
+      "output": {
+        "text": "Tu pedido 55102 ya se ha enviado y llegará el viernes."
+      },
+      "checks": [
+        {
+          "kind": "judge",
+          "label": "replies in Spanish",
+          "pass": true
+        }
+      ],
+      "mocks": [
+        {
+          "tool": "lookup_order",
+          "args": {
+            "orderId": "55102"
+          },
+          "result": {
+            "status": "shipped"
+          }
+        }
+      ]
+    },
+    {
+      "file": "skills/eval-report/fixtures/evals/support-agent.eval.ts",
+      "name": "answers in the language the buyer wrote in",
+      "round": 2,
+      "durationMs": 7701,
+      "input": "Hola, ¿dónde está mi pedido 55102?",
+      "output": {
+        "text": "Tu pedido ya está en camino."
+      },
+      "checks": [
+        {
+          "kind": "judge",
+          "label": "replies in Spanish",
+          "pass": true
+        }
+      ],
+      "mocks": [
+        {
+          "tool": "lookup_order",
+          "args": {
+            "orderId": "55102"
+          },
+          "result": {
+            "status": "shipped"
+          }
+        }
+      ]
+    },
+    {
+      "file": "skills/eval-report/fixtures/evals/support-agent.eval.ts",
+      "name": "an unknown order number is said plainly, not guessed",
+      "round": 1,
+      "durationMs": 8678,
+      "input": "Where is order 99999?",
+      "output": {
+        "text": "I couldn’t find an order 99999. Could you check the number in your confirmation email?"
+      },
+      "checks": [
+        {
+          "kind": "judge",
+          "label": "says the order was not found",
+          "pass": true
+        },
+        {
+          "kind": "judge",
+          "label": "asks the buyer to check the number",
+          "pass": true
+        }
+      ],
+      "mocks": [
+        {
+          "tool": "lookup_order",
+          "args": {
+            "orderId": "99999"
+          },
+          "result": null
+        }
+      ]
+    },
+    {
+      "file": "skills/eval-report/fixtures/evals/travel-planner.eval.ts",
+      "name": "a weekend itinerary has one plan per day",
+      "round": 1,
+      "durationMs": 9655,
+      "rule": "Instructions, ‘Itineraries’: one section per day; adapt to the weather.",
+      "input": "Plan a weekend in Lisbon for two, mid-range budget, we love food.",
+      "output": {
+        "text": "**Saturday: Alfama and Baixa**\n- Morning: Castelo de São Jorge, then the 28 tram down\n- Lunch: Taberna da Rua das Flores (book ahead)\n- Evening: fado in Alfama\n\n**Sunday (rain forecast): museums**\n- Museu Nacional do Azulejo\n- Lunch at Time Out Market\n- MAAT if the rain stops",
+        "cards": [
+          {
+            "kind": "Hotel",
+            "title": "Memmo Alfama",
+            "body": "€165 / night · 4.6★",
+            "chips": [
+              "Breakfast",
+              "Rooftop",
+              "Central"
+            ]
+          }
+        ]
+      },
+      "checks": [
+        {
+          "kind": "judge",
+          "label": "one section per day",
+          "pass": true
+        },
+        {
+          "kind": "judge",
+          "label": "suggests an indoor plan for the rainy day",
+          "pass": true
+        },
+        {
+          "kind": "exact",
+          "label": "calls weather",
+          "pass": true
+        }
+      ],
+      "mocks": [
+        {
+          "tool": "weather",
+          "args": {
+            "city": "Lisbon",
+            "from": "2026-11-28",
+            "to": "2026-11-29"
+          },
+          "result": {
+            "sat": "sunny",
+            "sun": "rain"
+          }
+        },
+        {
+          "tool": "search_hotels",
+          "args": {
+            "city": "Lisbon",
+            "budget": "mid"
+          },
+          "result": [
+            {
+              "name": "Memmo Alfama",
+              "price": 165
+            }
+          ],
+          "fake": "lisbonHotels"
+        }
+      ]
+    },
+    {
+      "file": "skills/eval-report/fixtures/evals/travel-planner.eval.ts",
+      "name": "a weekend itinerary has one plan per day",
+      "round": 2,
+      "durationMs": 10632,
+      "rule": "Instructions, ‘Itineraries’: one section per day; adapt to the weather.",
+      "input": "Plan a weekend in Lisbon for two, mid-range budget, we love food.",
+      "output": {
+        "text": "Lisbon is great for food! Try:\n- Time Out Market\n- Pastéis de Belém\n- Taberna da Rua das Flores\n- A fado dinner in Alfama"
+      },
+      "checks": [
+        {
+          "kind": "judge",
+          "label": "one section per day",
+          "pass": false,
+          "reason": "One list for the whole weekend."
+        },
+        {
+          "kind": "judge",
+          "label": "suggests an indoor plan for the rainy day",
+          "pass": false,
+          "reason": "Rain on Sunday never mentioned."
+        },
+        {
+          "kind": "exact",
+          "label": "calls weather",
+          "pass": false,
+          "reason": "weather was not called."
+        }
+      ],
+      "mocks": [
+        {
+          "tool": "search_hotels",
+          "args": {
+            "city": "Lisbon"
+          },
+          "result": [],
+          "fake": "lisbonHotels"
+        }
+      ]
+    },
+    {
+      "file": "skills/eval-report/fixtures/evals/travel-planner.eval.ts",
+      "name": "flight options show price, stops and times",
+      "round": 1,
+      "durationMs": 11609,
+      "input": "Cheapest flights London to Lisbon on 12 Dec, back 15 Dec.",
+      "output": {
+        "text": "Three options, cheapest first. Prices can change until you book.",
+        "cards": [
+          {
+            "kind": "Flight",
+            "title": "£84 return · easyJet",
+            "items": [
+              {
+                "Out": "LGW 06:15 → LIS 09:00, direct"
+              },
+              {
+                "Back": "LIS 19:40 → LGW 22:25, direct"
+              }
+            ]
+          },
+          {
+            "kind": "Flight",
+            "title": "£112 return · TAP",
+            "items": [
+              {
+                "Out": "LHR 07:30 → LIS 10:10, direct"
+              },
+              {
+                "Back": "LIS 16:05 → LHR 18:50, direct"
+              }
+            ]
+          },
+          {
+            "kind": "Flight",
+            "title": "£96 return · Ryanair",
+            "items": [
+              {
+                "Out": "STN 13:20 → LIS 16:05, direct"
+              },
+              {
+                "Back": "LIS 10:50 → STN 13:35, direct"
+              }
+            ]
+          }
+        ]
+      },
+      "checks": [
+        {
+          "kind": "exact",
+          "label": "calls search_flights with {\"from\":\"LON\",\"to\":\"LIS\"}",
+          "pass": true
+        },
+        {
+          "kind": "exact",
+          "label": "shows a flight card",
+          "pass": true
+        },
+        {
+          "kind": "judge",
+          "label": "says prices may change",
+          "pass": true
+        }
+      ],
+      "mocks": [
+        {
+          "tool": "search_flights",
+          "args": {
+            "from": "LON",
+            "to": "LIS",
+            "out": "2026-12-12",
+            "back": "2026-12-15"
+          },
+          "result": {
+            "offers": 3
+          },
+          "fake": "lonLisFlights"
+        }
+      ]
+    },
+    {
+      "file": "skills/eval-report/fixtures/evals/travel-planner.eval.ts",
+      "name": "flight options show price, stops and times",
+      "round": 2,
+      "durationMs": 12586,
+      "input": "Cheapest flights London to Lisbon on 12 Dec, back 15 Dec.",
+      "output": {
+        "text": "The cheapest is easyJet at £84 return, direct both ways.",
+        "cards": [
+          {
+            "kind": "Flight",
+            "title": "£84 return · easyJet",
+            "items": [
+              {
+                "Out": "LGW 06:15 → LIS 09:00"
+              },
+              {
+                "Back": "LIS 19:40 → LGW 22:25"
+              }
+            ]
+          }
+        ]
+      },
+      "checks": [
+        {
+          "kind": "exact",
+          "label": "calls search_flights with {\"from\":\"LON\",\"to\":\"LIS\"}",
+          "pass": true
+        },
+        {
+          "kind": "exact",
+          "label": "shows a flight card",
+          "pass": true
+        },
+        {
+          "kind": "judge",
+          "label": "says prices may change",
+          "pass": false,
+          "reason": "No mention that the price can change."
+        }
+      ],
+      "mocks": [
+        {
+          "tool": "search_flights",
+          "args": {
+            "from": "LON",
+            "to": "LIS"
+          },
+          "result": {
+            "offers": 3
+          },
+          "fake": "lonLisFlights"
+        }
+      ]
+    },
+    {
+      "file": "skills/eval-report/fixtures/evals/travel-planner.eval.ts",
+      "name": "asks for dates before searching flights",
+      "round": 1,
+      "durationMs": 4563,
+      "knownBug": "Intermittent. The reply is a question card with no words at all (service.ts, endsReply).",
+      "input": "Find me flights to Tokyo.",
+      "output": {
+        "text": "",
+        "cards": [
+          {
+            "kind": "Question",
+            "body": "When would you like to travel?",
+            "chips": [
+              "This month",
+              "Next month",
+              "Pick dates"
+            ]
+          }
+        ]
+      },
+      "checks": [
+        {
+          "kind": "exact",
+          "label": "does not call search_flights",
+          "pass": true
+        },
+        {
+          "kind": "exact",
+          "label": "shows a question card",
+          "pass": true
+        },
+        {
+          "kind": "judge",
+          "label": "asks for the dates once",
+          "pass": true
+        }
+      ],
+      "mocks": [
+        {
+          "tool": "ask_buyer",
+          "args": {
+            "question": "When would you like to travel?"
+          },
+          "result": "shown"
+        }
+      ]
+    },
+    {
+      "file": "skills/eval-report/fixtures/evals/travel-planner.eval.ts",
+      "name": "asks for dates before searching flights",
+      "round": 2,
+      "durationMs": 5540,
+      "knownBug": "Intermittent. The reply is a question card with no words at all (service.ts, endsReply).",
+      "input": "Find me flights to Tokyo.",
+      "output": {
+        "text": "Happy to! When are you thinking of going, and from which airport?",
+        "cards": [
+          {
+            "kind": "Question",
+            "body": "When would you like to travel?",
+            "chips": [
+              "This month",
+              "Next month",
+              "Pick dates"
+            ]
+          }
+        ]
+      },
+      "checks": [
+        {
+          "kind": "exact",
+          "label": "does not call search_flights",
+          "pass": true
+        },
+        {
+          "kind": "exact",
+          "label": "shows a question card",
+          "pass": true
+        },
+        {
+          "kind": "judge",
+          "label": "asks for the dates once",
+          "pass": true
+        }
+      ],
+      "mocks": [
+        {
+          "tool": "ask_buyer",
+          "args": {
+            "question": "When would you like to travel?"
+          },
+          "result": "shown"
+        }
+      ]
+    },
+    {
+      "file": "skills/eval-report/fixtures/evals/travel-planner.eval.ts",
+      "name": "a visa question points to the official source",
+      "round": 1,
+      "durationMs": 6517,
+      "input": "Do I need a visa for Japan with a UK passport?",
+      "output": {
+        "text": "For short tourist stays, UK passport holders usually don’t need a visa, but rules change. Check the official page before you book:",
+        "cards": [
+          {
+            "kind": "Link",
+            "title": "GOV.UK: Japan entry requirements",
+            "links": [
+              "https://www.gov.uk/foreign-travel-advice/japan/entry-requirements"
+            ]
+          }
+        ]
+      },
+      "checks": [
+        {
+          "kind": "judge",
+          "label": "links the official government page",
+          "pass": true
+        },
+        {
+          "kind": "judge",
+          "label": "does not state rules as certain",
+          "pass": true
+        }
+      ],
+      "mocks": []
+    },
+    {
+      "file": "skills/eval-report/fixtures/evals/travel-planner.eval.ts",
+      "name": "a hotel shortlist stays within budget",
+      "round": 1,
+      "durationMs": 7494,
+      "input": "Hotels in Porto under €120 a night, 3 nights from 20 Dec.",
+      "output": {
+        "text": "Here are four within budget, all near Ribeira:",
+        "cards": [
+          {
+            "kind": "Hotel",
+            "title": "Pestana Vintage",
+            "body": "€118 / night · 4.5★",
+            "chips": [
+              "River view"
+            ]
+          },
+          {
+            "kind": "Hotel",
+            "title": "Moov Hotel Porto Centro",
+            "body": "€74 / night · 4.1★"
+          },
+          {
+            "kind": "Hotel",
+            "title": "Torel 1884",
+            "body": "€145 / night · 4.8★",
+            "chips": [
+              "Boutique"
+            ]
+          }
+        ]
+      },
+      "checks": [
+        {
+          "kind": "exact",
+          "label": "calls search_hotels with {\"maxPrice\":120}",
+          "pass": true
+        },
+        {
+          "kind": "judge",
+          "label": "every hotel shown is under €120",
+          "pass": false,
+          "reason": "Torel 1884 is €145."
+        }
+      ],
+      "mocks": [
+        {
+          "tool": "search_hotels",
+          "args": {
+            "city": "Porto",
+            "maxPrice": 120,
+            "nights": 3
+          },
+          "result": [
+            {
+              "name": "Pestana Vintage"
+            },
+            {
+              "name": "Moov"
+            },
+            {
+              "name": "Torel 1884"
+            }
+          ],
+          "fake": "portoHotels"
+        }
+      ]
+    },
+    {
+      "file": "skills/eval-report/fixtures/evals/travel-planner.eval.ts",
+      "name": "a hotel shortlist stays within budget",
+      "round": 2,
+      "durationMs": 8471,
+      "input": "Hotels in Porto under €120 a night, 3 nights from 20 Dec.",
+      "output": {
+        "text": "Two good options under €120:",
+        "cards": [
+          {
+            "kind": "Hotel",
+            "title": "Pestana Vintage",
+            "body": "€118 / night"
+          },
+          {
+            "kind": "Hotel",
+            "title": "Moov Hotel Porto Centro",
+            "body": "€74 / night"
+          }
+        ]
+      },
+      "checks": [
+        {
+          "kind": "exact",
+          "label": "calls search_hotels with {\"maxPrice\":120}",
+          "pass": true
+        },
+        {
+          "kind": "judge",
+          "label": "every hotel shown is under €120",
+          "pass": true
+        }
+      ],
+      "mocks": [
+        {
+          "tool": "search_hotels",
+          "args": {
+            "city": "Porto",
+            "maxPrice": 120
+          },
+          "result": [
+            {
+              "name": "Pestana Vintage"
+            },
+            {
+              "name": "Moov"
+            }
+          ],
+          "fake": "portoHotels"
+        }
+      ]
+    },
+    {
+      "file": "skills/eval-report/fixtures/evals/travel-planner.eval.ts",
+      "name": "a hotel shortlist stays within budget",
+      "round": 3,
+      "durationMs": 9448,
+      "input": "Hotels in Porto under €120 a night, 3 nights from 20 Dec.",
+      "output": {
+        "text": "Here are two under €120:\n1. Pestana Vintage, €118\n2. Moov Porto Centro, €74"
+      },
+      "checks": [
+        {
+          "kind": "exact",
+          "label": "calls search_hotels with {\"maxPrice\":120}",
+          "pass": true
+        },
+        {
+          "kind": "judge",
+          "label": "every hotel shown is under €120",
+          "pass": true
+        }
+      ],
+      "mocks": [
+        {
+          "tool": "search_hotels",
+          "args": {
+            "city": "Porto",
+            "maxPrice": 120
+          },
+          "result": [
+            {
+              "name": "Pestana Vintage"
+            },
+            {
+              "name": "Moov"
+            }
+          ],
+          "fake": "portoHotels"
+        }
+      ]
+    },
+    {
+      "file": "skills/eval-report/fixtures/evals/travel-planner.eval.ts",
+      "name": "weather is given for the trip dates, not today",
+      "round": 1,
+      "durationMs": 10425,
+      "input": "What will the weather be like in Rome from 3 to 6 January?",
+      "output": {
+        "text": "Expect cool, mostly dry days: highs around 13°C, lows near 4°C, with a chance of rain on the 5th."
+      },
+      "checks": [
+        {
+          "kind": "exact",
+          "label": "calls weather with {\"from\":\"2027-01-03\",\"to\":\"2027-01-06\"}",
+          "pass": true
+        }
+      ],
+      "mocks": [
+        {
+          "tool": "weather",
+          "args": {
+            "city": "Rome",
+            "from": "2027-01-03",
+            "to": "2027-01-06"
+          },
+          "result": {
+            "high": 13,
+            "low": 4,
+            "rain": [
+              "2027-01-05"
+            ]
+          },
+          "fake": "romeJanuary"
+        }
+      ]
+    },
+    {
+      "file": "skills/eval-report/fixtures/evals/travel-planner.eval.ts",
+      "name": "a tool error is explained and retried once",
+      "round": 1,
+      "durationMs": 30000,
+      "input": "Book me the 9:40 to Lisbon on 12 Dec.",
+      "error": "Timed out after 30s waiting for the model",
+      "output": null,
+      "checks": [],
+      "mocks": [
+        {
+          "tool": "search_flights",
+          "args": {
+            "from": "LON",
+            "to": "LIS"
+          },
+          "result": {
+            "error": "timeout"
+          }
+        }
+      ]
+    },
+    {
+      "file": "skills/eval-report/fixtures/evals/travel-planner.eval.ts",
+      "name": "a tool error is explained and retried once",
+      "round": 2,
+      "durationMs": 12379,
+      "input": "Book me the 9:40 to Lisbon on 12 Dec.",
+      "output": {
+        "text": "The flight search didn’t answer just now, so I tried again and it worked. The 9:40 TAP flight is £118; want me to hold it?"
+      },
+      "checks": [
+        {
+          "kind": "exact",
+          "label": "calls search_flights 2 times",
+          "pass": true
+        },
+        {
+          "kind": "judge",
+          "label": "tells the buyer the search failed, without jargon",
+          "pass": true
+        }
+      ],
+      "mocks": [
+        {
+          "tool": "search_flights",
+          "args": {
+            "from": "LON",
+            "to": "LIS"
+          },
+          "result": {
+            "error": "timeout"
+          }
+        },
+        {
+          "tool": "search_flights",
+          "args": {
+            "from": "LON",
+            "to": "LIS"
+          },
+          "result": {
+            "offers": 1
+          }
+        }
+      ]
+    },
+    {
+      "file": "skills/eval-report/fixtures/evals/sql-assistant.eval.ts",
+      "name": "reads the schema before writing a query",
+      "round": 1,
+      "durationMs": 4356,
+      "rule": "Instructions, ‘Queries’: describe_table before run_query, every time.",
+      "input": {
+        "question": "How many orders last week?",
+        "database": "shop"
+      },
+      "output": {
+        "text": "There were **412 orders** last week (Mon 16 – Sun 22 Nov).",
+        "data": {
+          "sql": "SELECT count(*) FROM orders WHERE created_at >= date '2026-11-16' AND created_at < date '2026-11-23'"
+        }
+      },
+      "checks": [
+        {
+          "kind": "exact",
+          "label": "calls describe_table before run_query",
+          "pass": true
+        },
+        {
+          "kind": "exact",
+          "label": "answer contains \"412\"",
+          "pass": true
+        }
+      ],
+      "mocks": [
+        {
+          "tool": "describe_table",
+          "args": {
+            "table": "orders"
+          },
+          "result": {
+            "columns": [
+              "id",
+              "created_at",
+              "total",
+              "customer_id"
+            ]
+          },
+          "fake": "ordersSchema"
+        },
+        {
+          "tool": "run_query",
+          "args": {
+            "sql": "SELECT count(*) …"
+          },
+          "result": [
+            {
+              "count": 412
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "file": "skills/eval-report/fixtures/evals/sql-assistant.eval.ts",
+      "name": "reads the schema before writing a query",
+      "round": 2,
+      "durationMs": 5333,
+      "rule": "Instructions, ‘Queries’: describe_table before run_query, every time.",
+      "input": {
+        "question": "How many orders last week?",
+        "database": "shop"
+      },
+      "output": {
+        "text": "412 orders."
+      },
+      "checks": [
+        {
+          "kind": "exact",
+          "label": "calls describe_table before run_query",
+          "pass": false,
+          "reason": "run_query was called first."
+        },
+        {
+          "kind": "exact",
+          "label": "answer contains \"412\"",
+          "pass": true
+        }
+      ],
+      "mocks": [
+        {
+          "tool": "run_query",
+          "args": {
+            "sql": "SELECT count(*) FROM orders …"
+          },
+          "result": [
+            {
+              "count": 412
+            }
+          ]
+        },
+        {
+          "tool": "describe_table",
+          "args": {
+            "table": "orders"
+          },
+          "result": {
+            "columns": [
+              "id",
+              "created_at"
+            ]
+          },
+          "fake": "ordersSchema"
+        }
+      ]
+    },
+    {
+      "file": "skills/eval-report/fixtures/evals/sql-assistant.eval.ts",
+      "name": "refuses to run a query that changes data",
+      "round": 1,
+      "durationMs": 6310,
+      "input": {
+        "question": "Delete all test users.",
+        "database": "shop"
+      },
+      "output": {
+        "text": "I can only read data, so I can’t delete users. Here’s a query to find them, for someone with write access:",
+        "data": {
+          "sql": "SELECT id, email FROM users WHERE email LIKE '%@test.example'"
+        }
+      },
+      "checks": [
+        {
+          "kind": "exact",
+          "label": "does not call run_query",
+          "pass": true
+        },
+        {
+          "kind": "judge",
+          "label": "explains it only reads data",
+          "pass": true
+        }
+      ],
+      "mocks": []
+    },
+    {
+      "file": "skills/eval-report/fixtures/evals/sql-assistant.eval.ts",
+      "name": "a top-N question returns a table",
+      "round": 1,
+      "durationMs": 7287,
+      "input": {
+        "question": "Top 5 products by revenue this month",
+        "database": "shop"
+      },
+      "output": {
+        "text": "Top 5 products by revenue, 1–25 November:",
+        "data": [
+          {
+            "product": "Lisbon tote",
+            "revenue_gbp": 18420
+          },
+          {
+            "product": "Ceramic mug",
+            "revenue_gbp": 12110
+          },
+          {
+            "product": "Linen apron",
+            "revenue_gbp": 9870
+          },
+          {
+            "product": "Cork coasters",
+            "revenue_gbp": 6430
+          },
+          {
+            "product": "Olive oil 500ml",
+            "revenue_gbp": 5990
+          }
+        ]
+      },
+      "checks": [
+        {
+          "kind": "exact",
+          "label": "output has data",
+          "pass": true
+        },
+        {
+          "kind": "exact",
+          "label": "data has 5 rows",
+          "pass": true
+        },
+        {
+          "kind": "judge",
+          "label": "names the revenue column clearly",
+          "pass": true
+        }
+      ],
+      "mocks": [
+        {
+          "tool": "run_query",
+          "args": {
+            "sql": "SELECT product, sum(total) AS revenue_gbp … LIMIT 5"
+          },
+          "result": {
+            "rows": 5
+          },
+          "fake": "topProducts"
+        }
+      ]
+    },
+    {
+      "file": "skills/eval-report/fixtures/evals/sql-assistant.eval.ts",
+      "name": "a top-N question returns a table",
+      "round": 2,
+      "durationMs": 8264,
+      "input": {
+        "question": "Top 5 products by revenue this month",
+        "database": "shop"
+      },
+      "output": {
+        "text": "Here you go:",
+        "data": [
+          {
+            "product": "Lisbon tote",
+            "sum": 18420
+          },
+          {
+            "product": "Ceramic mug",
+            "sum": 12110
+          },
+          {
+            "product": "Linen apron",
+            "sum": 9870
+          }
+        ]
+      },
+      "checks": [
+        {
+          "kind": "exact",
+          "label": "output has data",
+          "pass": true
+        },
+        {
+          "kind": "exact",
+          "label": "data has 5 rows",
+          "pass": false,
+          "reason": "Has 3 rows."
+        },
+        {
+          "kind": "judge",
+          "label": "names the revenue column clearly",
+          "pass": false,
+          "reason": "Column is called “sum”."
+        }
+      ],
+      "mocks": [
+        {
+          "tool": "run_query",
+          "args": {
+            "sql": "SELECT product, sum(total) … LIMIT 3"
+          },
+          "result": {
+            "rows": 3
+          },
+          "fake": "topProducts"
+        }
+      ]
+    },
+    {
+      "file": "skills/eval-report/fixtures/evals/sql-assistant.eval.ts",
+      "name": "an ambiguous column is asked about, not guessed",
+      "round": 1,
+      "durationMs": 9241,
+      "input": {
+        "question": "Average value per customer",
+        "database": "shop"
+      },
+      "output": {
+        "text": "",
+        "cards": [
+          {
+            "kind": "Question",
+            "body": "By “value”, do you mean order total or lifetime spend?",
+            "chips": [
+              "Average order total",
+              "Lifetime spend"
+            ]
+          }
+        ]
+      },
+      "checks": [
+        {
+          "kind": "exact",
+          "label": "shows a question card",
+          "pass": true
+        },
+        {
+          "kind": "exact",
+          "label": "does not call run_query",
+          "pass": true
+        }
+      ],
+      "mocks": [
+        {
+          "tool": "describe_table",
+          "args": {
+            "table": "orders"
+          },
+          "result": {
+            "columns": [
+              "total",
+              "customer_id"
+            ]
+          },
+          "fake": "ordersSchema"
+        }
+      ]
+    },
+    {
+      "file": "skills/eval-report/fixtures/evals/sql-assistant.eval.ts",
+      "name": "a slow query gets a LIMIT",
+      "round": 1,
+      "durationMs": 10218,
+      "input": {
+        "question": "Show me all events",
+        "database": "analytics"
+      },
+      "output": {
+        "text": "Here are the latest 100 events. The table has 48 million rows, so I limited it.",
+        "data": {
+          "sql": "SELECT * FROM events ORDER BY ts DESC LIMIT 100"
+        }
+      },
+      "checks": [
+        {
+          "kind": "exact",
+          "label": "query matches /LIMIT \\d+/i",
+          "pass": true
+        }
+      ],
+      "mocks": [
+        {
+          "tool": "run_query",
+          "args": {
+            "sql": "SELECT * FROM events ORDER BY ts DESC LIMIT 100"
+          },
+          "result": {
+            "rows": 100
+          },
+          "fake": "events"
+        }
+      ]
+    },
+    {
+      "file": "skills/eval-report/fixtures/evals/sql-assistant.eval.ts",
+      "name": "a slow query gets a LIMIT",
+      "round": 2,
+      "durationMs": 11195,
+      "input": {
+        "question": "Show me all events",
+        "database": "analytics"
+      },
+      "output": {
+        "text": "Running that now."
+      },
+      "checks": [
+        {
+          "kind": "exact",
+          "label": "query matches /LIMIT \\d+/i",
+          "pass": false,
+          "reason": "SELECT * FROM events, no LIMIT."
+        }
+      ],
+      "mocks": [
+        {
+          "tool": "run_query",
+          "args": {
+            "sql": "SELECT * FROM events"
+          },
+          "result": {
+            "error": "statement timeout"
+          },
+          "fake": "events"
+        }
+      ]
+    },
+    {
+      "file": "skills/eval-report/fixtures/evals/sql-assistant.eval.ts",
+      "name": "explains the SQL it ran in one sentence",
+      "round": 1,
+      "durationMs": 12172,
+      "input": {
+        "question": "Which countries had no orders in October?",
+        "database": "shop"
+      },
+      "output": {
+        "text": "Two countries had no orders in October:\n- Iceland\n- Malta\n\nI listed every country we ship to and removed those with an order dated in October."
+      },
+      "checks": [
+        {
+          "kind": "judge",
+          "label": "one-sentence explanation of the query",
+          "pass": true
+        },
+        {
+          "kind": "judge",
+          "label": "lists both countries",
+          "pass": true
+        }
+      ],
+      "mocks": [
+        {
+          "tool": "run_query",
+          "args": {
+            "sql": "SELECT c.name FROM countries c LEFT JOIN orders o …"
+          },
+          "result": [
+            {
+              "country": "Iceland"
+            },
+            {
+              "country": "Malta"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,16 @@
+      # Add after the step that runs the evals. That step needs
+      # `continue-on-error: true` (or this one `if: always()`) so failures still
+      # get a report, and checkout needs `fetch-depth: 0`. The job needs
+      # permissions: contents: write, pull-requests: write.
+      - name: Eval report
+        if: always()
+        run: bash .github/eval-report/scripts/ci.sh __RESULTS__ __REPORT_ARGS__
+        env:
+          GH_TOKEN: ${{ github.token }}
+          EVAL_REPORT_SHA: ${{ github.event.pull_request.head.sha || github.sha }}
+          EVAL_REPORT_COMMENT: __COMMENT__
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: eval-report
+          path: eval-report/

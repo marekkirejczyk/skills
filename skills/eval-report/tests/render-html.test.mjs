@@ -1,0 +1,69 @@
+import { test } from 'node:test';
+import assert from 'node:assert/strict';
+import { buildReport } from '../scripts/lib/load.mjs';
+import { formatDuration, formatText, renderHtml, renderInput, renderOutput, summarizeResult } from '../scripts/lib/render-html.mjs';
+
+test('formatText makes paragraphs, lists, bold and code, and escapes HTML', () => {
+  assert.equal(formatText('Hi **you**\n\n- one\n- `two`\n1. three'),
+    '<p>Hi <b>you</b></p><ul><li>one</li><li><code>two</code></li></ul><ol><li>three</li></ol>');
+  assert.equal(formatText('<script>'), '<p>&lt;script&gt;</p>');
+});
+
+test('an output with no words says so, then shows its cards', () => {
+  const html = renderOutput({ text: '', cards: [{ kind: 'Question', body: 'Which?', chips: ['A', 'B'] }] });
+  assert.match(html, /\(no words\)/);
+  assert.match(html, /<span class="chip">A<\/span><span class="chip">B<\/span>/);
+});
+
+test('rows of data become a table', () => {
+  const html = renderOutput({ text: 'Top', data: [{ product: 'mug', revenue: 3 }, { product: 'tote' }] });
+  assert.match(html, /<table class="data"><thead><tr><th>product<\/th><th>revenue<\/th>/);
+  assert.match(html, /<td>tote<\/td><td><\/td>/);
+});
+
+test('a plain string output is formatted text', () => {
+  assert.equal(renderOutput('- a\n- b'), '<ul><li>a</li><li>b</li></ul>');
+});
+
+test('a conversation input shows who said each message', () => {
+  const html = renderInput([{ role: 'user', content: 'Hi' }, { role: 'assistant', content: 'Hello' }]);
+  assert.match(html, /<div class="who">user<\/div><p>Hi<\/p>/);
+  assert.match(html, /<div class="who">assistant<\/div><p>Hello<\/p>/);
+});
+
+test('a structured input is shown as fields', () => {
+  assert.match(renderInput({ question: 'How many?', database: 'shop' }), /<dt>question<\/dt><dd>How many\?<\/dd>/);
+});
+
+test('mock results are summarised short', () => {
+  assert.equal(summarizeResult(undefined), 'not called');
+  assert.equal(summarizeResult('noted'), 'noted');
+  assert.equal(summarizeResult({ count: 412 }), '{"count":412}');
+  assert.equal(summarizeResult('x'.repeat(50)).length, 40);
+});
+
+test('durations read like 850ms, 4.2s, 2m 41s', () => {
+  assert.deepEqual([850, 4200, 161000].map(formatDuration), ['850ms', '4.2s', '2m 41s']);
+});
+
+const sample = () => buildReport({ meta: { title: 'T <b>' }, results: [
+  { file: 'a.eval.ts', name: 'ok', checks: [{ kind: 'exact', label: 'x', pass: true }] },
+  { file: 'a.eval.ts', name: 'bad <img>', checks: [{ kind: 'judge', label: 'y', pass: false, reason: 'because' }] },
+] });
+
+test('the page shows totals, colours each round, and escapes everything from the results', () => {
+  const html = renderHtml(sample());
+  assert.match(html, /<span class="is-fail">1<\/span><span class="of">\/ 2<\/span>/);
+  assert.match(html, /<tr class="run" data-pass="1"/);
+  assert.match(html, /<tr class="run" data-pass="0"/);
+  assert.match(html, /<div class="check is-fail">/);
+  assert.match(html, /bad &lt;img&gt;/);
+  assert.doesNotMatch(html, /<img>|T <b>/);
+});
+
+test('the scope filter and tile appear only when a scope is given', () => {
+  assert.doesNotMatch(renderHtml(sample()), /data-scope=/);
+  const scoped = renderHtml(sample(), { scope: 'pr' });
+  assert.match(scoped, /data-scope="fresh"/);
+  assert.match(scoped, /New or changed in this PR/);
+});

@@ -1,6 +1,6 @@
 # Skills
 
-**Explain any codebase or pull request, without writing a single slide.** Two agent skills that read your code, run it, and turn what they find into a walkthrough people actually watch: a slide deck, or a narrated video. Three more skills clean up the code itself: `refactor-tests` brings your tests up to a written standard, `self-documented-code` makes every name explain itself, and `dont-repeat-yourself` gives each concept one implementation.
+**Explain any codebase or pull request, without writing a single slide.** Two agent skills that read your code, run it, and turn what they find into a walkthrough people actually watch: a slide deck, or a narrated video. Three more skills clean up the code itself: `refactor-tests` brings your tests up to a written standard, `self-documented-code` makes every name explain itself, and `dont-repeat-yourself` gives each concept one implementation. And `eval-report` turns an eval run into a report you can review in a minute.
 
 Works with Claude Code, Codex, Cursor and other agents that read `SKILL.md`.
 
@@ -11,6 +11,7 @@ Works with Claude Code, Codex, Cursor and other agents that read `SKILL.md`.
 | [`/refactor-tests`](#refactor-tests-tests-to-a-written-standard) | Tests rewritten to the rules for their type, with every case covered | A file, a class or a branch |
 | [`/self-documented-code`](#self-documented-code-names-that-explain-themselves) | Names that explain themselves, one name per concept, comments only for the why | A repository, a pull request, a path or a concept |
 | [`/dont-repeat-yourself`](#dont-repeat-yourself-one-implementation-per-concept) | One well-tested implementation of each concept that was written several times | A repository, a pull request, a path or a concept |
+| [`/eval-report`](#eval-report-evals-you-can-review-in-a-minute) | A static HTML report of an eval run, linked on the PR, built by a script with no model tokens | A repository, a commit or a pull request, locally or on CI |
 
 ## /explain-with-video: a narrated explainer
 
@@ -75,9 +76,22 @@ Finds concepts implemented more than once, even when the copies are written diff
 /dont-repeat-yourself src/payments             # a directory, file or concept
 ```
 
+## /eval-report: evals you can review in a minute
+
+One static HTML page per eval run, built for scrolling: green and red pass totals at the top, a collapsible group per eval file, and one row per round with its input, output, every judge and check on a green or red background, and the tools it mocked with what they gave. Filters show only the failed rounds, or only the cases new or changed in a commit or PR. Each case links to its code on GitHub.
+
+```
+/eval-report                     # run every eval, report on all of them
+/eval-report pr                  # the same, marking what this PR added or changed
+/eval-report only pr             # run and report only the new or changed cases
+/eval-report-install-ci          # build it on every PR in GitHub Actions
+```
+
+A script does the work, so a run costs almost no tokens; the first run in a repository sets it up once. On CI it publishes the page to GitHub Pages and keeps a comment on the PR, and a line at the top of its description, pointing to the latest report. [Input format →](skills/eval-report/reference/format.md)
+
 ## Install
 
-**Claude Code**, all five skills as a plugin that updates itself:
+**Claude Code**, all seven skills as a plugin that updates itself:
 
 ```bash
 claude plugin marketplace add marekkirejczyk/skills
@@ -87,10 +101,10 @@ claude plugin install marekkirejczyk-skills@marekkirejczyk
 **Codex, Cursor and other agents**, one skill at a time:
 
 ```bash
-npx skills add marekkirejczyk/skills --skill explain-with-video          # or explain-with-slides, refactor-tests, self-documented-code, dont-repeat-yourself
+npx skills add marekkirejczyk/skills --skill explain-with-video          # or explain-with-slides, refactor-tests, self-documented-code, dont-repeat-yourself, eval-report
 ```
 
-Then type `/explain-with-video`, `/explain-with-slides`, `/refactor-tests`, `/self-documented-code` or `/dont-repeat-yourself` (`$explain-with-video` in Codex). Each runs only when you ask for it. [More install options →](docs/installation.md)
+Then type `/explain-with-video`, `/explain-with-slides`, `/refactor-tests`, `/self-documented-code`, `/dont-repeat-yourself` or `/eval-report` (`$explain-with-video` in Codex). Each runs only when you ask for it. [More install options →](docs/installation.md)
 
 ## Using the explainers
 

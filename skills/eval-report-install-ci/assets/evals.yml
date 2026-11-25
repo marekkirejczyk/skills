@@ -1,0 +1,44 @@
+# Runs the evals on PRs that touch them, then links a readable report on the PR.
+# The report step makes no model calls; only the evals themselves do.
+name: evals
+on:
+  pull_request:
+    paths:
+      - __EVAL_PATHS__   # the evals, the prompts and code they test, and this file
+      - .github/workflows/evals.yml
+      - .github/eval-report/**
+permissions:
+  contents: write        # push the report to gh-pages
+  pull-requests: write   # one comment, and a block at the top of the description
+concurrency:
+  group: evals-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+jobs:
+  evals:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0   # the base branch, to find new and changed cases
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      # __SETUP__: the project's install step, e.g. pnpm/action-setup and `pnpm install --frozen-lockfile`
+      - name: Run evals
+        run: __RUN_EVALS__   # must write __RESULTS__
+        continue-on-error: true   # failed evals still get a report
+        env:
+          __SECRETS__: ${{ secrets.__SECRETS__ }}
+      - name: Eval report
+        if: always()
+        run: bash .github/eval-report/scripts/ci.sh __RESULTS__ __REPORT_ARGS__
+        env:
+          GH_TOKEN: ${{ github.token }}
+          EVAL_REPORT_SHA: ${{ github.event.pull_request.head.sha }}
+          EVAL_REPORT_COMMENT: __COMMENT__
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: eval-report
+          path: eval-report/
