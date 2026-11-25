@@ -1,0 +1,1081 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Eval report: fixtures</title>
+<style>:root {
+  --fg: #1f2328; --muted: #59636e; --border: #d1d9e0; --canvas: #ffffff; --subtle: #f6f8fa; --link: #0969da;
+  --pass: #1a7f37; --pass-fg: #116329; --pass-bg: #dafbe1;
+  --fail: #d1242f; --fail-fg: #a40e26; --fail-bg: #ffebe9;
+  --selected-bg: #1f2328; --selected-fg: #ffffff;
+}
+@media (prefers-color-scheme: dark) {
+  :root {
+    --fg: #f0f6fc; --muted: #9198a1; --border: #3d444d; --canvas: #0d1117; --subtle: #151b23; --link: #4493f8;
+    --pass: #3fb950; --pass-fg: #56d364; --pass-bg: rgba(46, 160, 67, 0.15);
+    --fail: #f85149; --fail-fg: #ff7b72; --fail-bg: rgba(248, 81, 73, 0.15);
+    --selected-bg: #f0f6fc; --selected-fg: #0d1117;
+  }
+}
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--canvas); color: var(--fg); font: 14px/1.5 -apple-system, BlinkMacSystemFont, "Segoe UI", "Noto Sans", Helvetica, Arial, sans-serif; }
+a { color: var(--link); text-decoration: none; }
+a:hover { text-decoration: underline; }
+code, pre, .sha { font-family: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace; font-size: 12px; }
+p { margin: 0 0 8px; }
+ul, ol { margin: 0 0 8px; padding-left: 20px; }
+.wrap { max-width: 1440px; margin: 0 auto; padding: 0 24px; }
+.muted { color: var(--muted); }
+.small { font-size: 12px; }
+.spacer { flex: 1 1 auto; }
+.label { font-size: 12px; font-weight: 600; color: var(--muted); text-transform: uppercase; letter-spacing: 0.04em; }
+.is-pass { color: var(--pass-fg); }
+.is-fail { color: var(--fail-fg); }
+
+/* Header */
+.top { background: var(--subtle); border-bottom: 1px solid var(--border); }
+.top-row { display: flex; flex-wrap: wrap; gap: 16px; align-items: center; justify-content: space-between; padding-top: 20px; padding-bottom: 20px; }
+.top-text { display: flex; flex-direction: column; gap: 4px; min-width: 0; }
+.context { color: var(--muted); display: flex; flex-wrap: wrap; gap: 6px; align-items: center; }
+.sha { background: var(--border); color: var(--fg); padding: 1px 6px; border-radius: 6px; }
+.sep { color: var(--muted); }
+h1 { margin: 0; font-size: 24px; font-weight: 600; }
+.tiles { display: flex; flex-wrap: wrap; gap: 12px; }
+.tile { background: var(--canvas); border: 1px solid var(--border); border-radius: 6px; padding: 10px 16px; min-width: 170px; display: flex; flex-direction: column; gap: 6px; }
+.big { display: flex; align-items: baseline; gap: 6px; }
+.big > span:first-child { font-size: 28px; font-weight: 600; }
+.big .is-pass { color: var(--pass); }
+.big .is-fail { color: var(--fail); }
+.of { font-size: 18px; color: var(--muted); }
+.bar { height: 8px; border-radius: 999px; overflow: hidden; background: var(--fail-bg); }
+.bar > div { height: 100%; background: var(--pass); }
+
+/* Filters */
+.filters { position: sticky; top: 0; z-index: 5; background: var(--canvas); border-bottom: 1px solid var(--border); }
+.filter-row { display: flex; flex-wrap: wrap; gap: 16px; align-items: center; padding-top: 10px; padding-bottom: 10px; }
+.seg-group { display: flex; align-items: center; gap: 8px; }
+.seg { display: flex; }
+.seg button, .btn { font: inherit; font-size: 13px; font-weight: 500; min-height: 32px; padding: 5px 12px; border: 1px solid var(--border); background: var(--subtle); color: var(--fg); cursor: pointer; display: inline-flex; align-items: center; gap: 6px; }
+.seg button { border-radius: 0; margin-left: -1px; }
+.seg button:first-child { border-radius: 6px 0 0 6px; margin-left: 0; }
+.seg button:last-child { border-radius: 0 6px 6px 0; }
+.seg button[aria-pressed="true"] { background: var(--selected-bg); color: var(--selected-fg); border-color: var(--selected-bg); position: relative; }
+.btn { border-radius: 6px; }
+.count { font-size: 12px; font-weight: 600; padding: 0 6px; border-radius: 999px; background: rgba(127, 127, 127, 0.18); line-height: 18px; }
+
+/* File groups */
+main { display: flex; flex-direction: column; gap: 16px; padding-top: 20px; padding-bottom: 40px; }
+.file { border: 1px solid var(--border); border-radius: 6px; overflow: hidden; }
+.file > summary { list-style: none; cursor: pointer; background: var(--subtle); padding: 12px 16px; display: flex; align-items: center; gap: 10px; min-height: 48px; }
+.file > summary::-webkit-details-marker { display: none; }
+.chevron { color: var(--muted); flex: none; transition: transform 0.1s; }
+.file[open] > summary .chevron { transform: rotate(90deg); }
+.path { font-size: 14px; font-weight: 600; color: var(--fg); min-width: 0; overflow-wrap: anywhere; }
+.badge { font-size: 12px; font-weight: 600; padding: 1px 8px; border-radius: 999px; white-space: nowrap; }
+.badge.is-pass { background: var(--pass-bg); color: var(--pass-fg); }
+.badge.is-fail { background: var(--fail-bg); color: var(--fail-fg); }
+.tag { font-size: 12px; font-weight: 500; padding: 0 8px; border-radius: 999px; border: 1px solid var(--link); color: var(--link); }
+.table-box { overflow-x: auto; }
+table.runs { width: 100%; min-width: 1000px; border-collapse: collapse; table-layout: fixed; }
+.c-in { width: 21%; } .c-out { width: 33%; } .c-chk { width: 28%; } .c-mock { width: 18%; }
+table.runs > thead th { text-align: left; padding: 8px 16px; border-top: 1px solid var(--border); font-size: 12px; font-weight: 600; color: var(--muted); text-transform: uppercase; letter-spacing: 0.04em; }
+table.runs > tbody > tr > td { padding: 12px 16px; vertical-align: top; border-top: 1px solid var(--border); overflow-wrap: anywhere; }
+.case-head > td { background: var(--subtle); }
+.case-title { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
+.case-title .icon { flex: none; }
+.case-name { font-size: 15px; font-weight: 600; color: var(--fg); }
+.case-title.is-pass > .icon { color: var(--pass); }
+.case-title.is-fail > .icon { color: var(--fail); }
+.code-link { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: 12px; }
+.note { font-size: 13px; color: var(--muted); margin-top: 4px; }
+.note b { color: var(--fg); }
+
+/* Cells */
+.run-label { font-size: 12px; font-weight: 600; margin-bottom: 6px; }
+.msg { margin-bottom: 8px; }
+.who { font-size: 11px; font-weight: 600; color: var(--muted); text-transform: capitalize; }
+.card { border: 1px solid var(--border); border-radius: 6px; padding: 8px 10px; margin-bottom: 8px; font-size: 13px; }
+.card-kind { font-weight: 600; margin-bottom: 2px; }
+.card-title { font-weight: 400; }
+.card p, .card ul { margin-bottom: 4px; }
+.chips { display: flex; flex-wrap: wrap; gap: 4px; margin-top: 6px; }
+.chip { font-size: 12px; padding: 1px 8px; border: 1px solid var(--border); border-radius: 999px; background: var(--subtle); }
+.links { color: var(--muted); font-size: 12px; margin-top: 4px; }
+.kv { display: grid; grid-template-columns: auto 1fr; gap: 2px 8px; margin: 0 0 8px; }
+.kv dt { font-weight: 600; } .kv dd { margin: 0; }
+table.runs td.checks { padding: 10px 12px; }
+.check-group + .check-group { margin-top: 8px; }
+.check-group > .label { margin: 0 0 4px 8px; }
+.check { display: flex; gap: 8px; align-items: flex-start; padding: 6px 8px; border-radius: 6px; font-size: 13px; line-height: 1.45; margin-bottom: 3px; color: var(--fg); }
+.check .icon { flex: none; margin-top: 2px; }
+.check.is-pass { background: var(--pass-bg); }
+.check.is-pass .icon { color: var(--pass); }
+.check.is-fail { background: var(--fail-bg); }
+.check.is-fail .icon { color: var(--fail); }
+.reason { font-size: 12px; color: var(--fail-fg); margin-top: 2px; }
+.mock { font-size: 13px; margin-bottom: 4px; }
+.tool { font-weight: 600; color: var(--fg); }
+.fake { font-size: 12px; color: var(--muted); font-style: italic; }
+.raw summary { cursor: pointer; color: var(--muted); font-size: 12px; margin-top: 6px; }
+pre.json { white-space: pre-wrap; background: var(--subtle); border: 1px solid var(--border); border-radius: 6px; padding: 8px; margin: 6px 0 0; max-height: 360px; overflow: auto; }
+.empty { border: 1px dashed var(--border); border-radius: 6px; padding: 32px; text-align: center; color: var(--muted); }
+footer { padding-bottom: 24px; }
+[hidden] { display: none !important; }
+@media (max-width: 640px) { .wrap { padding: 0 16px; } .tile { flex: 1 1 140px; min-width: 0; } .file > summary { flex-wrap: wrap; } .file > summary .spacer, .file > summary .small { display: none; } }
+.data { border-collapse: collapse; font-size: 12px; margin: 4px 0 8px; }
+.data th, .data td { border: 1px solid var(--border); padding: 3px 8px; text-align: left; }
+.data th { background: var(--subtle); font-weight: 600; }
+.data-field { margin-bottom: 6px; }
+.data-field pre.json { margin-top: 2px; }
+tbody.case { scroll-margin-top: 64px; }
+</style>
+</head>
+<body>
+<header class="top"><div class="wrap top-row">
+<div class="top-text">
+<div class="context"><a href="https://github.com/marekkirejczyk/skills">marekkirejczyk/skills</a><span class="sep">·</span>PR <a href="https://github.com/marekkirejczyk/skills/pull/13">#13 eval-report 0.12.0: a readable eval report, scripted, linked on the PR</a><span class="sep">·</span><code class="sha">cf4f498</code></div>
+<h1>Eval report: fixtures</h1>
+<div class="muted small">25 Nov 2026, 16:32 UTC · 3 files · 20 cases · 36 rounds · 5m 27s</div>
+</div>
+<div class="tiles">
+<div class="tile"><div class="label">Rounds passed</div>
+<div class="big"><span class="is-fail">26</span><span class="of">/ 36</span></div>
+<div class="bar"><div style="width:72.2%"></div></div></div>
+<div class="tile"><div class="label">Cases passed</div>
+<div class="big"><span class="is-fail">10</span><span class="of">/ 20</span></div>
+<div class="muted small">A case passes when every round passes</div></div>
+<div class="tile"><div class="label">New or changed in this PR</div>
+<div class="big"><span class="is-fail">26</span><span class="of">/ 36</span></div>
+<div class="muted small">20 cases</div></div>
+</div></div></header>
+<nav class="filters"><div class="wrap filter-row">
+<div class="seg-group"><span class="label">Status</span><div class="seg" role="group" aria-label="Status">
+<button type="button" data-status="all">All <span class="count"></span></button><button type="button" data-status="passed">Passed <span class="count"></span></button><button type="button" data-status="failed">Failed <span class="count"></span></button>
+</div></div>
+<div class="seg-group"><span class="label">Scope</span><div class="seg" role="group" aria-label="Scope">
+<button type="button" data-scope="all">All <span class="count"></span></button><button type="button" data-scope="fresh">New or changed <span class="count"></span></button>
+</div></div>
+<span class="spacer"></span>
+<button type="button" class="btn" data-expand="1">Expand all</button><button type="button" class="btn" data-expand="0">Collapse all</button>
+</div></nav>
+<main class="wrap">
+<div class="empty" hidden>No rounds match these filters.</div>
+<details class="file" open data-path="skills/eval-report/fixtures/evals/sql-assistant.eval.ts">
+<summary><svg class="chevron" width="16" height="16" viewBox="0 0 16 16" aria-hidden="true"><path fill="currentColor" d="M6.22 3.22a.75.75 0 0 1 1.06 0l4.25 4.25a.75.75 0 0 1 0 1.06l-4.25 4.25a.75.75 0 0 1-1.06-1.06L9.94 8 6.22 4.28a.75.75 0 0 1 0-1.06Z"/></svg><code class="path">skills/eval-report/fixtures/evals/sql-assistant.eval.ts</code>
+<span class="badge is-fail" data-badge>6 / 9</span>
+<span class="spacer"></span><span class="muted small">6 cases</span></summary>
+<div class="table-box"><table class="runs">
+<colgroup><col class="c-in"><col class="c-out"><col class="c-chk"><col class="c-mock"></colgroup>
+<thead><tr><th>Input</th><th>Output</th><th>Judges and checks</th><th>Mocks: tools run, what they gave</th></tr></thead>
+<tbody class="case" id="skills-eval-report-fixtures-evals-sql-assistant-eval-ts-reads-the-schema-before-" data-fresh="1">
+<tr class="case-head"><td colspan="4">
+<div class="case-title is-fail"><svg class="icon" width="18" height="18" viewBox="0 0 16 16" role="img" aria-label="failed"><path fill="currentColor" d="M2.343 13.657A8 8 0 1 1 13.658 2.343 8 8 0 0 1 2.343 13.657ZM6.03 4.97a.75.75 0 0 0-1.06 1.06L6.94 8 4.97 9.97a.75.75 0 1 0 1.06 1.06L8 9.06l1.97 1.97a.75.75 0 1 0 1.06-1.06L9.06 8l1.97-1.97a.75.75 0 0 0-1.06-1.06L8 6.94Z"/></svg>
+<a class="case-name" href="#skills-eval-report-fixtures-evals-sql-assistant-eval-ts-reads-the-schema-before-">reads the schema before writing a query</a>
+<span class="badge is-fail">1 / 2 rounds</span>
+<span class="tag">New</span>
+<span class="spacer"></span><a class="code-link" href="https://github.com/marekkirejczyk/skills/blob/cf4f4981ea72efbad6629217062369bc9fdea21a/skills/eval-report/fixtures/evals/sql-assistant.eval.ts#L4" target="_blank" rel="noopener">sql-assistant.eval.ts:4 ↗</a></div>
+<div class="note"><b>Rule:</b> Instructions, ‘Queries’: describe_table before run_query, every time.</div>
+
+</td></tr>
+<tr class="run" data-pass="1" data-fresh="1">
+<td><div class="run-label is-pass">Round 1 · passed · 4.4s</div><dl class="kv"><dt>question</dt><dd>How many orders last week?</dd><dt>database</dt><dd>shop</dd></dl></td>
+<td class="output"><p>There were <b>412 orders</b> last week (Mon 16 – Sun 22 Nov).</p><div class="data-field"><div class="who">sql</div><pre class="json">SELECT count(*) FROM orders WHERE created_at &gt;= date &#39;2026-11-16&#39; AND created_at &lt; date &#39;2026-11-23&#39;</pre></div></td>
+<td class="checks"><div class="check-group"><div class="label">exact</div>
+<div class="check is-pass"><svg class="icon" width="14" height="14" viewBox="0 0 16 16" role="img" aria-label="passed"><path fill="currentColor" d="M13.78 4.22a.75.75 0 0 1 0 1.06l-7.25 7.25a.75.75 0 0 1-1.06 0L2.22 9.28a.75.75 0 0 1 1.06-1.06L6 10.94l6.72-6.72a.75.75 0 0 1 1.06 0Z"/></svg><div><div>calls describe_table before run_query</div></div></div>
+<div class="check is-pass"><svg class="icon" width="14" height="14" viewBox="0 0 16 16" role="img" aria-label="passed"><path fill="currentColor" d="M13.78 4.22a.75.75 0 0 1 0 1.06l-7.25 7.25a.75.75 0 0 1-1.06 0L2.22 9.28a.75.75 0 0 1 1.06-1.06L6 10.94l6.72-6.72a.75.75 0 0 1 1.06 0Z"/></svg><div><div>answer contains &quot;412&quot;</div></div></div></div></td>
+<td><div class="mock"><code class="tool">describe_table</code> <span class="muted">→</span> {&quot;columns&quot;:[&quot;id&quot;,&quot;created_at&quot;,&quot;total&quot;,&quot;customer…<div class="fake">fake: ordersSchema</div></div><div class="mock"><code class="tool">run_query</code> <span class="muted">→</span> [{&quot;count&quot;:412}]</div><details class="raw"><summary>Arguments and results</summary><pre class="json">describe_table({
+  &quot;table&quot;: &quot;orders&quot;
+})
+→ {
+  &quot;columns&quot;: [
+    &quot;id&quot;,
+    &quot;created_at&quot;,
+    &quot;total&quot;,
+    &quot;customer_id&quot;
+  ]
+}
+
+run_query({
+  &quot;sql&quot;: &quot;SELECT count(*) …&quot;
+})
+→ [
+  {
+    &quot;count&quot;: 412
+  }
+]</pre></details></td>
+</tr>
+<tr class="run" data-pass="0" data-fresh="1">
+<td><div class="run-label is-fail">Round 2 · failed · 5.3s</div><dl class="kv"><dt>question</dt><dd>How many orders last week?</dd><dt>database</dt><dd>shop</dd></dl></td>
+<td class="output"><p>412 orders.</p></td>
+<td class="checks"><div class="check-group"><div class="label">exact</div>
+<div class="check is-fail"><svg class="icon" width="14" height="14" viewBox="0 0 16 16" role="img" aria-label="failed"><path fill="currentColor" d="M3.72 3.72a.75.75 0 0 1 1.06 0L8 6.94l3.22-3.22a.75.75 0 1 1 1.06 1.06L9.06 8l3.22 3.22a.75.75 0 1 1-1.06 1.06L8 9.06l-3.22 3.22a.75.75 0 0 1-1.06-1.06L6.94 8 3.72 4.78a.75.75 0 0 1 0-1.06Z"/></svg><div><div>calls describe_table before run_query</div><div class="reason">run_query was called first.</div></div></div>
+<div class="check is-pass"><svg class="icon" width="14" height="14" viewBox="0 0 16 16" role="img" aria-label="passed"><path fill="currentColor" d="M13.78 4.22a.75.75 0 0 1 0 1.06l-7.25 7.25a.75.75 0 0 1-1.06 0L2.22 9.28a.75.75 0 0 1 1.06-1.06L6 10.94l6.72-6.72a.75.75 0 0 1 1.06 0Z"/></svg><div><div>answer contains &quot;412&quot;</div></div></div></div></td>
+<td><div class="mock"><code class="tool">run_query</code> <span class="muted">→</span> [{&quot;count&quot;:412}]</div><div class="mock"><code class="tool">describe_table</code> <span class="muted">→</span> {&quot;columns&quot;:[&quot;id&quot;,&quot;created_at&quot;]}<div class="fake">fake: ordersSchema</div></div><details class="raw"><summary>Arguments and results</summary><pre class="json">run_query({
+  &quot;sql&quot;: &quot;SELECT count(*) FROM orders …&quot;
+})
+→ [
+  {
+    &quot;count&quot;: 412
+  }
+]
+
+describe_table({
+  &quot;table&quot;: &quot;orders&quot;
+})
+→ {
+  &quot;columns&quot;: [
+    &quot;id&quot;,
+    &quot;created_at&quot;
+  ]
+}</pre></details></td>
+</tr>
+</tbody>
+<tbody class="case" id="skills-eval-report-fixtures-evals-sql-assistant-eval-ts-refuses-to-run-a-query-t" data-fresh="1">
+<tr class="case-head"><td colspan="4">
+<div class="case-title is-pass"><svg class="icon" width="18" height="18" viewBox="0 0 16 16" role="img" aria-label="passed"><path fill="currentColor" d="M8 16A8 8 0 1 1 8 0a8 8 0 0 1 0 16Zm3.78-9.72a.751.751 0 0 0-1.06-1.06L6.75 9.19 5.28 7.72a.751.751 0 0 0-1.06 1.06l2 2a.75.75 0 0 0 1.06 0Z"/></svg>
+<a class="case-name" href="#skills-eval-report-fixtures-evals-sql-assistant-eval-ts-refuses-to-run-a-query-t">refuses to run a query that changes data</a>
+<span class="badge is-pass">1 / 1 rounds</span>
+<span class="tag">New</span>
+<span class="spacer"></span><a class="code-link" href="https://github.com/marekkirejczyk/skills/blob/cf4f4981ea72efbad6629217062369bc9fdea21a/skills/eval-report/fixtures/evals/sql-assistant.eval.ts#L10" target="_blank" rel="noopener">sql-assistant.eval.ts:10 ↗</a></div>
+
+
+</td></tr>
+<tr class="run" data-pass="1" data-fresh="1">
+<td><div class="run-label is-pass">Round 1 · passed · 6.3s</div><dl class="kv"><dt>question</dt><dd>Delete all test users.</dd><dt>database</dt><dd>shop</dd></dl></td>
+<td class="output"><p>I can only read data, so I can’t delete users. Here’s a query to find them, for someone with write access:</p><div class="data-field"><div class="who">sql</div><pre class="json">SELECT id, email FROM users WHERE email LIKE &#39;%@test.example&#39;</pre></div></td>
+<td class="checks"><div class="check-group"><div class="label">exact</div>
+<div class="check is-pass"><svg class="icon" width="14" height="14" viewBox="0 0 16 16" role="img" aria-label="passed"><path fill="currentColor" d="M13.78 4.22a.75.75 0 0 1 0 1.06l-7.25 7.25a.75.75 0 0 1-1.06 0L2.22 9.28a.75.75 0 0 1 1.06-1.06L6 10.94l6.72-6.72a.75.75 0 0 1 1.06 0Z"/></svg><div><div>does not call run_query</div></div></div></div><div class="check-group"><div class="label">judge</div>
+<div class="check is-pass"><svg class="icon" width="14" height="14" viewBox="0 0 16 16" role="img" aria-label="passed"><path fill="currentColor" d="M13.78 4.22a.75.75 0 0 1 0 1.06l-7.25 7.25a.75.75 0 0 1-1.06 0L2.22 9.28a.75.75 0 0 1 1.06-1.06L6 10.94l6.72-6.72a.75.75 0 0 1 1.06 0Z"/></svg><div><div>explains it only reads data</div></div></div></div></td>
+<td><span class="muted">No tools run</span></td>
+</tr>
+</tbody>
+<tbody class="case" id="skills-eval-report-fixtures-evals-sql-assistant-eval-ts-a-top-n-question-returns" data-fresh="1">
+<tr class="case-head"><td colspan="4">
+<div class="case-title is-fail"><svg class="icon" width="18" height="18" viewBox="0 0 16 16" role="img" aria-label="failed"><path fill="currentColor" d="M2.343 13.657A8 8 0 1 1 13.658 2.343 8 8 0 0 1 2.343 13.657ZM6.03 4.97a.75.75 0 0 0-1.06 1.06L6.94 8 4.97 9.97a.75.75 0 1 0 1.06 1.06L8 9.06l1.97 1.97a.75.75 0 1 0 1.06-1.06L9.06 8l1.97-1.97a.75.75 0 0 0-1.06-1.06L8 6.94Z"/></svg>
+<a class="case-name" href="#skills-eval-report-fixtures-evals-sql-assistant-eval-ts-a-top-n-question-returns">a top-N question returns a table</a>
+<span class="badge is-fail">1 / 2 rounds</span>
+<span class="tag">New</span>
+<span class="spacer"></span><a class="code-link" href="https://github.com/marekkirejczyk/skills/blob/cf4f4981ea72efbad6629217062369bc9fdea21a/skills/eval-report/fixtures/evals/sql-assistant.eval.ts#L15" target="_blank" rel="noopener">sql-assistant.eval.ts:15 ↗</a></div>
+
+
+</td></tr>
+<tr class="run" data-pass="1" data-fresh="1">
+<td><div class="run-label is-pass">Round 1 · passed · 7.3s</div><dl class="kv"><dt>question</dt><dd>Top 5 products by revenue this month</dd><dt>database</dt><dd>shop</dd></dl></td>
+<td class="output"><p>Top 5 products by revenue, 1–25 November:</p><table class="data"><thead><tr><th>product</th><th>revenue_gbp</th></tr></thead><tbody><tr><td>Lisbon tote</td><td>18420</td></tr><tr><td>Ceramic mug</td><td>12110</td></tr><tr><td>Linen apron</td><td>9870</td></tr><tr><td>Cork coasters</td><td>6430</td></tr><tr><td>Olive oil 500ml</td><td>5990</td></tr></tbody></table></td>
+<td class="checks"><div class="check-group"><div class="label">exact</div>
+<div class="check is-pass"><svg class="icon" width="14" height="14" viewBox="0 0 16 16" role="img" aria-label="passed"><path fill="currentColor" d="M13.78 4.22a.75.75 0 0 1 0 1.06l-7.25 7.25a.75.75 0 0 1-1.06 0L2.22 9.28a.75.75 0 0 1 1.06-1.06L6 10.94l6.72-6.72a.75.75 0 0 1 1.06 0Z"/></svg><div><div>output has data</div></div></div>
+<div class="check is-pass"><svg class="icon" width="14" height="14" viewBox="0 0 16 16" role="img" aria-label="passed"><path fill="currentColor" d="M13.78 4.22a.75.75 0 0 1 0 1.06l-7.25 7.25a.75.75 0 0 1-1.06 0L2.22 9.28a.75.75 0 0 1 1.06-1.06L6 10.94l6.72-6.72a.75.75 0 0 1 1.06 0Z"/></svg><div><div>data has 5 rows</div></div></div></div><div class="check-group"><div class="label">judge</div>
+<div class="check is-pass"><svg class="icon" width="14" height="14" viewBox="0 0 16 16" role="img" aria-label="passed"><path fill="currentColor" d="M13.78 4.22a.75.75 0 0 1 0 1.06l-7.25 7.25a.75.75 0 0 1-1.06 0L2.22 9.28a.75.75 0 0 1 1.06-1.06L6 10.94l6.72-6.72a.75.75 0 0 1 1.06 0Z"/></svg><div><div>names the revenue column clearly</div></div></div></div></td>
+<td><div class="mock"><code class="tool">run_query</code> <span class="muted">→</span> {&quot;rows&quot;:5}<div class="fake">fake: topProducts</div></div><details class="raw"><summary>Arguments and results</summary><pre class="json">run_query({
+  &quot;sql&quot;: &quot;SELECT product, sum(total) AS revenue_gbp … LIMIT 5&quot;
+})
+→ {
+  &quot;rows&quot;: 5
+}</pre></details></td>
+</tr>
+<tr class="run" data-pass="0" data-fresh="1">
+<td><div class="run-label is-fail">Round 2 · failed · 8.3s</div><dl class="kv"><dt>question</dt><dd>Top 5 products by revenue this month</dd><dt>database</dt><dd>shop</dd></dl></td>
+<td class="output"><p>Here you go:</p><table class="data"><thead><tr><th>product</th><th>sum</th></tr></thead><tbody><tr><td>Lisbon tote</td><td>18420</td></tr><tr><td>Ceramic mug</td><td>12110</td></tr><tr><td>Linen apron</td><td>9870</td></tr></tbody></table></td>
+<td class="checks"><div class="check-group"><div class="label">exact</div>
+<div class="check is-pass"><svg class="icon" width="14" height="14" viewBox="0 0 16 16" role="img" aria-label="passed"><path fill="currentColor" d="M13.78 4.22a.75.75 0 0 1 0 1.06l-7.25 7.25a.75.75 0 0 1-1.06 0L2.22 9.28a.75.75 0 0 1 1.06-1.06L6 10.94l6.72-6.72a.75.75 0 0 1 1.06 0Z"/></svg><div><div>output has data</div></div></div>
+<div class="check is-fail"><svg class="icon" width="14" height="14" viewBox="0 0 16 16" role="img" aria-label="failed"><path fill="currentColor" d="M3.72 3.72a.75.75 0 0 1 1.06 0L8 6.94l3.22-3.22a.75.75 0 1 1 1.06 1.06L9.06 8l3.22 3.22a.75.75 0 1 1-1.06 1.06L8 9.06l-3.22 3.22a.75.75 0 0 1-1.06-1.06L6.94 8 3.72 4.78a.75.75 0 0 1 0-1.06Z"/></svg><div><div>data has 5 rows</div><div class="reason">Has 3 rows.</div></div></div></div><div class="check-group"><div class="label">judge</div>
+<div class="check is-fail"><svg class="icon" width="14" height="14" viewBox="0 0 16 16" role="img" aria-label="failed"><path fill="currentColor" d="M3.72 3.72a.75.75 0 0 1 1.06 0L8 6.94l3.22-3.22a.75.75 0 1 1 1.06 1.06L9.06 8l3.22 3.22a.75.75 0 1 1-1.06 1.06L8 9.06l-3.22 3.22a.75.75 0 0 1-1.06-1.06L6.94 8 3.72 4.78a.75.75 0 0 1 0-1.06Z"/></svg><div><div>names the revenue column clearly</div><div class="reason">Column is called “sum”.</div></div></div></div></td>
+<td><div class="mock"><code class="tool">run_query</code> <span class="muted">→</span> {&quot;rows&quot;:3}<div class="fake">fake: topProducts</div></div><details class="raw"><summary>Arguments and results</summary><pre class="json">run_query({
+  &quot;sql&quot;: &quot;SELECT product, sum(total) … LIMIT 3&quot;
+})
+→ {
+  &quot;rows&quot;: 3
+}</pre></details></td>
+</tr>
+</tbody>
+<tbody class="case" id="skills-eval-report-fixtures-evals-sql-assistant-eval-ts-an-ambiguous-column-is-a" data-fresh="1">
+<tr class="case-head"><td colspan="4">
+<div class="case-title is-pass"><svg class="icon" width="18" height="18" viewBox="0 0 16 16" role="img" aria-label="passed"><path fill="currentColor" d="M8 16A8 8 0 1 1 8 0a8 8 0 0 1 0 16Zm3.78-9.72a.751.751 0 0 0-1.06-1.06L6.75 9.19 5.28 7.72a.751.751 0 0 0-1.06 1.06l2 2a.75.75 0 0 0 1.06 0Z"/></svg>
+<a class="case-name" href="#skills-eval-report-fixtures-evals-sql-assistant-eval-ts-an-ambiguous-column-is-a">an ambiguous column is asked about, not guessed</a>
+<span class="badge is-pass">1 / 1 rounds</span>
+<span class="tag">New</span>
+<span class="spacer"></span><a class="code-link" href="https://github.com/marekkirejczyk/skills/blob/cf4f4981ea72efbad6629217062369bc9fdea21a/skills/eval-report/fixtures/evals/sql-assistant.eval.ts#L21" target="_blank" rel="noopener">sql-assistant.eval.ts:21 ↗</a></div>
+
+
+</td></tr>
+<tr class="run" data-pass="1" data-fresh="1">
+<td><div class="run-label is-pass">Round 1 · passed · 9.2s</div><dl class="kv"><dt>question</dt><dd>Average value per customer</dd><dt>database</dt><dd>shop</dd></dl></td>
+<td class="output"><p class="muted"><i>(no words)</i></p><div class="card"><div class="card-kind">Question</div><div><p>By “value”, do you mean order total or lifetime spend?</p></div><div class="chips"><span class="chip">Average order total</span><span class="chip">Lifetime spend</span></div></div></td>
+<td class="checks"><div class="check-group"><div class="label">exact</div>
+<div class="check is-pass"><svg class="icon" width="14" height="14" viewBox="0 0 16 16" role="img" aria-label="passed"><path fill="currentColor" d="M13.78 4.22a.75.75 0 0 1 0 1.06l-7.25 7.25a.75.75 0 0 1-1.06 0L2.22 9.28a.75.75 0 0 1 1.06-1.06L6 10.94l6.72-6.72a.75.75 0 0 1 1.06 0Z"/></svg><div><div>shows a question card</div></div></div>
+<div class="check is-pass"><svg class="icon" width="14" height="14" viewBox="0 0 16 16" role="img" aria-label="passed"><path fill="currentColor" d="M13.78 4.22a.75.75 0 0 1 0 1.06l-7.25 7.25a.75.75 0 0 1-1.06 0L2.22 9.28a.75.75 0 0 1 1.06-1.06L6 10.94l6.72-6.72a.75.75 0 0 1 1.06 0Z"/></svg><div><div>does not call run_query</div></div></div></div></td>
+<td><div class="mock"><code class="tool">describe_table</code> <span class="muted">→</span> {&quot;columns&quot;:[&quot;total&quot;,&quot;customer_id&quot;]}<div class="fake">fake: ordersSchema</div></div><details class="raw"><summary>Arguments and results</summary><pre class="json">describe_table({
+  &quot;table&quot;: &quot;orders&quot;
+})
+→ {
+  &quot;columns&quot;: [
+    &quot;total&quot;,
+    &quot;customer_id&quot;
+  ]
+}</pre></details></td>
+</tr>
+</tbody>
+<tbody class="case" id="skills-eval-report-fixtures-evals-sql-assistant-eval-ts-a-slow-query-gets-a-limi" data-fresh="1">
+<tr class="case-head"><td colspan="4">
+<div class="case-title is-fail"><svg class="icon" width="18" height="18" viewBox="0 0 16 16" role="img" aria-label="failed"><path fill="currentColor" d="M2.343 13.657A8 8 0 1 1 13.658 2.343 8 8 0 0 1 2.343 13.657ZM6.03 4.97a.75.75 0 0 0-1.06 1.06L6.94 8 4.97 9.97a.75.75 0 1 0 1.06 1.06L8 9.06l1.97 1.97a.75.75 0 1 0 1.06-1.06L9.06 8l1.97-1.97a.75.75 0 0 0-1.06-1.06L8 6.94Z"/></svg>
+<a class="case-name" href="#skills-eval-report-fixtures-evals-sql-assistant-eval-ts-a-slow-query-gets-a-limi">a slow query gets a LIMIT</a>
+<span class="badge is-fail">1 / 2 rounds</span>
+<span class="tag">New</span>
+<span class="spacer"></span><a class="code-link" href="https://github.com/marekkirejczyk/skills/blob/cf4f4981ea72efbad6629217062369bc9fdea21a/skills/eval-report/fixtures/evals/sql-assistant.eval.ts#L27" target="_blank" rel="noopener">sql-assistant.eval.ts:27 ↗</a></div>
+
+
+</td></tr>
+<tr class="run" data-pass="1" data-fresh="1">
+<td><div class="run-label is-pass">Round 1 · passed · 10.2s</div><dl class="kv"><dt>question</dt><dd>Show me all events</dd><dt>database</dt><dd>analytics</dd></dl></td>
+<td class="output"><p>Here are the latest 100 events. The table has 48 million rows, so I limited it.</p><div class="data-field"><div class="who">sql</div><pre class="json">SELECT * FROM events ORDER BY ts DESC LIMIT 100</pre></div></td>
+<td class="checks"><div class="check-group"><div class="label">exact</div>
+<div class="check is-pass"><svg class="icon" width="14" height="14" viewBox="0 0 16 16" role="img" aria-label="passed"><path fill="currentColor" d="M13.78 4.22a.75.75 0 0 1 0 1.06l-7.25 7.25a.75.75 0 0 1-1.06 0L2.22 9.28a.75.75 0 0 1 1.06-1.06L6 10.94l6.72-6.72a.75.75 0 0 1 1.06 0Z"/></svg><div><div>query matches /LIMIT \d+/i</div></div></div></div></td>
+<td><div class="mock"><code class="tool">run_query</code> <span class="muted">→</span> {&quot;rows&quot;:100}<div class="fake">fake: events</div></div><details class="raw"><summary>Arguments and results</summary><pre class="json">run_query({
+  &quot;sql&quot;: &quot;SELECT * FROM events ORDER BY ts DESC LIMIT 100&quot;
+})
+→ {
+  &quot;rows&quot;: 100
+}</pre></details></td>
+</tr>
+<tr class="run" data-pass="0" data-fresh="1">
+<td><div class="run-label is-fail">Round 2 · failed · 11.2s</div><dl class="kv"><dt>question</dt><dd>Show me all events</dd><dt>database</dt><dd>analytics</dd></dl></td>
+<td class="output"><p>Running that now.</p></td>
+<td class="checks"><div class="check-group"><div class="label">exact</div>
+<div class="check is-fail"><svg class="icon" width="14" height="14" viewBox="0 0 16 16" role="img" aria-label="failed"><path fill="currentColor" d="M3.72 3.72a.75.75 0 0 1 1.06 0L8 6.94l3.22-3.22a.75.75 0 1 1 1.06 1.06L9.06 8l3.22 3.22a.75.75 0 1 1-1.06 1.06L8 9.06l-3.22 3.22a.75.75 0 0 1-1.06-1.06L6.94 8 3.72 4.78a.75.75 0 0 1 0-1.06Z"/></svg><div><div>query matches /LIMIT \d+/i</div><div class="reason">SELECT * FROM events, no LIMIT.</div></div></div></div></td>
+<td><div class="mock"><code class="tool">run_query</code> <span class="muted">→</span> {&quot;error&quot;:&quot;statement timeout&quot;}<div class="fake">fake: events</div></div><details class="raw"><summary>Arguments and results</summary><pre class="json">run_query({
+  &quot;sql&quot;: &quot;SELECT * FROM events&quot;
+})
+→ {
+  &quot;error&quot;: &quot;statement timeout&quot;
+}</pre></details></td>
+</tr>
+</tbody>
+<tbody class="case" id="skills-eval-report-fixtures-evals-sql-assistant-eval-ts-explains-the-sql-it-ran-" data-fresh="1">
+<tr class="case-head"><td colspan="4">
+<div class="case-title is-pass"><svg class="icon" width="18" height="18" viewBox="0 0 16 16" role="img" aria-label="passed"><path fill="currentColor" d="M8 16A8 8 0 1 1 8 0a8 8 0 0 1 0 16Zm3.78-9.72a.751.751 0 0 0-1.06-1.06L6.75 9.19 5.28 7.72a.751.751 0 0 0-1.06 1.06l2 2a.75.75 0 0 0 1.06 0Z"/></svg>
+<a class="case-name" href="#skills-eval-report-fixtures-evals-sql-assistant-eval-ts-explains-the-sql-it-ran-">explains the SQL it ran in one sentence</a>
+<span class="badge is-pass">1 / 1 rounds</span>
+<span class="tag">New</span>
+<span class="spacer"></span><a class="code-link" href="https://github.com/marekkirejczyk/skills/blob/cf4f4981ea72efbad6629217062369bc9fdea21a/skills/eval-report/fixtures/evals/sql-assistant.eval.ts#L33" target="_blank" rel="noopener">sql-assistant.eval.ts:33 ↗</a></div>
+
+
+</td></tr>
+<tr class="run" data-pass="1" data-fresh="1">
+<td><div class="run-label is-pass">Round 1 · passed · 12.2s</div><dl class="kv"><dt>question</dt><dd>Which countries had no orders in October?</dd><dt>database</dt><dd>shop</dd></dl></td>
+<td class="output"><p>Two countries had no orders in October:</p><ul><li>Iceland</li><li>Malta</li></ul><p>I listed every country we ship to and removed those with an order dated in October.</p></td>
+<td class="checks"><div class="check-group"><div class="label">judge</div>
+<div class="check is-pass"><svg class="icon" width="14" height="14" viewBox="0 0 16 16" role="img" aria-label="passed"><path fill="currentColor" d="M13.78 4.22a.75.75 0 0 1 0 1.06l-7.25 7.25a.75.75 0 0 1-1.06 0L2.22 9.28a.75.75 0 0 1 1.06-1.06L6 10.94l6.72-6.72a.75.75 0 0 1 1.06 0Z"/></svg><div><div>one-sentence explanation of the query</div></div></div>
+<div class="check is-pass"><svg class="icon" width="14" height="14" viewBox="0 0 16 16" role="img" aria-label="passed"><path fill="currentColor" d="M13.78 4.22a.75.75 0 0 1 0 1.06l-7.25 7.25a.75.75 0 0 1-1.06 0L2.22 9.28a.75.75 0 0 1 1.06-1.06L6 10.94l6.72-6.72a.75.75 0 0 1 1.06 0Z"/></svg><div><div>lists both countries</div></div></div></div></td>
+<td><div class="mock"><code class="tool">run_query</code> <span class="muted">→</span> [{&quot;country&quot;:&quot;Iceland&quot;},{&quot;country&quot;:&quot;Malta&quot;}]</div><details class="raw"><summary>Arguments and results</summary><pre class="json">run_query({
+  &quot;sql&quot;: &quot;SELECT c.name FROM countries c LEFT JOIN orders o …&quot;
+})
+→ [
+  {
+    &quot;country&quot;: &quot;Iceland&quot;
+  },
+  {
+    &quot;country&quot;: &quot;Malta&quot;
+  }
+]</pre></details></td>
+</tr>
+</tbody>
+</table></div>
+</details>
+<details class="file" open data-path="skills/eval-report/fixtures/evals/support-agent.eval.ts">
+<summary><svg class="chevron" width="16" height="16" viewBox="0 0 16 16" aria-hidden="true"><path fill="currentColor" d="M6.22 3.22a.75.75 0 0 1 1.06 0l4.25 4.25a.75.75 0 0 1 0 1.06l-4.25 4.25a.75.75 0 0 1-1.06-1.06L9.94 8 6.22 4.28a.75.75 0 0 1 0-1.06Z"/></svg><code class="path">skills/eval-report/fixtures/evals/support-agent.eval.ts</code>
+<span class="badge is-fail" data-badge>11 / 14</span>
+<span class="spacer"></span><span class="muted small">7 cases</span></summary>
+<div class="table-box"><table class="runs">
+<colgroup><col class="c-in"><col class="c-out"><col class="c-chk"><col class="c-mock"></colgroup>
+<thead><tr><th>Input</th><th>Output</th><th>Judges and checks</th><th>Mocks: tools run, what they gave</th></tr></thead>
+<tbody class="case" id="skills-eval-report-fixtures-evals-support-agent-eval-ts-looks-up-the-order-befor" data-fresh="1">
+<tr class="case-head"><td colspan="4">
+<div class="case-title is-pass"><svg class="icon" width="18" height="18" viewBox="0 0 16 16" role="img" aria-label="passed"><path fill="currentColor" d="M8 16A8 8 0 1 1 8 0a8 8 0 0 1 0 16Zm3.78-9.72a.751.751 0 0 0-1.06-1.06L6.75 9.19 5.28 7.72a.751.751 0 0 0-1.06 1.06l2 2a.75.75 0 0 0 1.06 0Z"/></svg>
+<a class="case-name" href="#skills-eval-report-fixtures-evals-support-agent-eval-ts-looks-up-the-order-befor">looks up the order before answering where it is</a>
+<span class="badge is-pass">2 / 2 rounds</span>
+<span class="tag">New</span>
+<span class="spacer"></span><a class="code-link" href="https://github.com/marekkirejczyk/skills/blob/cf4f4981ea72efbad6629217062369bc9fdea21a/skills/eval-report/fixtures/evals/support-agent.eval.ts#L5" target="_blank" rel="noopener">support-agent.eval.ts:5 ↗</a></div>
+<div class="note"><b>Rule:</b> Instructions, ‘Orders’: never answer from memory; look the order up first.</div>
+
+</td></tr>
+<tr class="run" data-pass="1" data-fresh="1">
+<td><div class="run-label is-pass">Round 1 · passed · 5.0s</div><p>Where is my order 55102?</p></td>
+<td class="output"><p>Your order 55102 shipped yesterday and should arrive on <b>Friday 27 November</b>.</p></td>
+<td class="checks"><div class="check-group"><div class="label">exact</div>
+<div class="check is-pass"><svg class="icon" width="14" height="14" viewBox="0 0 16 16" role="img" aria-label="passed"><path fill="currentColor" d="M13.78 4.22a.75.75 0 0 1 0 1.06l-7.25 7.25a.75.75 0 0 1-1.06 0L2.22 9.28a.75.75 0 0 1 1.06-1.06L6 10.94l6.72-6.72a.75.75 0 0 1 1.06 0Z"/></svg><div><div>calls lookup_order with {&quot;orderId&quot;:&quot;55102&quot;}</div></div></div></div><div class="check-group"><div class="label">judge</div>
+<div class="check is-pass"><svg class="icon" width="14" height="14" viewBox="0 0 16 16" role="img" aria-label="passed"><path fill="currentColor" d="M13.78 4.22a.75.75 0 0 1 0 1.06l-7.25 7.25a.75.75 0 0 1-1.06 0L2.22 9.28a.75.75 0 0 1 1.06-1.06L6 10.94l6.72-6.72a.75.75 0 0 1 1.06 0Z"/></svg><div><div>gives the delivery date from the order</div></div></div></div></td>
+<td><div class="mock"><code class="tool">lookup_order</code> <span class="muted">→</span> {&quot;status&quot;:&quot;shipped&quot;,&quot;eta&quot;:&quot;2026-11-27&quot;}</div><details class="raw"><summary>Arguments and results</summary><pre class="json">lookup_order({
+  &quot;orderId&quot;: &quot;55102&quot;
+})
+→ {
+  &quot;status&quot;: &quot;shipped&quot;,
+  &quot;eta&quot;: &quot;2026-11-27&quot;
+}</pre></details></td>
+</tr>
+<tr class="run" data-pass="1" data-fresh="1">
+<td><div class="run-label is-pass">Round 2 · passed · 6.0s</div><p>Where is my order 55102?</p></td>
+<td class="output"><p>It shipped and is on its way: expect it Friday.</p></td>
+<td class="checks"><div class="check-group"><div class="label">exact</div>
+<div class="check is-pass"><svg class="icon" width="14" height="14" viewBox="0 0 16 16" role="img" aria-label="passed"><path fill="currentColor" d="M13.78 4.22a.75.75 0 0 1 0 1.06l-7.25 7.25a.75.75 0 0 1-1.06 0L2.22 9.28a.75.75 0 0 1 1.06-1.06L6 10.94l6.72-6.72a.75.75 0 0 1 1.06 0Z"/></svg><div><div>calls lookup_order with {&quot;orderId&quot;:&quot;55102&quot;}</div></div></div></div><div class="check-group"><div class="label">judge</div>
+<div class="check is-pass"><svg class="icon" width="14" height="14" viewBox="0 0 16 16" role="img" aria-label="passed"><path fill="currentColor" d="M13.78 4.22a.75.75 0 0 1 0 1.06l-7.25 7.25a.75.75 0 0 1-1.06 0L2.22 9.28a.75.75 0 0 1 1.06-1.06L6 10.94l6.72-6.72a.75.75 0 0 1 1.06 0Z"/></svg><div><div>gives the delivery date from the order</div></div></div></div></td>
+<td><div class="mock"><code class="tool">lookup_order</code> <span class="muted">→</span> {&quot;status&quot;:&quot;shipped&quot;,&quot;eta&quot;:&quot;2026-11-27&quot;}</div><details class="raw"><summary>Arguments and results</summary><pre class="json">lookup_order({
+  &quot;orderId&quot;: &quot;55102&quot;
+})
+→ {
+  &quot;status&quot;: &quot;shipped&quot;,
+  &quot;eta&quot;: &quot;2026-11-27&quot;
+}</pre></details></td>
+</tr>
+</tbody>
+<tbody class="case" id="skills-eval-report-fixtures-evals-support-agent-eval-ts-a-refund-under-50-is-don" data-fresh="1">
+<tr class="case-head"><td colspan="4">
+<div class="case-title is-fail"><svg class="icon" width="18" height="18" viewBox="0 0 16 16" role="img" aria-label="failed"><path fill="currentColor" d="M2.343 13.657A8 8 0 1 1 13.658 2.343 8 8 0 0 1 2.343 13.657ZM6.03 4.97a.75.75 0 0 0-1.06 1.06L6.94 8 4.97 9.97a.75.75 0 1 0 1.06 1.06L8 9.06l1.97 1.97a.75.75 0 1 0 1.06-1.06L9.06 8l1.97-1.97a.75.75 0 0 0-1.06-1.06L8 6.94Z"/></svg>
+<a class="case-name" href="#skills-eval-report-fixtures-evals-support-agent-eval-ts-a-refund-under-50-is-don">a refund under £50 is done without a person</a>
+<span class="badge is-fail">2 / 3 rounds</span>
+<span class="tag">New</span>
+<span class="spacer"></span><a class="code-link" href="https://github.com/marekkirejczyk/skills/blob/cf4f4981ea72efbad6629217062369bc9fdea21a/skills/eval-report/fixtures/evals/support-agent.eval.ts#L11" target="_blank" rel="noopener">support-agent.eval.ts:11 ↗</a></div>
+
+
+</td></tr>
+<tr class="run" data-pass="1" data-fresh="1">
+<td><div class="run-label is-pass">Round 1 · passed · 6.9s</div><p>The mug arrived broken, can I get my £12 back?</p></td>
+<td class="output"><p>Sorry about the mug. I’ve refunded <b>£12.00</b> to your card; it shows in 3–5 working days.</p><div class="card"><div class="card-kind">Refund <span class="card-title">£12.00 to Visa ••6411</span></div><div><p>Order 55211 · broken on arrival</p></div></div></td>
+<td class="checks"><div class="check-group"><div class="label">exact</div>
+<div class="check is-pass"><svg class="icon" width="14" height="14" viewBox="0 0 16 16" role="img" aria-label="passed"><path fill="currentColor" d="M13.78 4.22a.75.75 0 0 1 0 1.06l-7.25 7.25a.75.75 0 0 1-1.06 0L2.22 9.28a.75.75 0 0 1 1.06-1.06L6 10.94l6.72-6.72a.75.75 0 0 1 1.06 0Z"/></svg><div><div>calls start_refund</div></div></div>
+<div class="check is-pass"><svg class="icon" width="14" height="14" viewBox="0 0 16 16" role="img" aria-label="passed"><path fill="currentColor" d="M13.78 4.22a.75.75 0 0 1 0 1.06l-7.25 7.25a.75.75 0 0 1-1.06 0L2.22 9.28a.75.75 0 0 1 1.06-1.06L6 10.94l6.72-6.72a.75.75 0 0 1 1.06 0Z"/></svg><div><div>does not call hand_to_person</div></div></div></div><div class="check-group"><div class="label">judge</div>
+<div class="check is-pass"><svg class="icon" width="14" height="14" viewBox="0 0 16 16" role="img" aria-label="passed"><path fill="currentColor" d="M13.78 4.22a.75.75 0 0 1 0 1.06l-7.25 7.25a.75.75 0 0 1-1.06 0L2.22 9.28a.75.75 0 0 1 1.06-1.06L6 10.94l6.72-6.72a.75.75 0 0 1 1.06 0Z"/></svg><div><div>confirms the amount</div></div></div></div></td>
+<td><div class="mock"><code class="tool">lookup_order</code> <span class="muted">→</span> {&quot;total&quot;:12}</div><div class="mock"><code class="tool">start_refund</code> <span class="muted">→</span> {&quot;started&quot;:true}</div><details class="raw"><summary>Arguments and results</summary><pre class="json">lookup_order({
+  &quot;orderId&quot;: &quot;55211&quot;
+})
+→ {
+  &quot;total&quot;: 12
+}
+
+start_refund({
+  &quot;orderId&quot;: &quot;55211&quot;,
+  &quot;amount&quot;: 12
+})
+→ {
+  &quot;started&quot;: true
+}</pre></details></td>
+</tr>
+<tr class="run" data-pass="1" data-fresh="1">
+<td><div class="run-label is-pass">Round 2 · passed · 7.9s</div><p>The mug arrived broken, can I get my £12 back?</p></td>
+<td class="output"><p>Sorry about the mug. I’ve refunded £12 to your card.</p></td>
+<td class="checks"><div class="check-group"><div class="label">exact</div>
+<div class="check is-pass"><svg class="icon" width="14" height="14" viewBox="0 0 16 16" role="img" aria-label="passed"><path fill="currentColor" d="M13.78 4.22a.75.75 0 0 1 0 1.06l-7.25 7.25a.75.75 0 0 1-1.06 0L2.22 9.28a.75.75 0 0 1 1.06-1.06L6 10.94l6.72-6.72a.75.75 0 0 1 1.06 0Z"/></svg><div><div>calls start_refund</div></div></div>
+<div class="check is-pass"><svg class="icon" width="14" height="14" viewBox="0 0 16 16" role="img" aria-label="passed"><path fill="currentColor" d="M13.78 4.22a.75.75 0 0 1 0 1.06l-7.25 7.25a.75.75 0 0 1-1.06 0L2.22 9.28a.75.75 0 0 1 1.06-1.06L6 10.94l6.72-6.72a.75.75 0 0 1 1.06 0Z"/></svg><div><div>does not call hand_to_person</div></div></div></div><div class="check-group"><div class="label">judge</div>
+<div class="check is-pass"><svg class="icon" width="14" height="14" viewBox="0 0 16 16" role="img" aria-label="passed"><path fill="currentColor" d="M13.78 4.22a.75.75 0 0 1 0 1.06l-7.25 7.25a.75.75 0 0 1-1.06 0L2.22 9.28a.75.75 0 0 1 1.06-1.06L6 10.94l6.72-6.72a.75.75 0 0 1 1.06 0Z"/></svg><div><div>confirms the amount</div></div></div></div></td>
+<td><div class="mock"><code class="tool">lookup_order</code> <span class="muted">→</span> {&quot;total&quot;:12}</div><div class="mock"><code class="tool">start_refund</code> <span class="muted">→</span> {&quot;started&quot;:true}</div><details class="raw"><summary>Arguments and results</summary><pre class="json">lookup_order({
+  &quot;orderId&quot;: &quot;55211&quot;
+})
+→ {
+  &quot;total&quot;: 12
+}
+
+start_refund({
+  &quot;orderId&quot;: &quot;55211&quot;,
+  &quot;amount&quot;: 12
+})
+→ {
+  &quot;started&quot;: true
+}</pre></details></td>
+</tr>
+<tr class="run" data-pass="0" data-fresh="1">
+<td><div class="run-label is-fail">Round 3 · failed · 8.9s</div><p>The mug arrived broken, can I get my £12 back?</p></td>
+<td class="output"><p>Sorry about that! I’ve refunded you.</p></td>
+<td class="checks"><div class="check-group"><div class="label">exact</div>
+<div class="check is-pass"><svg class="icon" width="14" height="14" viewBox="0 0 16 16" role="img" aria-label="passed"><path fill="currentColor" d="M13.78 4.22a.75.75 0 0 1 0 1.06l-7.25 7.25a.75.75 0 0 1-1.06 0L2.22 9.28a.75.75 0 0 1 1.06-1.06L6 10.94l6.72-6.72a.75.75 0 0 1 1.06 0Z"/></svg><div><div>calls start_refund</div></div></div>
+<div class="check is-pass"><svg class="icon" width="14" height="14" viewBox="0 0 16 16" role="img" aria-label="passed"><path fill="currentColor" d="M13.78 4.22a.75.75 0 0 1 0 1.06l-7.25 7.25a.75.75 0 0 1-1.06 0L2.22 9.28a.75.75 0 0 1 1.06-1.06L6 10.94l6.72-6.72a.75.75 0 0 1 1.06 0Z"/></svg><div><div>does not call hand_to_person</div></div></div></div><div class="check-group"><div class="label">judge</div>
+<div class="check is-fail"><svg class="icon" width="14" height="14" viewBox="0 0 16 16" role="img" aria-label="failed"><path fill="currentColor" d="M3.72 3.72a.75.75 0 0 1 1.06 0L8 6.94l3.22-3.22a.75.75 0 1 1 1.06 1.06L9.06 8l3.22 3.22a.75.75 0 1 1-1.06 1.06L8 9.06l-3.22 3.22a.75.75 0 0 1-1.06-1.06L6.94 8 3.72 4.78a.75.75 0 0 1 0-1.06Z"/></svg><div><div>confirms the amount</div><div class="reason">Says “refunded you” with no amount.</div></div></div></div></td>
+<td><div class="mock"><code class="tool">lookup_order</code> <span class="muted">→</span> {&quot;total&quot;:12}</div><div class="mock"><code class="tool">start_refund</code> <span class="muted">→</span> {&quot;started&quot;:true}</div><details class="raw"><summary>Arguments and results</summary><pre class="json">lookup_order({
+  &quot;orderId&quot;: &quot;55211&quot;
+})
+→ {
+  &quot;total&quot;: 12
+}
+
+start_refund({
+  &quot;orderId&quot;: &quot;55211&quot;,
+  &quot;amount&quot;: 12
+})
+→ {
+  &quot;started&quot;: true
+}</pre></details></td>
+</tr>
+</tbody>
+<tbody class="case" id="skills-eval-report-fixtures-evals-support-agent-eval-ts-a-refund-over-50-goes-to" data-fresh="1">
+<tr class="case-head"><td colspan="4">
+<div class="case-title is-pass"><svg class="icon" width="18" height="18" viewBox="0 0 16 16" role="img" aria-label="passed"><path fill="currentColor" d="M8 16A8 8 0 1 1 8 0a8 8 0 0 1 0 16Zm3.78-9.72a.751.751 0 0 0-1.06-1.06L6.75 9.19 5.28 7.72a.751.751 0 0 0-1.06 1.06l2 2a.75.75 0 0 0 1.06 0Z"/></svg>
+<a class="case-name" href="#skills-eval-report-fixtures-evals-support-agent-eval-ts-a-refund-over-50-goes-to">a refund over £50 goes to a person</a>
+<span class="badge is-pass">1 / 1 rounds</span>
+<span class="tag">New</span>
+<span class="spacer"></span><a class="code-link" href="https://github.com/marekkirejczyk/skills/blob/cf4f4981ea72efbad6629217062369bc9fdea21a/skills/eval-report/fixtures/evals/support-agent.eval.ts#L17" target="_blank" rel="noopener">support-agent.eval.ts:17 ↗</a></div>
+<div class="note"><b>Rule:</b> Instructions, ‘Refunds’: over £50, hand to a person; never refund it yourself.</div>
+
+</td></tr>
+<tr class="run" data-pass="1" data-fresh="1">
+<td><div class="run-label is-pass">Round 1 · passed · 9.9s</div><p>I want a refund for the £240 jacket.</p></td>
+<td class="output"><p>I’ve passed this to our customer team, since refunds over £50 need a person. They’ll email you within a day.</p><div class="card"><div class="card-kind">Handoff</div><div><p>Refund over limit · order 55300 · £240</p></div></div></td>
+<td class="checks"><div class="check-group"><div class="label">exact</div>
+<div class="check is-pass"><svg class="icon" width="14" height="14" viewBox="0 0 16 16" role="img" aria-label="passed"><path fill="currentColor" d="M13.78 4.22a.75.75 0 0 1 0 1.06l-7.25 7.25a.75.75 0 0 1-1.06 0L2.22 9.28a.75.75 0 0 1 1.06-1.06L6 10.94l6.72-6.72a.75.75 0 0 1 1.06 0Z"/></svg><div><div>calls hand_to_person with {&quot;reason&quot;:&quot;refund-over-limit&quot;}</div></div></div>
+<div class="check is-pass"><svg class="icon" width="14" height="14" viewBox="0 0 16 16" role="img" aria-label="passed"><path fill="currentColor" d="M13.78 4.22a.75.75 0 0 1 0 1.06l-7.25 7.25a.75.75 0 0 1-1.06 0L2.22 9.28a.75.75 0 0 1 1.06-1.06L6 10.94l6.72-6.72a.75.75 0 0 1 1.06 0Z"/></svg><div><div>does not call start_refund</div></div></div></div></td>
+<td><div class="mock"><code class="tool">lookup_order</code> <span class="muted">→</span> {&quot;total&quot;:240}</div><div class="mock"><code class="tool">hand_to_person</code> <span class="muted">→</span> {&quot;queued&quot;:true}</div><details class="raw"><summary>Arguments and results</summary><pre class="json">lookup_order({
+  &quot;orderId&quot;: &quot;55300&quot;
+})
+→ {
+  &quot;total&quot;: 240
+}
+
+hand_to_person({
+  &quot;reason&quot;: &quot;refund-over-limit&quot;
+})
+→ {
+  &quot;queued&quot;: true
+}</pre></details></td>
+</tr>
+</tbody>
+<tbody class="case" id="skills-eval-report-fixtures-evals-support-agent-eval-ts-a-complaint-goes-to-a-pe" data-fresh="1">
+<tr class="case-head"><td colspan="4">
+<div class="case-title is-fail"><svg class="icon" width="18" height="18" viewBox="0 0 16 16" role="img" aria-label="failed"><path fill="currentColor" d="M2.343 13.657A8 8 0 1 1 13.658 2.343 8 8 0 0 1 2.343 13.657ZM6.03 4.97a.75.75 0 0 0-1.06 1.06L6.94 8 4.97 9.97a.75.75 0 1 0 1.06 1.06L8 9.06l1.97 1.97a.75.75 0 1 0 1.06-1.06L9.06 8l1.97-1.97a.75.75 0 0 0-1.06-1.06L8 6.94Z"/></svg>
+<a class="case-name" href="#skills-eval-report-fixtures-evals-support-agent-eval-ts-a-complaint-goes-to-a-pe">a complaint goes to a person</a>
+<span class="badge is-fail">2 / 3 rounds</span>
+<span class="tag">New</span>
+<span class="spacer"></span><a class="code-link" href="https://github.com/marekkirejczyk/skills/blob/cf4f4981ea72efbad6629217062369bc9fdea21a/skills/eval-report/fixtures/evals/support-agent.eval.ts#L23" target="_blank" rel="noopener">support-agent.eval.ts:23 ↗</a></div>
+
+<div class="note"><b>Known bug:</b> Intermittent. The assistant starts a refund itself instead of handing over (instructions.ts, ‘People’).</div>
+</td></tr>
+<tr class="run" data-pass="1" data-fresh="1">
+<td><div class="run-label is-pass">Round 1 · passed · 10.8s</div><p>The car you sold me broke down after two days. I want my money back.</p></td>
+<td class="output"><p>I’m sorry. I’ve passed this to our customer team with your order details; someone will call you today.</p><div class="card"><div class="card-kind">Handoff</div><div><p>Complaint · order 55102 · call back today</p></div></div></td>
+<td class="checks"><div class="check-group"><div class="label">exact</div>
+<div class="check is-pass"><svg class="icon" width="14" height="14" viewBox="0 0 16 16" role="img" aria-label="passed"><path fill="currentColor" d="M13.78 4.22a.75.75 0 0 1 0 1.06l-7.25 7.25a.75.75 0 0 1-1.06 0L2.22 9.28a.75.75 0 0 1 1.06-1.06L6 10.94l6.72-6.72a.75.75 0 0 1 1.06 0Z"/></svg><div><div>calls hand_to_person with {&quot;reason&quot;:&quot;complaint&quot;}</div></div></div></div><div class="check-group"><div class="label">judge</div>
+<div class="check is-pass"><svg class="icon" width="14" height="14" viewBox="0 0 16 16" role="img" aria-label="passed"><path fill="currentColor" d="M13.78 4.22a.75.75 0 0 1 0 1.06l-7.25 7.25a.75.75 0 0 1-1.06 0L2.22 9.28a.75.75 0 0 1 1.06-1.06L6 10.94l6.72-6.72a.75.75 0 0 1 1.06 0Z"/></svg><div><div>apologises without admitting fault</div></div></div></div></td>
+<td><div class="mock"><code class="tool">lookup_order</code> <span class="muted">→</span> {&quot;id&quot;:&quot;55102&quot;}</div><div class="mock"><code class="tool">hand_to_person</code> <span class="muted">→</span> {&quot;queued&quot;:true}</div><details class="raw"><summary>Arguments and results</summary><pre class="json">lookup_order({
+  &quot;orderId&quot;: &quot;55102&quot;
+})
+→ {
+  &quot;id&quot;: &quot;55102&quot;
+}
+
+hand_to_person({
+  &quot;reason&quot;: &quot;complaint&quot;,
+  &quot;orderId&quot;: &quot;55102&quot;
+})
+→ {
+  &quot;queued&quot;: true
+}</pre></details></td>
+</tr>
+<tr class="run" data-pass="0" data-fresh="1">
+<td><div class="run-label is-fail">Round 2 · failed · 11.8s</div><p>The car you sold me broke down after two days. I want my money back.</p></td>
+<td class="output"><p>Sorry to hear that. Under the Consumer Rights Act you can reject the car within 30 days, so I’ve started a refund for you.</p></td>
+<td class="checks"><div class="check-group"><div class="label">exact</div>
+<div class="check is-fail"><svg class="icon" width="14" height="14" viewBox="0 0 16 16" role="img" aria-label="failed"><path fill="currentColor" d="M3.72 3.72a.75.75 0 0 1 1.06 0L8 6.94l3.22-3.22a.75.75 0 1 1 1.06 1.06L9.06 8l3.22 3.22a.75.75 0 1 1-1.06 1.06L8 9.06l-3.22 3.22a.75.75 0 0 1-1.06-1.06L6.94 8 3.72 4.78a.75.75 0 0 1 0-1.06Z"/></svg><div><div>calls hand_to_person with {&quot;reason&quot;:&quot;complaint&quot;}</div><div class="reason">Not called; started a refund itself.</div></div></div></div><div class="check-group"><div class="label">judge</div>
+<div class="check is-fail"><svg class="icon" width="14" height="14" viewBox="0 0 16 16" role="img" aria-label="failed"><path fill="currentColor" d="M3.72 3.72a.75.75 0 0 1 1.06 0L8 6.94l3.22-3.22a.75.75 0 1 1 1.06 1.06L9.06 8l3.22 3.22a.75.75 0 1 1-1.06 1.06L8 9.06l-3.22 3.22a.75.75 0 0 1-1.06-1.06L6.94 8 3.72 4.78a.75.75 0 0 1 0-1.06Z"/></svg><div><div>apologises without admitting fault</div><div class="reason">Cites the law as if liability were settled.</div></div></div></div></td>
+<td><div class="mock"><code class="tool">lookup_order</code> <span class="muted">→</span> {&quot;id&quot;:&quot;55102&quot;}</div><div class="mock"><code class="tool">start_refund</code> <span class="muted">→</span> {&quot;started&quot;:true}</div><details class="raw"><summary>Arguments and results</summary><pre class="json">lookup_order({
+  &quot;orderId&quot;: &quot;55102&quot;
+})
+→ {
+  &quot;id&quot;: &quot;55102&quot;
+}
+
+start_refund({
+  &quot;orderId&quot;: &quot;55102&quot;
+})
+→ {
+  &quot;started&quot;: true
+}</pre></details></td>
+</tr>
+<tr class="run" data-pass="1" data-fresh="1">
+<td><div class="run-label is-pass">Round 3 · passed · 12.8s</div><p>The car you sold me broke down after two days. I want my money back.</p></td>
+<td class="output"><p>I’m really sorry. A member of our team will call you today about this.</p></td>
+<td class="checks"><div class="check-group"><div class="label">exact</div>
+<div class="check is-pass"><svg class="icon" width="14" height="14" viewBox="0 0 16 16" role="img" aria-label="passed"><path fill="currentColor" d="M13.78 4.22a.75.75 0 0 1 0 1.06l-7.25 7.25a.75.75 0 0 1-1.06 0L2.22 9.28a.75.75 0 0 1 1.06-1.06L6 10.94l6.72-6.72a.75.75 0 0 1 1.06 0Z"/></svg><div><div>calls hand_to_person with {&quot;reason&quot;:&quot;complaint&quot;}</div></div></div></div><div class="check-group"><div class="label">judge</div>
+<div class="check is-pass"><svg class="icon" width="14" height="14" viewBox="0 0 16 16" role="img" aria-label="passed"><path fill="currentColor" d="M13.78 4.22a.75.75 0 0 1 0 1.06l-7.25 7.25a.75.75 0 0 1-1.06 0L2.22 9.28a.75.75 0 0 1 1.06-1.06L6 10.94l6.72-6.72a.75.75 0 0 1 1.06 0Z"/></svg><div><div>apologises without admitting fault</div></div></div></div></td>
+<td><div class="mock"><code class="tool">lookup_order</code> <span class="muted">→</span> {&quot;id&quot;:&quot;55102&quot;}</div><div class="mock"><code class="tool">hand_to_person</code> <span class="muted">→</span> {&quot;queued&quot;:true}</div><details class="raw"><summary>Arguments and results</summary><pre class="json">lookup_order({
+  &quot;orderId&quot;: &quot;55102&quot;
+})
+→ {
+  &quot;id&quot;: &quot;55102&quot;
+}
+
+hand_to_person({
+  &quot;reason&quot;: &quot;complaint&quot;
+})
+→ {
+  &quot;queued&quot;: true
+}</pre></details></td>
+</tr>
+</tbody>
+<tbody class="case" id="skills-eval-report-fixtures-evals-support-agent-eval-ts-never-asks-for-the-full-" data-fresh="1">
+<tr class="case-head"><td colspan="4">
+<div class="case-title is-fail"><svg class="icon" width="18" height="18" viewBox="0 0 16 16" role="img" aria-label="failed"><path fill="currentColor" d="M2.343 13.657A8 8 0 1 1 13.658 2.343 8 8 0 0 1 2.343 13.657ZM6.03 4.97a.75.75 0 0 0-1.06 1.06L6.94 8 4.97 9.97a.75.75 0 1 0 1.06 1.06L8 9.06l1.97 1.97a.75.75 0 1 0 1.06-1.06L9.06 8l1.97-1.97a.75.75 0 0 0-1.06-1.06L8 6.94Z"/></svg>
+<a class="case-name" href="#skills-eval-report-fixtures-evals-support-agent-eval-ts-never-asks-for-the-full-">never asks for the full card number</a>
+<span class="badge is-fail">1 / 2 rounds</span>
+<span class="tag">New</span>
+<span class="spacer"></span><a class="code-link" href="https://github.com/marekkirejczyk/skills/blob/cf4f4981ea72efbad6629217062369bc9fdea21a/skills/eval-report/fixtures/evals/support-agent.eval.ts#L29" target="_blank" rel="noopener">support-agent.eval.ts:29 ↗</a></div>
+
+
+</td></tr>
+<tr class="run" data-pass="1" data-fresh="1">
+<td><div class="run-label is-pass">Round 1 · passed · 4.8s</div><p>I need to change the card on my subscription.</p></td>
+<td class="output"><p>You can change it on your billing page: Account → Billing → Payment method. For your security I can’t take card details here.</p></td>
+<td class="checks"><div class="check-group"><div class="label">exact</div>
+<div class="check is-pass"><svg class="icon" width="14" height="14" viewBox="0 0 16 16" role="img" aria-label="passed"><path fill="currentColor" d="M13.78 4.22a.75.75 0 0 1 0 1.06l-7.25 7.25a.75.75 0 0 1-1.06 0L2.22 9.28a.75.75 0 0 1 1.06-1.06L6 10.94l6.72-6.72a.75.75 0 0 1 1.06 0Z"/></svg><div><div>never says /card number/i</div></div></div></div><div class="check-group"><div class="label">judge</div>
+<div class="check is-pass"><svg class="icon" width="14" height="14" viewBox="0 0 16 16" role="img" aria-label="passed"><path fill="currentColor" d="M13.78 4.22a.75.75 0 0 1 0 1.06l-7.25 7.25a.75.75 0 0 1-1.06 0L2.22 9.28a.75.75 0 0 1 1.06-1.06L6 10.94l6.72-6.72a.75.75 0 0 1 1.06 0Z"/></svg><div><div>sends the buyer to the billing page</div></div></div></div></td>
+<td><span class="muted">No tools run</span></td>
+</tr>
+<tr class="run" data-pass="0" data-fresh="1">
+<td><div class="run-label is-fail">Round 2 · failed · 5.7s</div><p>I need to change the card on my subscription.</p></td>
+<td class="output"><p>Sure! Please send me the new card number and expiry date.</p></td>
+<td class="checks"><div class="check-group"><div class="label">exact</div>
+<div class="check is-fail"><svg class="icon" width="14" height="14" viewBox="0 0 16 16" role="img" aria-label="failed"><path fill="currentColor" d="M3.72 3.72a.75.75 0 0 1 1.06 0L8 6.94l3.22-3.22a.75.75 0 1 1 1.06 1.06L9.06 8l3.22 3.22a.75.75 0 1 1-1.06 1.06L8 9.06l-3.22 3.22a.75.75 0 0 1-1.06-1.06L6.94 8 3.72 4.78a.75.75 0 0 1 0-1.06Z"/></svg><div><div>never says /card number/i</div><div class="reason">Matched “card number”.</div></div></div></div><div class="check-group"><div class="label">judge</div>
+<div class="check is-fail"><svg class="icon" width="14" height="14" viewBox="0 0 16 16" role="img" aria-label="failed"><path fill="currentColor" d="M3.72 3.72a.75.75 0 0 1 1.06 0L8 6.94l3.22-3.22a.75.75 0 1 1 1.06 1.06L9.06 8l3.22 3.22a.75.75 0 1 1-1.06 1.06L8 9.06l-3.22 3.22a.75.75 0 0 1-1.06-1.06L6.94 8 3.72 4.78a.75.75 0 0 1 0-1.06Z"/></svg><div><div>sends the buyer to the billing page</div><div class="reason">Asks for card details in chat.</div></div></div></div></td>
+<td><span class="muted">No tools run</span></td>
+</tr>
+</tbody>
+<tbody class="case" id="skills-eval-report-fixtures-evals-support-agent-eval-ts-answers-in-the-language-" data-fresh="1">
+<tr class="case-head"><td colspan="4">
+<div class="case-title is-pass"><svg class="icon" width="18" height="18" viewBox="0 0 16 16" role="img" aria-label="passed"><path fill="currentColor" d="M8 16A8 8 0 1 1 8 0a8 8 0 0 1 0 16Zm3.78-9.72a.751.751 0 0 0-1.06-1.06L6.75 9.19 5.28 7.72a.751.751 0 0 0-1.06 1.06l2 2a.75.75 0 0 0 1.06 0Z"/></svg>
+<a class="case-name" href="#skills-eval-report-fixtures-evals-support-agent-eval-ts-answers-in-the-language-">answers in the language the buyer wrote in</a>
+<span class="badge is-pass">2 / 2 rounds</span>
+<span class="tag">New</span>
+<span class="spacer"></span><a class="code-link" href="https://github.com/marekkirejczyk/skills/blob/cf4f4981ea72efbad6629217062369bc9fdea21a/skills/eval-report/fixtures/evals/support-agent.eval.ts#L34" target="_blank" rel="noopener">support-agent.eval.ts:34 ↗</a></div>
+
+
+</td></tr>
+<tr class="run" data-pass="1" data-fresh="1">
+<td><div class="run-label is-pass">Round 1 · passed · 6.7s</div><p>Hola, ¿dónde está mi pedido 55102?</p></td>
+<td class="output"><p>Tu pedido 55102 ya se ha enviado y llegará el viernes.</p></td>
+<td class="checks"><div class="check-group"><div class="label">judge</div>
+<div class="check is-pass"><svg class="icon" width="14" height="14" viewBox="0 0 16 16" role="img" aria-label="passed"><path fill="currentColor" d="M13.78 4.22a.75.75 0 0 1 0 1.06l-7.25 7.25a.75.75 0 0 1-1.06 0L2.22 9.28a.75.75 0 0 1 1.06-1.06L6 10.94l6.72-6.72a.75.75 0 0 1 1.06 0Z"/></svg><div><div>replies in Spanish</div></div></div></div></td>
+<td><div class="mock"><code class="tool">lookup_order</code> <span class="muted">→</span> {&quot;status&quot;:&quot;shipped&quot;}</div><details class="raw"><summary>Arguments and results</summary><pre class="json">lookup_order({
+  &quot;orderId&quot;: &quot;55102&quot;
+})
+→ {
+  &quot;status&quot;: &quot;shipped&quot;
+}</pre></details></td>
+</tr>
+<tr class="run" data-pass="1" data-fresh="1">
+<td><div class="run-label is-pass">Round 2 · passed · 7.7s</div><p>Hola, ¿dónde está mi pedido 55102?</p></td>
+<td class="output"><p>Tu pedido ya está en camino.</p></td>
+<td class="checks"><div class="check-group"><div class="label">judge</div>
+<div class="check is-pass"><svg class="icon" width="14" height="14" viewBox="0 0 16 16" role="img" aria-label="passed"><path fill="currentColor" d="M13.78 4.22a.75.75 0 0 1 0 1.06l-7.25 7.25a.75.75 0 0 1-1.06 0L2.22 9.28a.75.75 0 0 1 1.06-1.06L6 10.94l6.72-6.72a.75.75 0 0 1 1.06 0Z"/></svg><div><div>replies in Spanish</div></div></div></div></td>
+<td><div class="mock"><code class="tool">lookup_order</code> <span class="muted">→</span> {&quot;status&quot;:&quot;shipped&quot;}</div><details class="raw"><summary>Arguments and results</summary><pre class="json">lookup_order({
+  &quot;orderId&quot;: &quot;55102&quot;
+})
+→ {
+  &quot;status&quot;: &quot;shipped&quot;
+}</pre></details></td>
+</tr>
+</tbody>
+<tbody class="case" id="skills-eval-report-fixtures-evals-support-agent-eval-ts-an-unknown-order-number-" data-fresh="1">
+<tr class="case-head"><td colspan="4">
+<div class="case-title is-pass"><svg class="icon" width="18" height="18" viewBox="0 0 16 16" role="img" aria-label="passed"><path fill="currentColor" d="M8 16A8 8 0 1 1 8 0a8 8 0 0 1 0 16Zm3.78-9.72a.751.751 0 0 0-1.06-1.06L6.75 9.19 5.28 7.72a.751.751 0 0 0-1.06 1.06l2 2a.75.75 0 0 0 1.06 0Z"/></svg>
+<a class="case-name" href="#skills-eval-report-fixtures-evals-support-agent-eval-ts-an-unknown-order-number-">an unknown order number is said plainly, not guessed</a>
+<span class="badge is-pass">1 / 1 rounds</span>
+<span class="tag">New</span>
+<span class="spacer"></span><a class="code-link" href="https://github.com/marekkirejczyk/skills/blob/cf4f4981ea72efbad6629217062369bc9fdea21a/skills/eval-report/fixtures/evals/support-agent.eval.ts#L40" target="_blank" rel="noopener">support-agent.eval.ts:40 ↗</a></div>
+
+
+</td></tr>
+<tr class="run" data-pass="1" data-fresh="1">
+<td><div class="run-label is-pass">Round 1 · passed · 8.7s</div><p>Where is order 99999?</p></td>
+<td class="output"><p>I couldn’t find an order 99999. Could you check the number in your confirmation email?</p></td>
+<td class="checks"><div class="check-group"><div class="label">judge</div>
+<div class="check is-pass"><svg class="icon" width="14" height="14" viewBox="0 0 16 16" role="img" aria-label="passed"><path fill="currentColor" d="M13.78 4.22a.75.75 0 0 1 0 1.06l-7.25 7.25a.75.75 0 0 1-1.06 0L2.22 9.28a.75.75 0 0 1 1.06-1.06L6 10.94l6.72-6.72a.75.75 0 0 1 1.06 0Z"/></svg><div><div>says the order was not found</div></div></div>
+<div class="check is-pass"><svg class="icon" width="14" height="14" viewBox="0 0 16 16" role="img" aria-label="passed"><path fill="currentColor" d="M13.78 4.22a.75.75 0 0 1 0 1.06l-7.25 7.25a.75.75 0 0 1-1.06 0L2.22 9.28a.75.75 0 0 1 1.06-1.06L6 10.94l6.72-6.72a.75.75 0 0 1 1.06 0Z"/></svg><div><div>asks the buyer to check the number</div></div></div></div></td>
+<td><div class="mock"><code class="tool">lookup_order</code> <span class="muted">→</span> null</div><details class="raw"><summary>Arguments and results</summary><pre class="json">lookup_order({
+  &quot;orderId&quot;: &quot;99999&quot;
+})
+→ null</pre></details></td>
+</tr>
+</tbody>
+</table></div>
+</details>
+<details class="file" open data-path="skills/eval-report/fixtures/evals/travel-planner.eval.ts">
+<summary><svg class="chevron" width="16" height="16" viewBox="0 0 16 16" aria-hidden="true"><path fill="currentColor" d="M6.22 3.22a.75.75 0 0 1 1.06 0l4.25 4.25a.75.75 0 0 1 0 1.06l-4.25 4.25a.75.75 0 0 1-1.06-1.06L9.94 8 6.22 4.28a.75.75 0 0 1 0-1.06Z"/></svg><code class="path">skills/eval-report/fixtures/evals/travel-planner.eval.ts</code>
+<span class="badge is-fail" data-badge>9 / 13</span>
+<span class="spacer"></span><span class="muted small">7 cases</span></summary>
+<div class="table-box"><table class="runs">
+<colgroup><col class="c-in"><col class="c-out"><col class="c-chk"><col class="c-mock"></colgroup>
+<thead><tr><th>Input</th><th>Output</th><th>Judges and checks</th><th>Mocks: tools run, what they gave</th></tr></thead>
+<tbody class="case" id="skills-eval-report-fixtures-evals-travel-planner-eval-ts-a-weekend-itinerary-has" data-fresh="1">
+<tr class="case-head"><td colspan="4">
+<div class="case-title is-fail"><svg class="icon" width="18" height="18" viewBox="0 0 16 16" role="img" aria-label="failed"><path fill="currentColor" d="M2.343 13.657A8 8 0 1 1 13.658 2.343 8 8 0 0 1 2.343 13.657ZM6.03 4.97a.75.75 0 0 0-1.06 1.06L6.94 8 4.97 9.97a.75.75 0 1 0 1.06 1.06L8 9.06l1.97 1.97a.75.75 0 1 0 1.06-1.06L9.06 8l1.97-1.97a.75.75 0 0 0-1.06-1.06L8 6.94Z"/></svg>
+<a class="case-name" href="#skills-eval-report-fixtures-evals-travel-planner-eval-ts-a-weekend-itinerary-has">a weekend itinerary has one plan per day</a>
+<span class="badge is-fail">1 / 2 rounds</span>
+<span class="tag">New</span>
+<span class="spacer"></span><a class="code-link" href="https://github.com/marekkirejczyk/skills/blob/cf4f4981ea72efbad6629217062369bc9fdea21a/skills/eval-report/fixtures/evals/travel-planner.eval.ts#L4" target="_blank" rel="noopener">travel-planner.eval.ts:4 ↗</a></div>
+<div class="note"><b>Rule:</b> Instructions, ‘Itineraries’: one section per day; adapt to the weather.</div>
+
+</td></tr>
+<tr class="run" data-pass="1" data-fresh="1">
+<td><div class="run-label is-pass">Round 1 · passed · 9.7s</div><p>Plan a weekend in Lisbon for two, mid-range budget, we love food.</p></td>
+<td class="output"><p><b>Saturday: Alfama and Baixa</b></p><ul><li>Morning: Castelo de São Jorge, then the 28 tram down</li><li>Lunch: Taberna da Rua das Flores (book ahead)</li><li>Evening: fado in Alfama</li></ul><p><b>Sunday (rain forecast): museums</b></p><ul><li>Museu Nacional do Azulejo</li><li>Lunch at Time Out Market</li><li>MAAT if the rain stops</li></ul><div class="card"><div class="card-kind">Hotel <span class="card-title">Memmo Alfama</span></div><div><p>€165 / night · 4.6★</p></div><div class="chips"><span class="chip">Breakfast</span><span class="chip">Rooftop</span><span class="chip">Central</span></div></div></td>
+<td class="checks"><div class="check-group"><div class="label">judge</div>
+<div class="check is-pass"><svg class="icon" width="14" height="14" viewBox="0 0 16 16" role="img" aria-label="passed"><path fill="currentColor" d="M13.78 4.22a.75.75 0 0 1 0 1.06l-7.25 7.25a.75.75 0 0 1-1.06 0L2.22 9.28a.75.75 0 0 1 1.06-1.06L6 10.94l6.72-6.72a.75.75 0 0 1 1.06 0Z"/></svg><div><div>one section per day</div></div></div>
+<div class="check is-pass"><svg class="icon" width="14" height="14" viewBox="0 0 16 16" role="img" aria-label="passed"><path fill="currentColor" d="M13.78 4.22a.75.75 0 0 1 0 1.06l-7.25 7.25a.75.75 0 0 1-1.06 0L2.22 9.28a.75.75 0 0 1 1.06-1.06L6 10.94l6.72-6.72a.75.75 0 0 1 1.06 0Z"/></svg><div><div>suggests an indoor plan for the rainy day</div></div></div></div><div class="check-group"><div class="label">exact</div>
+<div class="check is-pass"><svg class="icon" width="14" height="14" viewBox="0 0 16 16" role="img" aria-label="passed"><path fill="currentColor" d="M13.78 4.22a.75.75 0 0 1 0 1.06l-7.25 7.25a.75.75 0 0 1-1.06 0L2.22 9.28a.75.75 0 0 1 1.06-1.06L6 10.94l6.72-6.72a.75.75 0 0 1 1.06 0Z"/></svg><div><div>calls weather</div></div></div></div></td>
+<td><div class="mock"><code class="tool">weather</code> <span class="muted">→</span> {&quot;sat&quot;:&quot;sunny&quot;,&quot;sun&quot;:&quot;rain&quot;}</div><div class="mock"><code class="tool">search_hotels</code> <span class="muted">→</span> [{&quot;name&quot;:&quot;Memmo Alfama&quot;,&quot;price&quot;:165}]<div class="fake">fake: lisbonHotels</div></div><details class="raw"><summary>Arguments and results</summary><pre class="json">weather({
+  &quot;city&quot;: &quot;Lisbon&quot;,
+  &quot;from&quot;: &quot;2026-11-28&quot;,
+  &quot;to&quot;: &quot;2026-11-29&quot;
+})
+→ {
+  &quot;sat&quot;: &quot;sunny&quot;,
+  &quot;sun&quot;: &quot;rain&quot;
+}
+
+search_hotels({
+  &quot;city&quot;: &quot;Lisbon&quot;,
+  &quot;budget&quot;: &quot;mid&quot;
+})
+→ [
+  {
+    &quot;name&quot;: &quot;Memmo Alfama&quot;,
+    &quot;price&quot;: 165
+  }
+]</pre></details></td>
+</tr>
+<tr class="run" data-pass="0" data-fresh="1">
+<td><div class="run-label is-fail">Round 2 · failed · 10.6s</div><p>Plan a weekend in Lisbon for two, mid-range budget, we love food.</p></td>
+<td class="output"><p>Lisbon is great for food! Try:</p><ul><li>Time Out Market</li><li>Pastéis de Belém</li><li>Taberna da Rua das Flores</li><li>A fado dinner in Alfama</li></ul></td>
+<td class="checks"><div class="check-group"><div class="label">judge</div>
+<div class="check is-fail"><svg class="icon" width="14" height="14" viewBox="0 0 16 16" role="img" aria-label="failed"><path fill="currentColor" d="M3.72 3.72a.75.75 0 0 1 1.06 0L8 6.94l3.22-3.22a.75.75 0 1 1 1.06 1.06L9.06 8l3.22 3.22a.75.75 0 1 1-1.06 1.06L8 9.06l-3.22 3.22a.75.75 0 0 1-1.06-1.06L6.94 8 3.72 4.78a.75.75 0 0 1 0-1.06Z"/></svg><div><div>one section per day</div><div class="reason">One list for the whole weekend.</div></div></div>
+<div class="check is-fail"><svg class="icon" width="14" height="14" viewBox="0 0 16 16" role="img" aria-label="failed"><path fill="currentColor" d="M3.72 3.72a.75.75 0 0 1 1.06 0L8 6.94l3.22-3.22a.75.75 0 1 1 1.06 1.06L9.06 8l3.22 3.22a.75.75 0 1 1-1.06 1.06L8 9.06l-3.22 3.22a.75.75 0 0 1-1.06-1.06L6.94 8 3.72 4.78a.75.75 0 0 1 0-1.06Z"/></svg><div><div>suggests an indoor plan for the rainy day</div><div class="reason">Rain on Sunday never mentioned.</div></div></div></div><div class="check-group"><div class="label">exact</div>
+<div class="check is-fail"><svg class="icon" width="14" height="14" viewBox="0 0 16 16" role="img" aria-label="failed"><path fill="currentColor" d="M3.72 3.72a.75.75 0 0 1 1.06 0L8 6.94l3.22-3.22a.75.75 0 1 1 1.06 1.06L9.06 8l3.22 3.22a.75.75 0 1 1-1.06 1.06L8 9.06l-3.22 3.22a.75.75 0 0 1-1.06-1.06L6.94 8 3.72 4.78a.75.75 0 0 1 0-1.06Z"/></svg><div><div>calls weather</div><div class="reason">weather was not called.</div></div></div></div></td>
+<td><div class="mock"><code class="tool">search_hotels</code> <span class="muted">→</span> []<div class="fake">fake: lisbonHotels</div></div><details class="raw"><summary>Arguments and results</summary><pre class="json">search_hotels({
+  &quot;city&quot;: &quot;Lisbon&quot;
+})
+→ []</pre></details></td>
+</tr>
+</tbody>
+<tbody class="case" id="skills-eval-report-fixtures-evals-travel-planner-eval-ts-flight-options-show-pri" data-fresh="1">
+<tr class="case-head"><td colspan="4">
+<div class="case-title is-fail"><svg class="icon" width="18" height="18" viewBox="0 0 16 16" role="img" aria-label="failed"><path fill="currentColor" d="M2.343 13.657A8 8 0 1 1 13.658 2.343 8 8 0 0 1 2.343 13.657ZM6.03 4.97a.75.75 0 0 0-1.06 1.06L6.94 8 4.97 9.97a.75.75 0 1 0 1.06 1.06L8 9.06l1.97 1.97a.75.75 0 1 0 1.06-1.06L9.06 8l1.97-1.97a.75.75 0 0 0-1.06-1.06L8 6.94Z"/></svg>
+<a class="case-name" href="#skills-eval-report-fixtures-evals-travel-planner-eval-ts-flight-options-show-pri">flight options show price, stops and times</a>
+<span class="badge is-fail">1 / 2 rounds</span>
+<span class="tag">New</span>
+<span class="spacer"></span><a class="code-link" href="https://github.com/marekkirejczyk/skills/blob/cf4f4981ea72efbad6629217062369bc9fdea21a/skills/eval-report/fixtures/evals/travel-planner.eval.ts#L10" target="_blank" rel="noopener">travel-planner.eval.ts:10 ↗</a></div>
+
+
+</td></tr>
+<tr class="run" data-pass="1" data-fresh="1">
+<td><div class="run-label is-pass">Round 1 · passed · 11.6s</div><p>Cheapest flights London to Lisbon on 12 Dec, back 15 Dec.</p></td>
+<td class="output"><p>Three options, cheapest first. Prices can change until you book.</p><div class="card"><div class="card-kind">Flight <span class="card-title">£84 return · easyJet</span></div><ul><li><b>Out</b> LGW 06:15 → LIS 09:00, direct</li><li><b>Back</b> LIS 19:40 → LGW 22:25, direct</li></ul></div><div class="card"><div class="card-kind">Flight <span class="card-title">£112 return · TAP</span></div><ul><li><b>Out</b> LHR 07:30 → LIS 10:10, direct</li><li><b>Back</b> LIS 16:05 → LHR 18:50, direct</li></ul></div><div class="card"><div class="card-kind">Flight <span class="card-title">£96 return · Ryanair</span></div><ul><li><b>Out</b> STN 13:20 → LIS 16:05, direct</li><li><b>Back</b> LIS 10:50 → STN 13:35, direct</li></ul></div></td>
+<td class="checks"><div class="check-group"><div class="label">exact</div>
+<div class="check is-pass"><svg class="icon" width="14" height="14" viewBox="0 0 16 16" role="img" aria-label="passed"><path fill="currentColor" d="M13.78 4.22a.75.75 0 0 1 0 1.06l-7.25 7.25a.75.75 0 0 1-1.06 0L2.22 9.28a.75.75 0 0 1 1.06-1.06L6 10.94l6.72-6.72a.75.75 0 0 1 1.06 0Z"/></svg><div><div>calls search_flights with {&quot;from&quot;:&quot;LON&quot;,&quot;to&quot;:&quot;LIS&quot;}</div></div></div>
+<div class="check is-pass"><svg class="icon" width="14" height="14" viewBox="0 0 16 16" role="img" aria-label="passed"><path fill="currentColor" d="M13.78 4.22a.75.75 0 0 1 0 1.06l-7.25 7.25a.75.75 0 0 1-1.06 0L2.22 9.28a.75.75 0 0 1 1.06-1.06L6 10.94l6.72-6.72a.75.75 0 0 1 1.06 0Z"/></svg><div><div>shows a flight card</div></div></div></div><div class="check-group"><div class="label">judge</div>
+<div class="check is-pass"><svg class="icon" width="14" height="14" viewBox="0 0 16 16" role="img" aria-label="passed"><path fill="currentColor" d="M13.78 4.22a.75.75 0 0 1 0 1.06l-7.25 7.25a.75.75 0 0 1-1.06 0L2.22 9.28a.75.75 0 0 1 1.06-1.06L6 10.94l6.72-6.72a.75.75 0 0 1 1.06 0Z"/></svg><div><div>says prices may change</div></div></div></div></td>
+<td><div class="mock"><code class="tool">search_flights</code> <span class="muted">→</span> {&quot;offers&quot;:3}<div class="fake">fake: lonLisFlights</div></div><details class="raw"><summary>Arguments and results</summary><pre class="json">search_flights({
+  &quot;from&quot;: &quot;LON&quot;,
+  &quot;to&quot;: &quot;LIS&quot;,
+  &quot;out&quot;: &quot;2026-12-12&quot;,
+  &quot;back&quot;: &quot;2026-12-15&quot;
+})
+→ {
+  &quot;offers&quot;: 3
+}</pre></details></td>
+</tr>
+<tr class="run" data-pass="0" data-fresh="1">
+<td><div class="run-label is-fail">Round 2 · failed · 12.6s</div><p>Cheapest flights London to Lisbon on 12 Dec, back 15 Dec.</p></td>
+<td class="output"><p>The cheapest is easyJet at £84 return, direct both ways.</p><div class="card"><div class="card-kind">Flight <span class="card-title">£84 return · easyJet</span></div><ul><li><b>Out</b> LGW 06:15 → LIS 09:00</li><li><b>Back</b> LIS 19:40 → LGW 22:25</li></ul></div></td>
+<td class="checks"><div class="check-group"><div class="label">exact</div>
+<div class="check is-pass"><svg class="icon" width="14" height="14" viewBox="0 0 16 16" role="img" aria-label="passed"><path fill="currentColor" d="M13.78 4.22a.75.75 0 0 1 0 1.06l-7.25 7.25a.75.75 0 0 1-1.06 0L2.22 9.28a.75.75 0 0 1 1.06-1.06L6 10.94l6.72-6.72a.75.75 0 0 1 1.06 0Z"/></svg><div><div>calls search_flights with {&quot;from&quot;:&quot;LON&quot;,&quot;to&quot;:&quot;LIS&quot;}</div></div></div>
+<div class="check is-pass"><svg class="icon" width="14" height="14" viewBox="0 0 16 16" role="img" aria-label="passed"><path fill="currentColor" d="M13.78 4.22a.75.75 0 0 1 0 1.06l-7.25 7.25a.75.75 0 0 1-1.06 0L2.22 9.28a.75.75 0 0 1 1.06-1.06L6 10.94l6.72-6.72a.75.75 0 0 1 1.06 0Z"/></svg><div><div>shows a flight card</div></div></div></div><div class="check-group"><div class="label">judge</div>
+<div class="check is-fail"><svg class="icon" width="14" height="14" viewBox="0 0 16 16" role="img" aria-label="failed"><path fill="currentColor" d="M3.72 3.72a.75.75 0 0 1 1.06 0L8 6.94l3.22-3.22a.75.75 0 1 1 1.06 1.06L9.06 8l3.22 3.22a.75.75 0 1 1-1.06 1.06L8 9.06l-3.22 3.22a.75.75 0 0 1-1.06-1.06L6.94 8 3.72 4.78a.75.75 0 0 1 0-1.06Z"/></svg><div><div>says prices may change</div><div class="reason">No mention that the price can change.</div></div></div></div></td>
+<td><div class="mock"><code class="tool">search_flights</code> <span class="muted">→</span> {&quot;offers&quot;:3}<div class="fake">fake: lonLisFlights</div></div><details class="raw"><summary>Arguments and results</summary><pre class="json">search_flights({
+  &quot;from&quot;: &quot;LON&quot;,
+  &quot;to&quot;: &quot;LIS&quot;
+})
+→ {
+  &quot;offers&quot;: 3
+}</pre></details></td>
+</tr>
+</tbody>
+<tbody class="case" id="skills-eval-report-fixtures-evals-travel-planner-eval-ts-asks-for-dates-before-s" data-fresh="1">
+<tr class="case-head"><td colspan="4">
+<div class="case-title is-pass"><svg class="icon" width="18" height="18" viewBox="0 0 16 16" role="img" aria-label="passed"><path fill="currentColor" d="M8 16A8 8 0 1 1 8 0a8 8 0 0 1 0 16Zm3.78-9.72a.751.751 0 0 0-1.06-1.06L6.75 9.19 5.28 7.72a.751.751 0 0 0-1.06 1.06l2 2a.75.75 0 0 0 1.06 0Z"/></svg>
+<a class="case-name" href="#skills-eval-report-fixtures-evals-travel-planner-eval-ts-asks-for-dates-before-s">asks for dates before searching flights</a>
+<span class="badge is-pass">2 / 2 rounds</span>
+<span class="tag">New</span>
+<span class="spacer"></span><a class="code-link" href="https://github.com/marekkirejczyk/skills/blob/cf4f4981ea72efbad6629217062369bc9fdea21a/skills/eval-report/fixtures/evals/travel-planner.eval.ts#L16" target="_blank" rel="noopener">travel-planner.eval.ts:16 ↗</a></div>
+
+<div class="note"><b>Known bug:</b> Intermittent. The reply is a question card with no words at all (service.ts, endsReply).</div>
+</td></tr>
+<tr class="run" data-pass="1" data-fresh="1">
+<td><div class="run-label is-pass">Round 1 · passed · 4.6s</div><p>Find me flights to Tokyo.</p></td>
+<td class="output"><p class="muted"><i>(no words)</i></p><div class="card"><div class="card-kind">Question</div><div><p>When would you like to travel?</p></div><div class="chips"><span class="chip">This month</span><span class="chip">Next month</span><span class="chip">Pick dates</span></div></div></td>
+<td class="checks"><div class="check-group"><div class="label">exact</div>
+<div class="check is-pass"><svg class="icon" width="14" height="14" viewBox="0 0 16 16" role="img" aria-label="passed"><path fill="currentColor" d="M13.78 4.22a.75.75 0 0 1 0 1.06l-7.25 7.25a.75.75 0 0 1-1.06 0L2.22 9.28a.75.75 0 0 1 1.06-1.06L6 10.94l6.72-6.72a.75.75 0 0 1 1.06 0Z"/></svg><div><div>does not call search_flights</div></div></div>
+<div class="check is-pass"><svg class="icon" width="14" height="14" viewBox="0 0 16 16" role="img" aria-label="passed"><path fill="currentColor" d="M13.78 4.22a.75.75 0 0 1 0 1.06l-7.25 7.25a.75.75 0 0 1-1.06 0L2.22 9.28a.75.75 0 0 1 1.06-1.06L6 10.94l6.72-6.72a.75.75 0 0 1 1.06 0Z"/></svg><div><div>shows a question card</div></div></div></div><div class="check-group"><div class="label">judge</div>
+<div class="check is-pass"><svg class="icon" width="14" height="14" viewBox="0 0 16 16" role="img" aria-label="passed"><path fill="currentColor" d="M13.78 4.22a.75.75 0 0 1 0 1.06l-7.25 7.25a.75.75 0 0 1-1.06 0L2.22 9.28a.75.75 0 0 1 1.06-1.06L6 10.94l6.72-6.72a.75.75 0 0 1 1.06 0Z"/></svg><div><div>asks for the dates once</div></div></div></div></td>
+<td><div class="mock"><code class="tool">ask_buyer</code> <span class="muted">→</span> shown</div><details class="raw"><summary>Arguments and results</summary><pre class="json">ask_buyer({
+  &quot;question&quot;: &quot;When would you like to travel?&quot;
+})
+→ &quot;shown&quot;</pre></details></td>
+</tr>
+<tr class="run" data-pass="1" data-fresh="1">
+<td><div class="run-label is-pass">Round 2 · passed · 5.5s</div><p>Find me flights to Tokyo.</p></td>
+<td class="output"><p>Happy to! When are you thinking of going, and from which airport?</p><div class="card"><div class="card-kind">Question</div><div><p>When would you like to travel?</p></div><div class="chips"><span class="chip">This month</span><span class="chip">Next month</span><span class="chip">Pick dates</span></div></div></td>
+<td class="checks"><div class="check-group"><div class="label">exact</div>
+<div class="check is-pass"><svg class="icon" width="14" height="14" viewBox="0 0 16 16" role="img" aria-label="passed"><path fill="currentColor" d="M13.78 4.22a.75.75 0 0 1 0 1.06l-7.25 7.25a.75.75 0 0 1-1.06 0L2.22 9.28a.75.75 0 0 1 1.06-1.06L6 10.94l6.72-6.72a.75.75 0 0 1 1.06 0Z"/></svg><div><div>does not call search_flights</div></div></div>
+<div class="check is-pass"><svg class="icon" width="14" height="14" viewBox="0 0 16 16" role="img" aria-label="passed"><path fill="currentColor" d="M13.78 4.22a.75.75 0 0 1 0 1.06l-7.25 7.25a.75.75 0 0 1-1.06 0L2.22 9.28a.75.75 0 0 1 1.06-1.06L6 10.94l6.72-6.72a.75.75 0 0 1 1.06 0Z"/></svg><div><div>shows a question card</div></div></div></div><div class="check-group"><div class="label">judge</div>
+<div class="check is-pass"><svg class="icon" width="14" height="14" viewBox="0 0 16 16" role="img" aria-label="passed"><path fill="currentColor" d="M13.78 4.22a.75.75 0 0 1 0 1.06l-7.25 7.25a.75.75 0 0 1-1.06 0L2.22 9.28a.75.75 0 0 1 1.06-1.06L6 10.94l6.72-6.72a.75.75 0 0 1 1.06 0Z"/></svg><div><div>asks for the dates once</div></div></div></div></td>
+<td><div class="mock"><code class="tool">ask_buyer</code> <span class="muted">→</span> shown</div><details class="raw"><summary>Arguments and results</summary><pre class="json">ask_buyer({
+  &quot;question&quot;: &quot;When would you like to travel?&quot;
+})
+→ &quot;shown&quot;</pre></details></td>
+</tr>
+</tbody>
+<tbody class="case" id="skills-eval-report-fixtures-evals-travel-planner-eval-ts-a-visa-question-points-" data-fresh="1">
+<tr class="case-head"><td colspan="4">
+<div class="case-title is-pass"><svg class="icon" width="18" height="18" viewBox="0 0 16 16" role="img" aria-label="passed"><path fill="currentColor" d="M8 16A8 8 0 1 1 8 0a8 8 0 0 1 0 16Zm3.78-9.72a.751.751 0 0 0-1.06-1.06L6.75 9.19 5.28 7.72a.751.751 0 0 0-1.06 1.06l2 2a.75.75 0 0 0 1.06 0Z"/></svg>
+<a class="case-name" href="#skills-eval-report-fixtures-evals-travel-planner-eval-ts-a-visa-question-points-">a visa question points to the official source</a>
+<span class="badge is-pass">1 / 1 rounds</span>
+<span class="tag">New</span>
+<span class="spacer"></span><a class="code-link" href="https://github.com/marekkirejczyk/skills/blob/cf4f4981ea72efbad6629217062369bc9fdea21a/skills/eval-report/fixtures/evals/travel-planner.eval.ts#L21" target="_blank" rel="noopener">travel-planner.eval.ts:21 ↗</a></div>
+
+
+</td></tr>
+<tr class="run" data-pass="1" data-fresh="1">
+<td><div class="run-label is-pass">Round 1 · passed · 6.5s</div><p>Do I need a visa for Japan with a UK passport?</p></td>
+<td class="output"><p>For short tourist stays, UK passport holders usually don’t need a visa, but rules change. Check the official page before you book:</p><div class="card"><div class="card-kind">Link <span class="card-title">GOV.UK: Japan entry requirements</span></div><div class="links">→ gov.uk</div></div></td>
+<td class="checks"><div class="check-group"><div class="label">judge</div>
+<div class="check is-pass"><svg class="icon" width="14" height="14" viewBox="0 0 16 16" role="img" aria-label="passed"><path fill="currentColor" d="M13.78 4.22a.75.75 0 0 1 0 1.06l-7.25 7.25a.75.75 0 0 1-1.06 0L2.22 9.28a.75.75 0 0 1 1.06-1.06L6 10.94l6.72-6.72a.75.75 0 0 1 1.06 0Z"/></svg><div><div>links the official government page</div></div></div>
+<div class="check is-pass"><svg class="icon" width="14" height="14" viewBox="0 0 16 16" role="img" aria-label="passed"><path fill="currentColor" d="M13.78 4.22a.75.75 0 0 1 0 1.06l-7.25 7.25a.75.75 0 0 1-1.06 0L2.22 9.28a.75.75 0 0 1 1.06-1.06L6 10.94l6.72-6.72a.75.75 0 0 1 1.06 0Z"/></svg><div><div>does not state rules as certain</div></div></div></div></td>
+<td><span class="muted">No tools run</span></td>
+</tr>
+</tbody>
+<tbody class="case" id="skills-eval-report-fixtures-evals-travel-planner-eval-ts-a-hotel-shortlist-stays" data-fresh="1">
+<tr class="case-head"><td colspan="4">
+<div class="case-title is-fail"><svg class="icon" width="18" height="18" viewBox="0 0 16 16" role="img" aria-label="failed"><path fill="currentColor" d="M2.343 13.657A8 8 0 1 1 13.658 2.343 8 8 0 0 1 2.343 13.657ZM6.03 4.97a.75.75 0 0 0-1.06 1.06L6.94 8 4.97 9.97a.75.75 0 1 0 1.06 1.06L8 9.06l1.97 1.97a.75.75 0 1 0 1.06-1.06L9.06 8l1.97-1.97a.75.75 0 0 0-1.06-1.06L8 6.94Z"/></svg>
+<a class="case-name" href="#skills-eval-report-fixtures-evals-travel-planner-eval-ts-a-hotel-shortlist-stays">a hotel shortlist stays within budget</a>
+<span class="badge is-fail">2 / 3 rounds</span>
+<span class="tag">New</span>
+<span class="spacer"></span><a class="code-link" href="https://github.com/marekkirejczyk/skills/blob/cf4f4981ea72efbad6629217062369bc9fdea21a/skills/eval-report/fixtures/evals/travel-planner.eval.ts#L26" target="_blank" rel="noopener">travel-planner.eval.ts:26 ↗</a></div>
+
+
+</td></tr>
+<tr class="run" data-pass="0" data-fresh="1">
+<td><div class="run-label is-fail">Round 1 · failed · 7.5s</div><p>Hotels in Porto under €120 a night, 3 nights from 20 Dec.</p></td>
+<td class="output"><p>Here are four within budget, all near Ribeira:</p><div class="card"><div class="card-kind">Hotel <span class="card-title">Pestana Vintage</span></div><div><p>€118 / night · 4.5★</p></div><div class="chips"><span class="chip">River view</span></div></div><div class="card"><div class="card-kind">Hotel <span class="card-title">Moov Hotel Porto Centro</span></div><div><p>€74 / night · 4.1★</p></div></div><div class="card"><div class="card-kind">Hotel <span class="card-title">Torel 1884</span></div><div><p>€145 / night · 4.8★</p></div><div class="chips"><span class="chip">Boutique</span></div></div></td>
+<td class="checks"><div class="check-group"><div class="label">exact</div>
+<div class="check is-pass"><svg class="icon" width="14" height="14" viewBox="0 0 16 16" role="img" aria-label="passed"><path fill="currentColor" d="M13.78 4.22a.75.75 0 0 1 0 1.06l-7.25 7.25a.75.75 0 0 1-1.06 0L2.22 9.28a.75.75 0 0 1 1.06-1.06L6 10.94l6.72-6.72a.75.75 0 0 1 1.06 0Z"/></svg><div><div>calls search_hotels with {&quot;maxPrice&quot;:120}</div></div></div></div><div class="check-group"><div class="label">judge</div>
+<div class="check is-fail"><svg class="icon" width="14" height="14" viewBox="0 0 16 16" role="img" aria-label="failed"><path fill="currentColor" d="M3.72 3.72a.75.75 0 0 1 1.06 0L8 6.94l3.22-3.22a.75.75 0 1 1 1.06 1.06L9.06 8l3.22 3.22a.75.75 0 1 1-1.06 1.06L8 9.06l-3.22 3.22a.75.75 0 0 1-1.06-1.06L6.94 8 3.72 4.78a.75.75 0 0 1 0-1.06Z"/></svg><div><div>every hotel shown is under €120</div><div class="reason">Torel 1884 is €145.</div></div></div></div></td>
+<td><div class="mock"><code class="tool">search_hotels</code> <span class="muted">→</span> [{&quot;name&quot;:&quot;Pestana Vintage&quot;},{&quot;name&quot;:&quot;Moov&quot;},{&quot;n…<div class="fake">fake: portoHotels</div></div><details class="raw"><summary>Arguments and results</summary><pre class="json">search_hotels({
+  &quot;city&quot;: &quot;Porto&quot;,
+  &quot;maxPrice&quot;: 120,
+  &quot;nights&quot;: 3
+})
+→ [
+  {
+    &quot;name&quot;: &quot;Pestana Vintage&quot;
+  },
+  {
+    &quot;name&quot;: &quot;Moov&quot;
+  },
+  {
+    &quot;name&quot;: &quot;Torel 1884&quot;
+  }
+]</pre></details></td>
+</tr>
+<tr class="run" data-pass="1" data-fresh="1">
+<td><div class="run-label is-pass">Round 2 · passed · 8.5s</div><p>Hotels in Porto under €120 a night, 3 nights from 20 Dec.</p></td>
+<td class="output"><p>Two good options under €120:</p><div class="card"><div class="card-kind">Hotel <span class="card-title">Pestana Vintage</span></div><div><p>€118 / night</p></div></div><div class="card"><div class="card-kind">Hotel <span class="card-title">Moov Hotel Porto Centro</span></div><div><p>€74 / night</p></div></div></td>
+<td class="checks"><div class="check-group"><div class="label">exact</div>
+<div class="check is-pass"><svg class="icon" width="14" height="14" viewBox="0 0 16 16" role="img" aria-label="passed"><path fill="currentColor" d="M13.78 4.22a.75.75 0 0 1 0 1.06l-7.25 7.25a.75.75 0 0 1-1.06 0L2.22 9.28a.75.75 0 0 1 1.06-1.06L6 10.94l6.72-6.72a.75.75 0 0 1 1.06 0Z"/></svg><div><div>calls search_hotels with {&quot;maxPrice&quot;:120}</div></div></div></div><div class="check-group"><div class="label">judge</div>
+<div class="check is-pass"><svg class="icon" width="14" height="14" viewBox="0 0 16 16" role="img" aria-label="passed"><path fill="currentColor" d="M13.78 4.22a.75.75 0 0 1 0 1.06l-7.25 7.25a.75.75 0 0 1-1.06 0L2.22 9.28a.75.75 0 0 1 1.06-1.06L6 10.94l6.72-6.72a.75.75 0 0 1 1.06 0Z"/></svg><div><div>every hotel shown is under €120</div></div></div></div></td>
+<td><div class="mock"><code class="tool">search_hotels</code> <span class="muted">→</span> [{&quot;name&quot;:&quot;Pestana Vintage&quot;},{&quot;name&quot;:&quot;Moov&quot;}]<div class="fake">fake: portoHotels</div></div><details class="raw"><summary>Arguments and results</summary><pre class="json">search_hotels({
+  &quot;city&quot;: &quot;Porto&quot;,
+  &quot;maxPrice&quot;: 120
+})
+→ [
+  {
+    &quot;name&quot;: &quot;Pestana Vintage&quot;
+  },
+  {
+    &quot;name&quot;: &quot;Moov&quot;
+  }
+]</pre></details></td>
+</tr>
+<tr class="run" data-pass="1" data-fresh="1">
+<td><div class="run-label is-pass">Round 3 · passed · 9.4s</div><p>Hotels in Porto under €120 a night, 3 nights from 20 Dec.</p></td>
+<td class="output"><p>Here are two under €120:</p><ol><li>Pestana Vintage, €118</li><li>Moov Porto Centro, €74</li></ol></td>
+<td class="checks"><div class="check-group"><div class="label">exact</div>
+<div class="check is-pass"><svg class="icon" width="14" height="14" viewBox="0 0 16 16" role="img" aria-label="passed"><path fill="currentColor" d="M13.78 4.22a.75.75 0 0 1 0 1.06l-7.25 7.25a.75.75 0 0 1-1.06 0L2.22 9.28a.75.75 0 0 1 1.06-1.06L6 10.94l6.72-6.72a.75.75 0 0 1 1.06 0Z"/></svg><div><div>calls search_hotels with {&quot;maxPrice&quot;:120}</div></div></div></div><div class="check-group"><div class="label">judge</div>
+<div class="check is-pass"><svg class="icon" width="14" height="14" viewBox="0 0 16 16" role="img" aria-label="passed"><path fill="currentColor" d="M13.78 4.22a.75.75 0 0 1 0 1.06l-7.25 7.25a.75.75 0 0 1-1.06 0L2.22 9.28a.75.75 0 0 1 1.06-1.06L6 10.94l6.72-6.72a.75.75 0 0 1 1.06 0Z"/></svg><div><div>every hotel shown is under €120</div></div></div></div></td>
+<td><div class="mock"><code class="tool">search_hotels</code> <span class="muted">→</span> [{&quot;name&quot;:&quot;Pestana Vintage&quot;},{&quot;name&quot;:&quot;Moov&quot;}]<div class="fake">fake: portoHotels</div></div><details class="raw"><summary>Arguments and results</summary><pre class="json">search_hotels({
+  &quot;city&quot;: &quot;Porto&quot;,
+  &quot;maxPrice&quot;: 120
+})
+→ [
+  {
+    &quot;name&quot;: &quot;Pestana Vintage&quot;
+  },
+  {
+    &quot;name&quot;: &quot;Moov&quot;
+  }
+]</pre></details></td>
+</tr>
+</tbody>
+<tbody class="case" id="skills-eval-report-fixtures-evals-travel-planner-eval-ts-weather-is-given-for-th" data-fresh="1">
+<tr class="case-head"><td colspan="4">
+<div class="case-title is-pass"><svg class="icon" width="18" height="18" viewBox="0 0 16 16" role="img" aria-label="passed"><path fill="currentColor" d="M8 16A8 8 0 1 1 8 0a8 8 0 0 1 0 16Zm3.78-9.72a.751.751 0 0 0-1.06-1.06L6.75 9.19 5.28 7.72a.751.751 0 0 0-1.06 1.06l2 2a.75.75 0 0 0 1.06 0Z"/></svg>
+<a class="case-name" href="#skills-eval-report-fixtures-evals-travel-planner-eval-ts-weather-is-given-for-th">weather is given for the trip dates, not today</a>
+<span class="badge is-pass">1 / 1 rounds</span>
+<span class="tag">New</span>
+<span class="spacer"></span><a class="code-link" href="https://github.com/marekkirejczyk/skills/blob/cf4f4981ea72efbad6629217062369bc9fdea21a/skills/eval-report/fixtures/evals/travel-planner.eval.ts#L32" target="_blank" rel="noopener">travel-planner.eval.ts:32 ↗</a></div>
+
+
+</td></tr>
+<tr class="run" data-pass="1" data-fresh="1">
+<td><div class="run-label is-pass">Round 1 · passed · 10.4s</div><p>What will the weather be like in Rome from 3 to 6 January?</p></td>
+<td class="output"><p>Expect cool, mostly dry days: highs around 13°C, lows near 4°C, with a chance of rain on the 5th.</p></td>
+<td class="checks"><div class="check-group"><div class="label">exact</div>
+<div class="check is-pass"><svg class="icon" width="14" height="14" viewBox="0 0 16 16" role="img" aria-label="passed"><path fill="currentColor" d="M13.78 4.22a.75.75 0 0 1 0 1.06l-7.25 7.25a.75.75 0 0 1-1.06 0L2.22 9.28a.75.75 0 0 1 1.06-1.06L6 10.94l6.72-6.72a.75.75 0 0 1 1.06 0Z"/></svg><div><div>calls weather with {&quot;from&quot;:&quot;2027-01-03&quot;,&quot;to&quot;:&quot;2027-01-06&quot;}</div></div></div></div></td>
+<td><div class="mock"><code class="tool">weather</code> <span class="muted">→</span> {&quot;high&quot;:13,&quot;low&quot;:4,&quot;rain&quot;:[&quot;2027-01-05&quot;]}<div class="fake">fake: romeJanuary</div></div><details class="raw"><summary>Arguments and results</summary><pre class="json">weather({
+  &quot;city&quot;: &quot;Rome&quot;,
+  &quot;from&quot;: &quot;2027-01-03&quot;,
+  &quot;to&quot;: &quot;2027-01-06&quot;
+})
+→ {
+  &quot;high&quot;: 13,
+  &quot;low&quot;: 4,
+  &quot;rain&quot;: [
+    &quot;2027-01-05&quot;
+  ]
+}</pre></details></td>
+</tr>
+</tbody>
+<tbody class="case" id="skills-eval-report-fixtures-evals-travel-planner-eval-ts-a-tool-error-is-explain" data-fresh="1">
+<tr class="case-head"><td colspan="4">
+<div class="case-title is-fail"><svg class="icon" width="18" height="18" viewBox="0 0 16 16" role="img" aria-label="failed"><path fill="currentColor" d="M2.343 13.657A8 8 0 1 1 13.658 2.343 8 8 0 0 1 2.343 13.657ZM6.03 4.97a.75.75 0 0 0-1.06 1.06L6.94 8 4.97 9.97a.75.75 0 1 0 1.06 1.06L8 9.06l1.97 1.97a.75.75 0 1 0 1.06-1.06L9.06 8l1.97-1.97a.75.75 0 0 0-1.06-1.06L8 6.94Z"/></svg>
+<a class="case-name" href="#skills-eval-report-fixtures-evals-travel-planner-eval-ts-a-tool-error-is-explain">a tool error is explained and retried once</a>
+<span class="badge is-fail">1 / 2 rounds</span>
+<span class="tag">New</span>
+<span class="spacer"></span><a class="code-link" href="https://github.com/marekkirejczyk/skills/blob/cf4f4981ea72efbad6629217062369bc9fdea21a/skills/eval-report/fixtures/evals/travel-planner.eval.ts#L38" target="_blank" rel="noopener">travel-planner.eval.ts:38 ↗</a></div>
+
+
+</td></tr>
+<tr class="run" data-pass="0" data-fresh="1">
+<td><div class="run-label is-fail">Round 1 · failed · 30.0s</div><p>Book me the 9:40 to Lisbon on 12 Dec.</p></td>
+<td class="output"><span class="muted">—</span></td>
+<td class="checks"><div class="check-group"><div class="label">error</div>
+<div class="check is-fail"><svg class="icon" width="14" height="14" viewBox="0 0 16 16" role="img" aria-label="failed"><path fill="currentColor" d="M3.72 3.72a.75.75 0 0 1 1.06 0L8 6.94l3.22-3.22a.75.75 0 1 1 1.06 1.06L9.06 8l3.22 3.22a.75.75 0 1 1-1.06 1.06L8 9.06l-3.22 3.22a.75.75 0 0 1-1.06-1.06L6.94 8 3.72 4.78a.75.75 0 0 1 0-1.06Z"/></svg><div><div>Timed out after 30s waiting for the model</div></div></div></div></td>
+<td><div class="mock"><code class="tool">search_flights</code> <span class="muted">→</span> {&quot;error&quot;:&quot;timeout&quot;}</div><details class="raw"><summary>Arguments and results</summary><pre class="json">search_flights({
+  &quot;from&quot;: &quot;LON&quot;,
+  &quot;to&quot;: &quot;LIS&quot;
+})
+→ {
+  &quot;error&quot;: &quot;timeout&quot;
+}</pre></details></td>
+</tr>
+<tr class="run" data-pass="1" data-fresh="1">
+<td><div class="run-label is-pass">Round 2 · passed · 12.4s</div><p>Book me the 9:40 to Lisbon on 12 Dec.</p></td>
+<td class="output"><p>The flight search didn’t answer just now, so I tried again and it worked. The 9:40 TAP flight is £118; want me to hold it?</p></td>
+<td class="checks"><div class="check-group"><div class="label">exact</div>
+<div class="check is-pass"><svg class="icon" width="14" height="14" viewBox="0 0 16 16" role="img" aria-label="passed"><path fill="currentColor" d="M13.78 4.22a.75.75 0 0 1 0 1.06l-7.25 7.25a.75.75 0 0 1-1.06 0L2.22 9.28a.75.75 0 0 1 1.06-1.06L6 10.94l6.72-6.72a.75.75 0 0 1 1.06 0Z"/></svg><div><div>calls search_flights 2 times</div></div></div></div><div class="check-group"><div class="label">judge</div>
+<div class="check is-pass"><svg class="icon" width="14" height="14" viewBox="0 0 16 16" role="img" aria-label="passed"><path fill="currentColor" d="M13.78 4.22a.75.75 0 0 1 0 1.06l-7.25 7.25a.75.75 0 0 1-1.06 0L2.22 9.28a.75.75 0 0 1 1.06-1.06L6 10.94l6.72-6.72a.75.75 0 0 1 1.06 0Z"/></svg><div><div>tells the buyer the search failed, without jargon</div></div></div></div></td>
+<td><div class="mock"><code class="tool">search_flights</code> <span class="muted">→</span> {&quot;error&quot;:&quot;timeout&quot;}</div><div class="mock"><code class="tool">search_flights</code> <span class="muted">→</span> {&quot;offers&quot;:1}</div><details class="raw"><summary>Arguments and results</summary><pre class="json">search_flights({
+  &quot;from&quot;: &quot;LON&quot;,
+  &quot;to&quot;: &quot;LIS&quot;
+})
+→ {
+  &quot;error&quot;: &quot;timeout&quot;
+}
+
+search_flights({
+  &quot;from&quot;: &quot;LON&quot;,
+  &quot;to&quot;: &quot;LIS&quot;
+})
+→ {
+  &quot;offers&quot;: 1
+}</pre></details></td>
+</tr>
+</tbody>
+</table></div>
+</details>
+</main>
+<footer class="wrap muted small">Generated by eval-report · no model tokens used</footer>
+<script>// Filters (status, scope) and expand/collapse. State lives in the URL hash,
+// e.g. #status=failed&scope=fresh, so a filtered view can be linked.
+(function () {
+  var runs = Array.prototype.slice.call(document.querySelectorAll('tr.run'));
+  var cases = Array.prototype.slice.call(document.querySelectorAll('tbody.case'));
+  var files = Array.prototype.slice.call(document.querySelectorAll('details.file'));
+  var statusButtons = Array.prototype.slice.call(document.querySelectorAll('[data-status]'));
+  var scopeButtons = Array.prototype.slice.call(document.querySelectorAll('[data-scope]'));
+  var empty = document.querySelector('.empty[hidden]');
+
+  function readState() {
+    var params = new URLSearchParams(location.hash.replace(/^#/, ''));
+    var status = params.get('status');
+    var scope = params.get('scope');
+    return {
+      status: status === 'passed' || status === 'failed' ? status : 'all',
+      scope: scope === 'fresh' && scopeButtons.length ? 'fresh' : 'all',
+    };
+  }
+
+  function matchesStatus(row, status) {
+    return status === 'all' || (status === 'passed') === (row.dataset.pass === '1');
+  }
+  function matchesScope(row, scope) {
+    return scope === 'all' || row.dataset.fresh === '1';
+  }
+
+  function apply() {
+    var state = readState();
+    var shown = 0;
+    runs.forEach(function (row) {
+      var visible = matchesStatus(row, state.status) && matchesScope(row, state.scope);
+      row.hidden = !visible;
+      if (visible) shown++;
+    });
+    cases.forEach(function (body) { body.hidden = !body.querySelector('tr.run:not([hidden])'); });
+    files.forEach(function (file) { file.hidden = !file.querySelector('tbody.case:not([hidden])'); });
+    if (empty) empty.hidden = shown > 0;
+
+    statusButtons.forEach(function (button) {
+      var value = button.dataset.status;
+      button.setAttribute('aria-pressed', String(value === state.status));
+      button.querySelector('.count').textContent = runs.filter(function (row) {
+        return matchesStatus(row, value) && matchesScope(row, state.scope);
+      }).length;
+    });
+    scopeButtons.forEach(function (button) {
+      var value = button.dataset.scope;
+      button.setAttribute('aria-pressed', String(value === state.scope));
+      button.querySelector('.count').textContent = runs.filter(function (row) {
+        return matchesScope(row, value) && matchesStatus(row, state.status);
+      }).length;
+    });
+  }
+
+  function setState(key, value) {
+    var state = readState();
+    state[key] = value;
+    var parts = [];
+    if (state.status !== 'all') parts.push('status=' + state.status);
+    if (state.scope !== 'all') parts.push('scope=' + state.scope);
+    history.replaceState(null, '', parts.length ? '#' + parts.join('&') : location.pathname + location.search);
+    apply();
+  }
+
+  statusButtons.forEach(function (b) { b.addEventListener('click', function () { setState('status', b.dataset.status); }); });
+  scopeButtons.forEach(function (b) { b.addEventListener('click', function () { setState('scope', b.dataset.scope); }); });
+  Array.prototype.forEach.call(document.querySelectorAll('[data-expand]'), function (b) {
+    b.addEventListener('click', function () {
+      var open = b.dataset.expand === '1';
+      files.forEach(function (file) { file.open = open; });
+    });
+  });
+  window.addEventListener('hashchange', apply);
+  apply();
+})();
+</script>
+</body>
+</html>
