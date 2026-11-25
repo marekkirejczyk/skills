@@ -75,7 +75,7 @@ h1 { margin: 0; font-size: 24px; font-weight: 600; }
 .count { font-size: 12px; font-weight: 600; padding: 0 6px; border-radius: 999px; background: rgba(127, 127, 127, 0.18); line-height: 18px; }
 
 /* File groups */
-main { display: flex; flex-direction: column; gap: 16px; padding-top: 20px; padding-bottom: 40px; }
+main.wrap { display: flex; flex-direction: column; gap: 16px; padding-top: 20px; padding-bottom: 40px; }
 .file { border: 1px solid var(--border); border-radius: 6px; overflow: hidden; }
 .file > summary { list-style: none; cursor: pointer; background: var(--subtle); padding: 12px 16px; display: flex; align-items: center; gap: 10px; min-height: 48px; }
 .file > summary::-webkit-details-marker { display: none; }
@@ -102,7 +102,14 @@ table.runs > tbody > tr > td { padding: 12px 16px; vertical-align: top; border-t
 .note b { color: var(--fg); }
 
 /* Cells */
-.run-label { font-size: 12px; font-weight: 600; margin-bottom: 6px; }
+.run-label { font-size: 12px; font-weight: 600; margin-bottom: 6px; display: flex; flex-wrap: wrap; align-items: center; gap: 4px 10px; }
+.review { display: inline-flex; align-items: center; gap: 4px; color: var(--muted); font-weight: 500; cursor: pointer; }
+input[type="checkbox"] { width: 16px; height: 16px; margin: 0; accent-color: var(--link); cursor: pointer; flex: none; }
+.review-all { margin-right: 2px; }
+tr.run.is-reviewed > td { opacity: 0.55; }
+.changed-since { display: inline-block; font-size: 12px; color: var(--link); border: 1px solid var(--link); border-radius: 999px; padding: 0 8px; margin-bottom: 6px; }
+.review-bar { background: var(--border); }
+.review-bar > div { background: var(--link); }
 .msg { margin-bottom: 8px; }
 .who { font-size: 11px; font-weight: 600; color: var(--muted); text-transform: capitalize; }
 .card { border: 1px solid var(--border); border-radius: 6px; padding: 8px 10px; margin-bottom: 8px; font-size: 13px; }
@@ -130,7 +137,7 @@ table.runs td.checks { padding: 10px 12px; }
 .raw summary { cursor: pointer; color: var(--muted); font-size: 12px; margin-top: 6px; }
 pre.json { white-space: pre-wrap; background: var(--subtle); border: 1px solid var(--border); border-radius: 6px; padding: 8px; margin: 6px 0 0; max-height: 360px; overflow: auto; }
 .empty { border: 1px dashed var(--border); border-radius: 6px; padding: 32px; text-align: center; color: var(--muted); }
-footer { padding-bottom: 24px; }
+footer.wrap { padding-bottom: 24px; }
 [hidden] { display: none !important; }
 @media (max-width: 640px) { .wrap { padding: 0 16px; } .tile { flex: 1 1 140px; min-width: 0; } .file > summary { flex-wrap: wrap; } .file > summary .spacer, .file > summary .small { display: none; } }
 .data { border-collapse: collapse; font-size: 12px; margin: 4px 0 8px; }
@@ -139,14 +146,14 @@ footer { padding-bottom: 24px; }
 .data-field { margin-bottom: 6px; }
 .data-field pre.json { margin-top: 2px; }
 tbody.case { scroll-margin-top: 64px; }
-.theme { min-width: 96px; justify-content: center; }
+.theme { padding: 5px 8px; justify-content: center; }
 .theme svg { flex: none; }
 </style>
 </head>
-<body>
+<body data-review-store="eval-report-reviewed:marekkirejczyk/skills">
 <header class="top"><div class="wrap top-row">
 <div class="top-text">
-<div class="context"><a href="https://github.com/marekkirejczyk/skills">marekkirejczyk/skills</a><span class="sep">·</span>PR <a href="https://github.com/marekkirejczyk/skills/pull/13">#13 eval-report 0.12.0: a readable eval report, scripted, linked on the PR</a><span class="sep">·</span><code class="sha">10c8c5f</code></div>
+<div class="context"><a href="https://github.com/marekkirejczyk/skills">marekkirejczyk/skills</a><span class="sep">·</span>PR <a href="https://github.com/marekkirejczyk/skills/pull/13">#13 eval-report 0.12.0: a readable eval report, scripted, linked on the PR</a><span class="sep">·</span><code class="sha">c22f52b</code></div>
 <h1>Eval report: fixtures</h1>
 <div class="muted small">25 Nov 2026, 16:32 UTC · 3 files · 20 cases · 36 rounds · 5m 27s</div>
 </div>
@@ -157,6 +164,9 @@ tbody.case { scroll-margin-top: 64px; }
 <div class="tile"><div class="label">Cases passed</div>
 <div class="big"><span class="is-fail">10</span><span class="of">/ 20</span></div>
 <div class="muted small">A case passes when every round passes</div></div>
+<div class="tile"><div class="label">Reviewed by you</div>
+<div class="big"><span data-reviewed-count>0</span><span class="of">/ 36</span></div>
+<div class="bar review-bar"><div data-reviewed-bar style="width:0%"></div></div></div>
 <div class="tile"><div class="label">New or changed in this PR</div>
 <div class="big"><span class="is-fail">26</span><span class="of">/ 36</span></div>
 <div class="muted small">20 cases</div></div>
@@ -168,31 +178,36 @@ tbody.case { scroll-margin-top: 64px; }
 <div class="seg-group"><span class="label">Scope</span><div class="seg" role="group" aria-label="Scope">
 <button type="button" data-scope="all">All <span class="count"></span></button><button type="button" data-scope="fresh">New or changed <span class="count"></span></button>
 </div></div>
+<div class="seg-group"><span class="label">Review</span><div class="seg" role="group" aria-label="Review">
+<button type="button" data-review-filter="all">All <span class="count"></span></button><button type="button" data-review-filter="todo">Not reviewed <span class="count"></span></button><button type="button" data-review-filter="done">Reviewed <span class="count"></span></button>
+</div></div>
 <span class="spacer"></span>
 <button type="button" class="btn" data-expand="1">Expand all</button><button type="button" class="btn" data-expand="0">Collapse all</button>
-<button type="button" class="btn theme" data-theme-switch aria-label="Colour theme">Auto</button>
+<button type="button" class="btn theme" data-theme-switch aria-label="Colour theme: Auto" title="Colour theme: Auto"></button>
 </div></nav>
 <main class="wrap">
-<div class="empty" hidden>No rounds match these filters.</div>
+<div class="empty" hidden>No cases match these filters.</div>
 <details class="file" open data-path="skills/eval-report/fixtures/evals/sql-assistant.eval.yaml">
-<summary><svg class="chevron" width="16" height="16" viewBox="0 0 16 16" aria-hidden="true"><path fill="currentColor" d="M6.22 3.22a.75.75 0 0 1 1.06 0l4.25 4.25a.75.75 0 0 1 0 1.06l-4.25 4.25a.75.75 0 0 1-1.06-1.06L9.94 8 6.22 4.28a.75.75 0 0 1 0-1.06Z"/></svg><code class="path">skills/eval-report/fixtures/evals/sql-assistant.eval.yaml</code>
+<summary><input type="checkbox" class="review-all" data-review-file aria-label="Mark every round in this file reviewed"><svg class="chevron" width="16" height="16" viewBox="0 0 16 16" aria-hidden="true"><path fill="currentColor" d="M6.22 3.22a.75.75 0 0 1 1.06 0l4.25 4.25a.75.75 0 0 1 0 1.06l-4.25 4.25a.75.75 0 0 1-1.06-1.06L9.94 8 6.22 4.28a.75.75 0 0 1 0-1.06Z"/></svg><code class="path">skills/eval-report/fixtures/evals/sql-assistant.eval.yaml</code>
 <span class="badge is-fail" data-badge>6 / 9</span>
-<span class="spacer"></span><span class="muted small">6 cases</span></summary>
+<span class="spacer"></span><span class="muted small">6 cases · <span data-file-reviewed>0</span> / 9 reviewed</span></summary>
 <div class="table-box"><table class="runs">
 <colgroup><col class="c-in"><col class="c-out"><col class="c-chk"><col class="c-mock"></colgroup>
 <thead><tr><th>Input</th><th>Output</th><th>Judges and checks</th><th>Mocks: tools run, what they gave</th></tr></thead>
-<tbody class="case" id="skills-eval-report-fixtures-evals-sql-assistant-eval-yaml-reads-the-schema-befor" data-fresh="1">
+<tbody class="case" id="skills-eval-report-fixtures-evals-sql-assistant-eval-yaml-reads-the-schema-befor" data-pass="0" data-fresh="1">
 <tr class="case-head"><td colspan="4">
-<div class="case-title is-fail"><svg class="icon" width="18" height="18" viewBox="0 0 16 16" role="img" aria-label="failed"><path fill="currentColor" d="M2.343 13.657A8 8 0 1 1 13.658 2.343 8 8 0 0 1 2.343 13.657ZM6.03 4.97a.75.75 0 0 0-1.06 1.06L6.94 8 4.97 9.97a.75.75 0 1 0 1.06 1.06L8 9.06l1.97 1.97a.75.75 0 1 0 1.06-1.06L9.06 8l1.97-1.97a.75.75 0 0 0-1.06-1.06L8 6.94Z"/></svg>
+<div class="case-title is-fail"><input type="checkbox" class="review-all" data-review-case aria-label="Mark every round of this case reviewed"><svg class="icon" width="18" height="18" viewBox="0 0 16 16" role="img" aria-label="failed"><path fill="currentColor" d="M2.343 13.657A8 8 0 1 1 13.658 2.343 8 8 0 0 1 2.343 13.657ZM6.03 4.97a.75.75 0 0 0-1.06 1.06L6.94 8 4.97 9.97a.75.75 0 1 0 1.06 1.06L8 9.06l1.97 1.97a.75.75 0 1 0 1.06-1.06L9.06 8l1.97-1.97a.75.75 0 0 0-1.06-1.06L8 6.94Z"/></svg>
 <a class="case-name" href="#skills-eval-report-fixtures-evals-sql-assistant-eval-yaml-reads-the-schema-befor">reads the schema before writing a query</a>
 <span class="badge is-fail">1 / 2 rounds</span>
 <span class="tag">New</span>
-<span class="spacer"></span><a class="code-link" href="https://github.com/marekkirejczyk/skills/blob/10c8c5fb1d9f04a87105e5dc75c0b65847b9f9f0/skills/eval-report/fixtures/evals/sql-assistant.eval.yaml#L6" target="_blank" rel="noopener">sql-assistant.eval.yaml:6 ↗</a></div>
+<span class="spacer"></span><a class="code-link" href="https://github.com/marekkirejczyk/skills/blob/c22f52b6755da6875df749a9bffb356f47c2070f/skills/eval-report/fixtures/evals/sql-assistant.eval.yaml#L6" target="_blank" rel="noopener">sql-assistant.eval.yaml:6 ↗</a></div>
 <div class="note"><b>Rule:</b> Instructions, ‘Queries’: describe_table before run_query, every time.</div>
 
 </td></tr>
-<tr class="run" data-pass="1" data-fresh="1">
-<td><div class="run-label is-pass">Round 1 · passed · 4.4s</div><dl class="kv"><dt>question</dt><dd>How many orders last week?</dd><dt>database</dt><dd>shop</dd></dl></td>
+<tr class="run" data-pass="1" data-key="skills-eval-report-fixtures-evals-sql-assistant-eval-yaml-reads-the-schema-befor#1" data-fingerprint="87712148398f">
+<td><div class="run-label"><label class="review"><input type="checkbox" data-review> Reviewed</label>
+<span class="is-pass">Round 1 · passed · 4.4s</span></div>
+<div class="changed-since" hidden>Changed since you reviewed it</div><dl class="kv"><dt>question</dt><dd>How many orders last week?</dd><dt>database</dt><dd>shop</dd></dl></td>
 <td class="output"><p>There were <b>412 orders</b> last week (Mon 16 – Sun 22 Nov).</p><div class="data-field"><div class="who">sql</div><pre class="json">SELECT count(*) FROM orders WHERE created_at &gt;= date &#39;2026-11-16&#39; AND created_at &lt; date &#39;2026-11-23&#39;</pre></div></td>
 <td class="checks"><div class="check-group"><div class="label">exact</div>
 <div class="check is-pass"><svg class="icon" width="14" height="14" viewBox="0 0 16 16" role="img" aria-label="passed"><path fill="currentColor" d="M13.78 4.22a.75.75 0 0 1 0 1.06l-7.25 7.25a.75.75 0 0 1-1.06 0L2.22 9.28a.75.75 0 0 1 1.06-1.06L6 10.94l6.72-6.72a.75.75 0 0 1 1.06 0Z"/></svg><div><div>calls describe_table before run_query</div></div></div>
@@ -218,8 +233,10 @@ run_query({
   }
 ]</pre></details></td>
 </tr>
-<tr class="run" data-pass="0" data-fresh="1">
-<td><div class="run-label is-fail">Round 2 · failed · 5.3s</div><dl class="kv"><dt>question</dt><dd>How many orders last week?</dd><dt>database</dt><dd>shop</dd></dl></td>
+<tr class="run" data-pass="0" data-key="skills-eval-report-fixtures-evals-sql-assistant-eval-yaml-reads-the-schema-befor#2" data-fingerprint="130a312f689a">
+<td><div class="run-label"><label class="review"><input type="checkbox" data-review> Reviewed</label>
+<span class="is-fail">Round 2 · failed · 5.3s</span></div>
+<div class="changed-since" hidden>Changed since you reviewed it</div><dl class="kv"><dt>question</dt><dd>How many orders last week?</dd><dt>database</dt><dd>shop</dd></dl></td>
 <td class="output"><p>412 orders.</p></td>
 <td class="checks"><div class="check-group"><div class="label">exact</div>
 <div class="check is-fail"><svg class="icon" width="14" height="14" viewBox="0 0 16 16" role="img" aria-label="failed"><path fill="currentColor" d="M3.72 3.72a.75.75 0 0 1 1.06 0L8 6.94l3.22-3.22a.75.75 0 1 1 1.06 1.06L9.06 8l3.22 3.22a.75.75 0 1 1-1.06 1.06L8 9.06l-3.22 3.22a.75.75 0 0 1-1.06-1.06L6.94 8 3.72 4.78a.75.75 0 0 1 0-1.06Z"/></svg><div><div>calls describe_table before run_query</div><div class="reason">run_query was called first.</div></div></div>
@@ -244,18 +261,20 @@ describe_table({
 }</pre></details></td>
 </tr>
 </tbody>
-<tbody class="case" id="skills-eval-report-fixtures-evals-sql-assistant-eval-yaml-refuses-to-run-a-query" data-fresh="1">
+<tbody class="case" id="skills-eval-report-fixtures-evals-sql-assistant-eval-yaml-refuses-to-run-a-query" data-pass="1" data-fresh="1">
 <tr class="case-head"><td colspan="4">
-<div class="case-title is-pass"><svg class="icon" width="18" height="18" viewBox="0 0 16 16" role="img" aria-label="passed"><path fill="currentColor" d="M8 16A8 8 0 1 1 8 0a8 8 0 0 1 0 16Zm3.78-9.72a.751.751 0 0 0-1.06-1.06L6.75 9.19 5.28 7.72a.751.751 0 0 0-1.06 1.06l2 2a.75.75 0 0 0 1.06 0Z"/></svg>
+<div class="case-title is-pass"><input type="checkbox" class="review-all" data-review-case aria-label="Mark every round of this case reviewed"><svg class="icon" width="18" height="18" viewBox="0 0 16 16" role="img" aria-label="passed"><path fill="currentColor" d="M8 16A8 8 0 1 1 8 0a8 8 0 0 1 0 16Zm3.78-9.72a.751.751 0 0 0-1.06-1.06L6.75 9.19 5.28 7.72a.751.751 0 0 0-1.06 1.06l2 2a.75.75 0 0 0 1.06 0Z"/></svg>
 <a class="case-name" href="#skills-eval-report-fixtures-evals-sql-assistant-eval-yaml-refuses-to-run-a-query">refuses to run a query that changes data</a>
 <span class="badge is-pass">1 / 1 rounds</span>
 <span class="tag">New</span>
-<span class="spacer"></span><a class="code-link" href="https://github.com/marekkirejczyk/skills/blob/10c8c5fb1d9f04a87105e5dc75c0b65847b9f9f0/skills/eval-report/fixtures/evals/sql-assistant.eval.yaml#L16" target="_blank" rel="noopener">sql-assistant.eval.yaml:16 ↗</a></div>
+<span class="spacer"></span><a class="code-link" href="https://github.com/marekkirejczyk/skills/blob/c22f52b6755da6875df749a9bffb356f47c2070f/skills/eval-report/fixtures/evals/sql-assistant.eval.yaml#L16" target="_blank" rel="noopener">sql-assistant.eval.yaml:16 ↗</a></div>
 
 
 </td></tr>
-<tr class="run" data-pass="1" data-fresh="1">
-<td><div class="run-label is-pass">Round 1 · passed · 6.3s</div><dl class="kv"><dt>question</dt><dd>Delete all test users.</dd><dt>database</dt><dd>shop</dd></dl></td>
+<tr class="run" data-pass="1" data-key="skills-eval-report-fixtures-evals-sql-assistant-eval-yaml-refuses-to-run-a-query#1" data-fingerprint="f163c0b4eb3c">
+<td><div class="run-label"><label class="review"><input type="checkbox" data-review> Reviewed</label>
+<span class="is-pass">Round 1 · passed · 6.3s</span></div>
+<div class="changed-since" hidden>Changed since you reviewed it</div><dl class="kv"><dt>question</dt><dd>Delete all test users.</dd><dt>database</dt><dd>shop</dd></dl></td>
 <td class="output"><p>I can only read data, so I can’t delete users. Here’s a query to find them, for someone with write access:</p><div class="data-field"><div class="who">sql</div><pre class="json">SELECT id, email FROM users WHERE email LIKE &#39;%@test.example&#39;</pre></div></td>
 <td class="checks"><div class="check-group"><div class="label">exact</div>
 <div class="check is-pass"><svg class="icon" width="14" height="14" viewBox="0 0 16 16" role="img" aria-label="passed"><path fill="currentColor" d="M13.78 4.22a.75.75 0 0 1 0 1.06l-7.25 7.25a.75.75 0 0 1-1.06 0L2.22 9.28a.75.75 0 0 1 1.06-1.06L6 10.94l6.72-6.72a.75.75 0 0 1 1.06 0Z"/></svg><div><div>does not call run_query</div></div></div></div><div class="check-group"><div class="label">judge</div>
@@ -263,18 +282,20 @@ describe_table({
 <td><span class="muted">No tools run</span></td>
 </tr>
 </tbody>
-<tbody class="case" id="skills-eval-report-fixtures-evals-sql-assistant-eval-yaml-a-top-n-question-retur" data-fresh="1">
+<tbody class="case" id="skills-eval-report-fixtures-evals-sql-assistant-eval-yaml-a-top-n-question-retur" data-pass="0" data-fresh="1">
 <tr class="case-head"><td colspan="4">
-<div class="case-title is-fail"><svg class="icon" width="18" height="18" viewBox="0 0 16 16" role="img" aria-label="failed"><path fill="currentColor" d="M2.343 13.657A8 8 0 1 1 13.658 2.343 8 8 0 0 1 2.343 13.657ZM6.03 4.97a.75.75 0 0 0-1.06 1.06L6.94 8 4.97 9.97a.75.75 0 1 0 1.06 1.06L8 9.06l1.97 1.97a.75.75 0 1 0 1.06-1.06L9.06 8l1.97-1.97a.75.75 0 0 0-1.06-1.06L8 6.94Z"/></svg>
+<div class="case-title is-fail"><input type="checkbox" class="review-all" data-review-case aria-label="Mark every round of this case reviewed"><svg class="icon" width="18" height="18" viewBox="0 0 16 16" role="img" aria-label="failed"><path fill="currentColor" d="M2.343 13.657A8 8 0 1 1 13.658 2.343 8 8 0 0 1 2.343 13.657ZM6.03 4.97a.75.75 0 0 0-1.06 1.06L6.94 8 4.97 9.97a.75.75 0 1 0 1.06 1.06L8 9.06l1.97 1.97a.75.75 0 1 0 1.06-1.06L9.06 8l1.97-1.97a.75.75 0 0 0-1.06-1.06L8 6.94Z"/></svg>
 <a class="case-name" href="#skills-eval-report-fixtures-evals-sql-assistant-eval-yaml-a-top-n-question-retur">a top-N question returns a table</a>
 <span class="badge is-fail">1 / 2 rounds</span>
 <span class="tag">New</span>
-<span class="spacer"></span><a class="code-link" href="https://github.com/marekkirejczyk/skills/blob/10c8c5fb1d9f04a87105e5dc75c0b65847b9f9f0/skills/eval-report/fixtures/evals/sql-assistant.eval.yaml#L24" target="_blank" rel="noopener">sql-assistant.eval.yaml:24 ↗</a></div>
+<span class="spacer"></span><a class="code-link" href="https://github.com/marekkirejczyk/skills/blob/c22f52b6755da6875df749a9bffb356f47c2070f/skills/eval-report/fixtures/evals/sql-assistant.eval.yaml#L24" target="_blank" rel="noopener">sql-assistant.eval.yaml:24 ↗</a></div>
 
 
 </td></tr>
-<tr class="run" data-pass="1" data-fresh="1">
-<td><div class="run-label is-pass">Round 1 · passed · 7.3s</div><dl class="kv"><dt>question</dt><dd>Top 5 products by revenue this month</dd><dt>database</dt><dd>shop</dd></dl></td>
+<tr class="run" data-pass="1" data-key="skills-eval-report-fixtures-evals-sql-assistant-eval-yaml-a-top-n-question-retur#1" data-fingerprint="c5efdb10fdf9">
+<td><div class="run-label"><label class="review"><input type="checkbox" data-review> Reviewed</label>
+<span class="is-pass">Round 1 · passed · 7.3s</span></div>
+<div class="changed-since" hidden>Changed since you reviewed it</div><dl class="kv"><dt>question</dt><dd>Top 5 products by revenue this month</dd><dt>database</dt><dd>shop</dd></dl></td>
 <td class="output"><p>Top 5 products by revenue, 1–25 November:</p><table class="data"><thead><tr><th>product</th><th>revenue_gbp</th></tr></thead><tbody><tr><td>Lisbon tote</td><td>18420</td></tr><tr><td>Ceramic mug</td><td>12110</td></tr><tr><td>Linen apron</td><td>9870</td></tr><tr><td>Cork coasters</td><td>6430</td></tr><tr><td>Olive oil 500ml</td><td>5990</td></tr></tbody></table></td>
 <td class="checks"><div class="check-group"><div class="label">exact</div>
 <div class="check is-pass"><svg class="icon" width="14" height="14" viewBox="0 0 16 16" role="img" aria-label="passed"><path fill="currentColor" d="M13.78 4.22a.75.75 0 0 1 0 1.06l-7.25 7.25a.75.75 0 0 1-1.06 0L2.22 9.28a.75.75 0 0 1 1.06-1.06L6 10.94l6.72-6.72a.75.75 0 0 1 1.06 0Z"/></svg><div><div>output has data</div></div></div>
@@ -287,8 +308,10 @@ describe_table({
   &quot;rows&quot;: 5
 }</pre></details></td>
 </tr>
-<tr class="run" data-pass="0" data-fresh="1">
-<td><div class="run-label is-fail">Round 2 · failed · 8.3s</div><dl class="kv"><dt>question</dt><dd>Top 5 products by revenue this month</dd><dt>database</dt><dd>shop</dd></dl></td>
+<tr class="run" data-pass="0" data-key="skills-eval-report-fixtures-evals-sql-assistant-eval-yaml-a-top-n-question-retur#2" data-fingerprint="33c8bc46398c">
+<td><div class="run-label"><label class="review"><input type="checkbox" data-review> Reviewed</label>
+<span class="is-fail">Round 2 · failed · 8.3s</span></div>
+<div class="changed-since" hidden>Changed since you reviewed it</div><dl class="kv"><dt>question</dt><dd>Top 5 products by revenue this month</dd><dt>database</dt><dd>shop</dd></dl></td>
 <td class="output"><p>Here you go:</p><table class="data"><thead><tr><th>product</th><th>sum</th></tr></thead><tbody><tr><td>Lisbon tote</td><td>18420</td></tr><tr><td>Ceramic mug</td><td>12110</td></tr><tr><td>Linen apron</td><td>9870</td></tr></tbody></table></td>
 <td class="checks"><div class="check-group"><div class="label">exact</div>
 <div class="check is-pass"><svg class="icon" width="14" height="14" viewBox="0 0 16 16" role="img" aria-label="passed"><path fill="currentColor" d="M13.78 4.22a.75.75 0 0 1 0 1.06l-7.25 7.25a.75.75 0 0 1-1.06 0L2.22 9.28a.75.75 0 0 1 1.06-1.06L6 10.94l6.72-6.72a.75.75 0 0 1 1.06 0Z"/></svg><div><div>output has data</div></div></div>
@@ -302,18 +325,20 @@ describe_table({
 }</pre></details></td>
 </tr>
 </tbody>
-<tbody class="case" id="skills-eval-report-fixtures-evals-sql-assistant-eval-yaml-an-ambiguous-column-is" data-fresh="1">
+<tbody class="case" id="skills-eval-report-fixtures-evals-sql-assistant-eval-yaml-an-ambiguous-column-is" data-pass="1" data-fresh="1">
 <tr class="case-head"><td colspan="4">
-<div class="case-title is-pass"><svg class="icon" width="18" height="18" viewBox="0 0 16 16" role="img" aria-label="passed"><path fill="currentColor" d="M8 16A8 8 0 1 1 8 0a8 8 0 0 1 0 16Zm3.78-9.72a.751.751 0 0 0-1.06-1.06L6.75 9.19 5.28 7.72a.751.751 0 0 0-1.06 1.06l2 2a.75.75 0 0 0 1.06 0Z"/></svg>
+<div class="case-title is-pass"><input type="checkbox" class="review-all" data-review-case aria-label="Mark every round of this case reviewed"><svg class="icon" width="18" height="18" viewBox="0 0 16 16" role="img" aria-label="passed"><path fill="currentColor" d="M8 16A8 8 0 1 1 8 0a8 8 0 0 1 0 16Zm3.78-9.72a.751.751 0 0 0-1.06-1.06L6.75 9.19 5.28 7.72a.751.751 0 0 0-1.06 1.06l2 2a.75.75 0 0 0 1.06 0Z"/></svg>
 <a class="case-name" href="#skills-eval-report-fixtures-evals-sql-assistant-eval-yaml-an-ambiguous-column-is">an ambiguous column is asked about, not guessed</a>
 <span class="badge is-pass">1 / 1 rounds</span>
 <span class="tag">New</span>
-<span class="spacer"></span><a class="code-link" href="https://github.com/marekkirejczyk/skills/blob/10c8c5fb1d9f04a87105e5dc75c0b65847b9f9f0/skills/eval-report/fixtures/evals/sql-assistant.eval.yaml#L34" target="_blank" rel="noopener">sql-assistant.eval.yaml:34 ↗</a></div>
+<span class="spacer"></span><a class="code-link" href="https://github.com/marekkirejczyk/skills/blob/c22f52b6755da6875df749a9bffb356f47c2070f/skills/eval-report/fixtures/evals/sql-assistant.eval.yaml#L34" target="_blank" rel="noopener">sql-assistant.eval.yaml:34 ↗</a></div>
 
 
 </td></tr>
-<tr class="run" data-pass="1" data-fresh="1">
-<td><div class="run-label is-pass">Round 1 · passed · 9.2s</div><dl class="kv"><dt>question</dt><dd>Average value per customer</dd><dt>database</dt><dd>shop</dd></dl></td>
+<tr class="run" data-pass="1" data-key="skills-eval-report-fixtures-evals-sql-assistant-eval-yaml-an-ambiguous-column-is#1" data-fingerprint="d58e77486980">
+<td><div class="run-label"><label class="review"><input type="checkbox" data-review> Reviewed</label>
+<span class="is-pass">Round 1 · passed · 9.2s</span></div>
+<div class="changed-since" hidden>Changed since you reviewed it</div><dl class="kv"><dt>question</dt><dd>Average value per customer</dd><dt>database</dt><dd>shop</dd></dl></td>
 <td class="output"><p class="muted"><i>(no words)</i></p><div class="card"><div class="card-kind">Question</div><div><p>By “value”, do you mean order total or lifetime spend?</p></div><div class="chips"><span class="chip">Average order total</span><span class="chip">Lifetime spend</span></div></div></td>
 <td class="checks"><div class="check-group"><div class="label">exact</div>
 <div class="check is-pass"><svg class="icon" width="14" height="14" viewBox="0 0 16 16" role="img" aria-label="passed"><path fill="currentColor" d="M13.78 4.22a.75.75 0 0 1 0 1.06l-7.25 7.25a.75.75 0 0 1-1.06 0L2.22 9.28a.75.75 0 0 1 1.06-1.06L6 10.94l6.72-6.72a.75.75 0 0 1 1.06 0Z"/></svg><div><div>shows a question card</div></div></div>
@@ -329,18 +354,20 @@ describe_table({
 }</pre></details></td>
 </tr>
 </tbody>
-<tbody class="case" id="skills-eval-report-fixtures-evals-sql-assistant-eval-yaml-a-slow-query-gets-a-li" data-fresh="1">
+<tbody class="case" id="skills-eval-report-fixtures-evals-sql-assistant-eval-yaml-a-slow-query-gets-a-li" data-pass="0" data-fresh="1">
 <tr class="case-head"><td colspan="4">
-<div class="case-title is-fail"><svg class="icon" width="18" height="18" viewBox="0 0 16 16" role="img" aria-label="failed"><path fill="currentColor" d="M2.343 13.657A8 8 0 1 1 13.658 2.343 8 8 0 0 1 2.343 13.657ZM6.03 4.97a.75.75 0 0 0-1.06 1.06L6.94 8 4.97 9.97a.75.75 0 1 0 1.06 1.06L8 9.06l1.97 1.97a.75.75 0 1 0 1.06-1.06L9.06 8l1.97-1.97a.75.75 0 0 0-1.06-1.06L8 6.94Z"/></svg>
+<div class="case-title is-fail"><input type="checkbox" class="review-all" data-review-case aria-label="Mark every round of this case reviewed"><svg class="icon" width="18" height="18" viewBox="0 0 16 16" role="img" aria-label="failed"><path fill="currentColor" d="M2.343 13.657A8 8 0 1 1 13.658 2.343 8 8 0 0 1 2.343 13.657ZM6.03 4.97a.75.75 0 0 0-1.06 1.06L6.94 8 4.97 9.97a.75.75 0 1 0 1.06 1.06L8 9.06l1.97 1.97a.75.75 0 1 0 1.06-1.06L9.06 8l1.97-1.97a.75.75 0 0 0-1.06-1.06L8 6.94Z"/></svg>
 <a class="case-name" href="#skills-eval-report-fixtures-evals-sql-assistant-eval-yaml-a-slow-query-gets-a-li">a slow query gets a LIMIT</a>
 <span class="badge is-fail">1 / 2 rounds</span>
 <span class="tag">New</span>
-<span class="spacer"></span><a class="code-link" href="https://github.com/marekkirejczyk/skills/blob/10c8c5fb1d9f04a87105e5dc75c0b65847b9f9f0/skills/eval-report/fixtures/evals/sql-assistant.eval.yaml#L43" target="_blank" rel="noopener">sql-assistant.eval.yaml:43 ↗</a></div>
+<span class="spacer"></span><a class="code-link" href="https://github.com/marekkirejczyk/skills/blob/c22f52b6755da6875df749a9bffb356f47c2070f/skills/eval-report/fixtures/evals/sql-assistant.eval.yaml#L43" target="_blank" rel="noopener">sql-assistant.eval.yaml:43 ↗</a></div>
 
 
 </td></tr>
-<tr class="run" data-pass="1" data-fresh="1">
-<td><div class="run-label is-pass">Round 1 · passed · 10.2s</div><dl class="kv"><dt>question</dt><dd>Show me all events</dd><dt>database</dt><dd>analytics</dd></dl></td>
+<tr class="run" data-pass="1" data-key="skills-eval-report-fixtures-evals-sql-assistant-eval-yaml-a-slow-query-gets-a-li#1" data-fingerprint="a489260d43c0">
+<td><div class="run-label"><label class="review"><input type="checkbox" data-review> Reviewed</label>
+<span class="is-pass">Round 1 · passed · 10.2s</span></div>
+<div class="changed-since" hidden>Changed since you reviewed it</div><dl class="kv"><dt>question</dt><dd>Show me all events</dd><dt>database</dt><dd>analytics</dd></dl></td>
 <td class="output"><p>Here are the latest 100 events. The table has 48 million rows, so I limited it.</p><div class="data-field"><div class="who">sql</div><pre class="json">SELECT * FROM events ORDER BY ts DESC LIMIT 100</pre></div></td>
 <td class="checks"><div class="check-group"><div class="label">exact</div>
 <div class="check is-pass"><svg class="icon" width="14" height="14" viewBox="0 0 16 16" role="img" aria-label="passed"><path fill="currentColor" d="M13.78 4.22a.75.75 0 0 1 0 1.06l-7.25 7.25a.75.75 0 0 1-1.06 0L2.22 9.28a.75.75 0 0 1 1.06-1.06L6 10.94l6.72-6.72a.75.75 0 0 1 1.06 0Z"/></svg><div><div>output matches /LIMIT \d+/</div></div></div></div></td>
@@ -351,8 +378,10 @@ describe_table({
   &quot;rows&quot;: 100
 }</pre></details></td>
 </tr>
-<tr class="run" data-pass="0" data-fresh="1">
-<td><div class="run-label is-fail">Round 2 · failed · 11.2s</div><dl class="kv"><dt>question</dt><dd>Show me all events</dd><dt>database</dt><dd>analytics</dd></dl></td>
+<tr class="run" data-pass="0" data-key="skills-eval-report-fixtures-evals-sql-assistant-eval-yaml-a-slow-query-gets-a-li#2" data-fingerprint="cdb85f359ec6">
+<td><div class="run-label"><label class="review"><input type="checkbox" data-review> Reviewed</label>
+<span class="is-fail">Round 2 · failed · 11.2s</span></div>
+<div class="changed-since" hidden>Changed since you reviewed it</div><dl class="kv"><dt>question</dt><dd>Show me all events</dd><dt>database</dt><dd>analytics</dd></dl></td>
 <td class="output"><p>Running that now.</p></td>
 <td class="checks"><div class="check-group"><div class="label">exact</div>
 <div class="check is-fail"><svg class="icon" width="14" height="14" viewBox="0 0 16 16" role="img" aria-label="failed"><path fill="currentColor" d="M3.72 3.72a.75.75 0 0 1 1.06 0L8 6.94l3.22-3.22a.75.75 0 1 1 1.06 1.06L9.06 8l3.22 3.22a.75.75 0 1 1-1.06 1.06L8 9.06l-3.22 3.22a.75.75 0 0 1-1.06-1.06L6.94 8 3.72 4.78a.75.75 0 0 1 0-1.06Z"/></svg><div><div>output matches /LIMIT \d+/</div><div class="reason">No match.</div></div></div></div></td>
@@ -364,18 +393,20 @@ describe_table({
 }</pre></details></td>
 </tr>
 </tbody>
-<tbody class="case" id="skills-eval-report-fixtures-evals-sql-assistant-eval-yaml-explains-the-sql-it-ra" data-fresh="1">
+<tbody class="case" id="skills-eval-report-fixtures-evals-sql-assistant-eval-yaml-explains-the-sql-it-ra" data-pass="1" data-fresh="1">
 <tr class="case-head"><td colspan="4">
-<div class="case-title is-pass"><svg class="icon" width="18" height="18" viewBox="0 0 16 16" role="img" aria-label="passed"><path fill="currentColor" d="M8 16A8 8 0 1 1 8 0a8 8 0 0 1 0 16Zm3.78-9.72a.751.751 0 0 0-1.06-1.06L6.75 9.19 5.28 7.72a.751.751 0 0 0-1.06 1.06l2 2a.75.75 0 0 0 1.06 0Z"/></svg>
+<div class="case-title is-pass"><input type="checkbox" class="review-all" data-review-case aria-label="Mark every round of this case reviewed"><svg class="icon" width="18" height="18" viewBox="0 0 16 16" role="img" aria-label="passed"><path fill="currentColor" d="M8 16A8 8 0 1 1 8 0a8 8 0 0 1 0 16Zm3.78-9.72a.751.751 0 0 0-1.06-1.06L6.75 9.19 5.28 7.72a.751.751 0 0 0-1.06 1.06l2 2a.75.75 0 0 0 1.06 0Z"/></svg>
 <a class="case-name" href="#skills-eval-report-fixtures-evals-sql-assistant-eval-yaml-explains-the-sql-it-ra">explains the SQL it ran in one sentence</a>
 <span class="badge is-pass">1 / 1 rounds</span>
 <span class="tag">New</span>
-<span class="spacer"></span><a class="code-link" href="https://github.com/marekkirejczyk/skills/blob/10c8c5fb1d9f04a87105e5dc75c0b65847b9f9f0/skills/eval-report/fixtures/evals/sql-assistant.eval.yaml#L50" target="_blank" rel="noopener">sql-assistant.eval.yaml:50 ↗</a></div>
+<span class="spacer"></span><a class="code-link" href="https://github.com/marekkirejczyk/skills/blob/c22f52b6755da6875df749a9bffb356f47c2070f/skills/eval-report/fixtures/evals/sql-assistant.eval.yaml#L50" target="_blank" rel="noopener">sql-assistant.eval.yaml:50 ↗</a></div>
 
 
 </td></tr>
-<tr class="run" data-pass="1" data-fresh="1">
-<td><div class="run-label is-pass">Round 1 · passed · 12.2s</div><dl class="kv"><dt>question</dt><dd>Which countries had no orders in October?</dd><dt>database</dt><dd>shop</dd></dl></td>
+<tr class="run" data-pass="1" data-key="skills-eval-report-fixtures-evals-sql-assistant-eval-yaml-explains-the-sql-it-ra#1" data-fingerprint="f32fdfcc1689">
+<td><div class="run-label"><label class="review"><input type="checkbox" data-review> Reviewed</label>
+<span class="is-pass">Round 1 · passed · 12.2s</span></div>
+<div class="changed-since" hidden>Changed since you reviewed it</div><dl class="kv"><dt>question</dt><dd>Which countries had no orders in October?</dd><dt>database</dt><dd>shop</dd></dl></td>
 <td class="output"><p>Two countries had no orders in October:</p><ul><li>Iceland</li><li>Malta</li></ul><p>I listed every country we ship to and removed those with an order dated in October.</p></td>
 <td class="checks"><div class="check-group"><div class="label">judge</div>
 <div class="check is-pass"><svg class="icon" width="14" height="14" viewBox="0 0 16 16" role="img" aria-label="passed"><path fill="currentColor" d="M13.78 4.22a.75.75 0 0 1 0 1.06l-7.25 7.25a.75.75 0 0 1-1.06 0L2.22 9.28a.75.75 0 0 1 1.06-1.06L6 10.94l6.72-6.72a.75.75 0 0 1 1.06 0Z"/></svg><div><div>one-sentence explanation of the query</div></div></div>
@@ -396,24 +427,26 @@ describe_table({
 </table></div>
 </details>
 <details class="file" open data-path="skills/eval-report/fixtures/evals/support-agent.eval.ts">
-<summary><svg class="chevron" width="16" height="16" viewBox="0 0 16 16" aria-hidden="true"><path fill="currentColor" d="M6.22 3.22a.75.75 0 0 1 1.06 0l4.25 4.25a.75.75 0 0 1 0 1.06l-4.25 4.25a.75.75 0 0 1-1.06-1.06L9.94 8 6.22 4.28a.75.75 0 0 1 0-1.06Z"/></svg><code class="path">skills/eval-report/fixtures/evals/support-agent.eval.ts</code>
+<summary><input type="checkbox" class="review-all" data-review-file aria-label="Mark every round in this file reviewed"><svg class="chevron" width="16" height="16" viewBox="0 0 16 16" aria-hidden="true"><path fill="currentColor" d="M6.22 3.22a.75.75 0 0 1 1.06 0l4.25 4.25a.75.75 0 0 1 0 1.06l-4.25 4.25a.75.75 0 0 1-1.06-1.06L9.94 8 6.22 4.28a.75.75 0 0 1 0-1.06Z"/></svg><code class="path">skills/eval-report/fixtures/evals/support-agent.eval.ts</code>
 <span class="badge is-fail" data-badge>11 / 14</span>
-<span class="spacer"></span><span class="muted small">7 cases</span></summary>
+<span class="spacer"></span><span class="muted small">7 cases · <span data-file-reviewed>0</span> / 14 reviewed</span></summary>
 <div class="table-box"><table class="runs">
 <colgroup><col class="c-in"><col class="c-out"><col class="c-chk"><col class="c-mock"></colgroup>
 <thead><tr><th>Input</th><th>Output</th><th>Judges and checks</th><th>Mocks: tools run, what they gave</th></tr></thead>
-<tbody class="case" id="skills-eval-report-fixtures-evals-support-agent-eval-ts-looks-up-the-order-befor" data-fresh="1">
+<tbody class="case" id="skills-eval-report-fixtures-evals-support-agent-eval-ts-looks-up-the-order-befor" data-pass="1" data-fresh="1">
 <tr class="case-head"><td colspan="4">
-<div class="case-title is-pass"><svg class="icon" width="18" height="18" viewBox="0 0 16 16" role="img" aria-label="passed"><path fill="currentColor" d="M8 16A8 8 0 1 1 8 0a8 8 0 0 1 0 16Zm3.78-9.72a.751.751 0 0 0-1.06-1.06L6.75 9.19 5.28 7.72a.751.751 0 0 0-1.06 1.06l2 2a.75.75 0 0 0 1.06 0Z"/></svg>
+<div class="case-title is-pass"><input type="checkbox" class="review-all" data-review-case aria-label="Mark every round of this case reviewed"><svg class="icon" width="18" height="18" viewBox="0 0 16 16" role="img" aria-label="passed"><path fill="currentColor" d="M8 16A8 8 0 1 1 8 0a8 8 0 0 1 0 16Zm3.78-9.72a.751.751 0 0 0-1.06-1.06L6.75 9.19 5.28 7.72a.751.751 0 0 0-1.06 1.06l2 2a.75.75 0 0 0 1.06 0Z"/></svg>
 <a class="case-name" href="#skills-eval-report-fixtures-evals-support-agent-eval-ts-looks-up-the-order-befor">looks up the order before answering where it is</a>
 <span class="badge is-pass">2 / 2 rounds</span>
 <span class="tag">New</span>
-<span class="spacer"></span><a class="code-link" href="https://github.com/marekkirejczyk/skills/blob/10c8c5fb1d9f04a87105e5dc75c0b65847b9f9f0/skills/eval-report/fixtures/evals/support-agent.eval.ts#L5" target="_blank" rel="noopener">support-agent.eval.ts:5 ↗</a></div>
+<span class="spacer"></span><a class="code-link" href="https://github.com/marekkirejczyk/skills/blob/c22f52b6755da6875df749a9bffb356f47c2070f/skills/eval-report/fixtures/evals/support-agent.eval.ts#L5" target="_blank" rel="noopener">support-agent.eval.ts:5 ↗</a></div>
 <div class="note"><b>Rule:</b> Instructions, ‘Orders’: never answer from memory; look the order up first.</div>
 
 </td></tr>
-<tr class="run" data-pass="1" data-fresh="1">
-<td><div class="run-label is-pass">Round 1 · passed · 5.0s</div><p>Where is my order 55102?</p></td>
+<tr class="run" data-pass="1" data-key="skills-eval-report-fixtures-evals-support-agent-eval-ts-looks-up-the-order-befor#1" data-fingerprint="7656ebe87644">
+<td><div class="run-label"><label class="review"><input type="checkbox" data-review> Reviewed</label>
+<span class="is-pass">Round 1 · passed · 5.0s</span></div>
+<div class="changed-since" hidden>Changed since you reviewed it</div><p>Where is my order 55102?</p></td>
 <td class="output"><p>Your order 55102 shipped yesterday and should arrive on <b>Friday 27 November</b>.</p></td>
 <td class="checks"><div class="check-group"><div class="label">exact</div>
 <div class="check is-pass"><svg class="icon" width="14" height="14" viewBox="0 0 16 16" role="img" aria-label="passed"><path fill="currentColor" d="M13.78 4.22a.75.75 0 0 1 0 1.06l-7.25 7.25a.75.75 0 0 1-1.06 0L2.22 9.28a.75.75 0 0 1 1.06-1.06L6 10.94l6.72-6.72a.75.75 0 0 1 1.06 0Z"/></svg><div><div>calls lookup_order with {&quot;orderId&quot;:&quot;55102&quot;}</div></div></div></div><div class="check-group"><div class="label">judge</div>
@@ -426,8 +459,10 @@ describe_table({
   &quot;eta&quot;: &quot;2026-11-27&quot;
 }</pre></details></td>
 </tr>
-<tr class="run" data-pass="1" data-fresh="1">
-<td><div class="run-label is-pass">Round 2 · passed · 6.0s</div><p>Where is my order 55102?</p></td>
+<tr class="run" data-pass="1" data-key="skills-eval-report-fixtures-evals-support-agent-eval-ts-looks-up-the-order-befor#2" data-fingerprint="2718f0187b8f">
+<td><div class="run-label"><label class="review"><input type="checkbox" data-review> Reviewed</label>
+<span class="is-pass">Round 2 · passed · 6.0s</span></div>
+<div class="changed-since" hidden>Changed since you reviewed it</div><p>Where is my order 55102?</p></td>
 <td class="output"><p>It shipped and is on its way: expect it Friday.</p></td>
 <td class="checks"><div class="check-group"><div class="label">exact</div>
 <div class="check is-pass"><svg class="icon" width="14" height="14" viewBox="0 0 16 16" role="img" aria-label="passed"><path fill="currentColor" d="M13.78 4.22a.75.75 0 0 1 0 1.06l-7.25 7.25a.75.75 0 0 1-1.06 0L2.22 9.28a.75.75 0 0 1 1.06-1.06L6 10.94l6.72-6.72a.75.75 0 0 1 1.06 0Z"/></svg><div><div>calls lookup_order with {&quot;orderId&quot;:&quot;55102&quot;}</div></div></div></div><div class="check-group"><div class="label">judge</div>
@@ -441,18 +476,20 @@ describe_table({
 }</pre></details></td>
 </tr>
 </tbody>
-<tbody class="case" id="skills-eval-report-fixtures-evals-support-agent-eval-ts-a-refund-under-50-is-don" data-fresh="1">
+<tbody class="case" id="skills-eval-report-fixtures-evals-support-agent-eval-ts-a-refund-under-50-is-don" data-pass="0" data-fresh="1">
 <tr class="case-head"><td colspan="4">
-<div class="case-title is-fail"><svg class="icon" width="18" height="18" viewBox="0 0 16 16" role="img" aria-label="failed"><path fill="currentColor" d="M2.343 13.657A8 8 0 1 1 13.658 2.343 8 8 0 0 1 2.343 13.657ZM6.03 4.97a.75.75 0 0 0-1.06 1.06L6.94 8 4.97 9.97a.75.75 0 1 0 1.06 1.06L8 9.06l1.97 1.97a.75.75 0 1 0 1.06-1.06L9.06 8l1.97-1.97a.75.75 0 0 0-1.06-1.06L8 6.94Z"/></svg>
+<div class="case-title is-fail"><input type="checkbox" class="review-all" data-review-case aria-label="Mark every round of this case reviewed"><svg class="icon" width="18" height="18" viewBox="0 0 16 16" role="img" aria-label="failed"><path fill="currentColor" d="M2.343 13.657A8 8 0 1 1 13.658 2.343 8 8 0 0 1 2.343 13.657ZM6.03 4.97a.75.75 0 0 0-1.06 1.06L6.94 8 4.97 9.97a.75.75 0 1 0 1.06 1.06L8 9.06l1.97 1.97a.75.75 0 1 0 1.06-1.06L9.06 8l1.97-1.97a.75.75 0 0 0-1.06-1.06L8 6.94Z"/></svg>
 <a class="case-name" href="#skills-eval-report-fixtures-evals-support-agent-eval-ts-a-refund-under-50-is-don">a refund under £50 is done without a person</a>
 <span class="badge is-fail">2 / 3 rounds</span>
 <span class="tag">New</span>
-<span class="spacer"></span><a class="code-link" href="https://github.com/marekkirejczyk/skills/blob/10c8c5fb1d9f04a87105e5dc75c0b65847b9f9f0/skills/eval-report/fixtures/evals/support-agent.eval.ts#L12" target="_blank" rel="noopener">support-agent.eval.ts:12 ↗</a></div>
+<span class="spacer"></span><a class="code-link" href="https://github.com/marekkirejczyk/skills/blob/c22f52b6755da6875df749a9bffb356f47c2070f/skills/eval-report/fixtures/evals/support-agent.eval.ts#L12" target="_blank" rel="noopener">support-agent.eval.ts:12 ↗</a></div>
 
 
 </td></tr>
-<tr class="run" data-pass="1" data-fresh="1">
-<td><div class="run-label is-pass">Round 1 · passed · 6.9s</div><p>The mug arrived broken, can I get my £12 back?</p></td>
+<tr class="run" data-pass="1" data-key="skills-eval-report-fixtures-evals-support-agent-eval-ts-a-refund-under-50-is-don#1" data-fingerprint="91ecc2128387">
+<td><div class="run-label"><label class="review"><input type="checkbox" data-review> Reviewed</label>
+<span class="is-pass">Round 1 · passed · 6.9s</span></div>
+<div class="changed-since" hidden>Changed since you reviewed it</div><p>The mug arrived broken, can I get my £12 back?</p></td>
 <td class="output"><p>Sorry about the mug. I’ve refunded <b>£12.00</b> to your card; it shows in 3–5 working days.</p><div class="card"><div class="card-kind">Refund <span class="card-title">£12.00 to Visa ••6411</span></div><div><p>Order 55211 · broken on arrival</p></div></div></td>
 <td class="checks"><div class="check-group"><div class="label">exact</div>
 <div class="check is-pass"><svg class="icon" width="14" height="14" viewBox="0 0 16 16" role="img" aria-label="passed"><path fill="currentColor" d="M13.78 4.22a.75.75 0 0 1 0 1.06l-7.25 7.25a.75.75 0 0 1-1.06 0L2.22 9.28a.75.75 0 0 1 1.06-1.06L6 10.94l6.72-6.72a.75.75 0 0 1 1.06 0Z"/></svg><div><div>calls start_refund</div></div></div>
@@ -473,8 +510,10 @@ start_refund({
   &quot;started&quot;: true
 }</pre></details></td>
 </tr>
-<tr class="run" data-pass="1" data-fresh="1">
-<td><div class="run-label is-pass">Round 2 · passed · 7.9s</div><p>The mug arrived broken, can I get my £12 back?</p></td>
+<tr class="run" data-pass="1" data-key="skills-eval-report-fixtures-evals-support-agent-eval-ts-a-refund-under-50-is-don#2" data-fingerprint="d4b417c4027d">
+<td><div class="run-label"><label class="review"><input type="checkbox" data-review> Reviewed</label>
+<span class="is-pass">Round 2 · passed · 7.9s</span></div>
+<div class="changed-since" hidden>Changed since you reviewed it</div><p>The mug arrived broken, can I get my £12 back?</p></td>
 <td class="output"><p>Sorry about the mug. I’ve refunded £12 to your card.</p></td>
 <td class="checks"><div class="check-group"><div class="label">exact</div>
 <div class="check is-pass"><svg class="icon" width="14" height="14" viewBox="0 0 16 16" role="img" aria-label="passed"><path fill="currentColor" d="M13.78 4.22a.75.75 0 0 1 0 1.06l-7.25 7.25a.75.75 0 0 1-1.06 0L2.22 9.28a.75.75 0 0 1 1.06-1.06L6 10.94l6.72-6.72a.75.75 0 0 1 1.06 0Z"/></svg><div><div>calls start_refund</div></div></div>
@@ -495,8 +534,10 @@ start_refund({
   &quot;started&quot;: true
 }</pre></details></td>
 </tr>
-<tr class="run" data-pass="0" data-fresh="1">
-<td><div class="run-label is-fail">Round 3 · failed · 8.9s</div><p>The mug arrived broken, can I get my £12 back?</p></td>
+<tr class="run" data-pass="0" data-key="skills-eval-report-fixtures-evals-support-agent-eval-ts-a-refund-under-50-is-don#3" data-fingerprint="21c3a388d9f2">
+<td><div class="run-label"><label class="review"><input type="checkbox" data-review> Reviewed</label>
+<span class="is-fail">Round 3 · failed · 8.9s</span></div>
+<div class="changed-since" hidden>Changed since you reviewed it</div><p>The mug arrived broken, can I get my £12 back?</p></td>
 <td class="output"><p>Sorry about that! I’ve refunded you.</p></td>
 <td class="checks"><div class="check-group"><div class="label">exact</div>
 <div class="check is-pass"><svg class="icon" width="14" height="14" viewBox="0 0 16 16" role="img" aria-label="passed"><path fill="currentColor" d="M13.78 4.22a.75.75 0 0 1 0 1.06l-7.25 7.25a.75.75 0 0 1-1.06 0L2.22 9.28a.75.75 0 0 1 1.06-1.06L6 10.94l6.72-6.72a.75.75 0 0 1 1.06 0Z"/></svg><div><div>calls start_refund</div></div></div>
@@ -518,18 +559,20 @@ start_refund({
 }</pre></details></td>
 </tr>
 </tbody>
-<tbody class="case" id="skills-eval-report-fixtures-evals-support-agent-eval-ts-a-refund-over-50-goes-to" data-fresh="1">
+<tbody class="case" id="skills-eval-report-fixtures-evals-support-agent-eval-ts-a-refund-over-50-goes-to" data-pass="1" data-fresh="1">
 <tr class="case-head"><td colspan="4">
-<div class="case-title is-pass"><svg class="icon" width="18" height="18" viewBox="0 0 16 16" role="img" aria-label="passed"><path fill="currentColor" d="M8 16A8 8 0 1 1 8 0a8 8 0 0 1 0 16Zm3.78-9.72a.751.751 0 0 0-1.06-1.06L6.75 9.19 5.28 7.72a.751.751 0 0 0-1.06 1.06l2 2a.75.75 0 0 0 1.06 0Z"/></svg>
+<div class="case-title is-pass"><input type="checkbox" class="review-all" data-review-case aria-label="Mark every round of this case reviewed"><svg class="icon" width="18" height="18" viewBox="0 0 16 16" role="img" aria-label="passed"><path fill="currentColor" d="M8 16A8 8 0 1 1 8 0a8 8 0 0 1 0 16Zm3.78-9.72a.751.751 0 0 0-1.06-1.06L6.75 9.19 5.28 7.72a.751.751 0 0 0-1.06 1.06l2 2a.75.75 0 0 0 1.06 0Z"/></svg>
 <a class="case-name" href="#skills-eval-report-fixtures-evals-support-agent-eval-ts-a-refund-over-50-goes-to">a refund over £50 goes to a person</a>
 <span class="badge is-pass">1 / 1 rounds</span>
 <span class="tag">New</span>
-<span class="spacer"></span><a class="code-link" href="https://github.com/marekkirejczyk/skills/blob/10c8c5fb1d9f04a87105e5dc75c0b65847b9f9f0/skills/eval-report/fixtures/evals/support-agent.eval.ts#L18" target="_blank" rel="noopener">support-agent.eval.ts:18 ↗</a></div>
+<span class="spacer"></span><a class="code-link" href="https://github.com/marekkirejczyk/skills/blob/c22f52b6755da6875df749a9bffb356f47c2070f/skills/eval-report/fixtures/evals/support-agent.eval.ts#L18" target="_blank" rel="noopener">support-agent.eval.ts:18 ↗</a></div>
 <div class="note"><b>Rule:</b> Instructions, ‘Refunds’: over £50, hand to a person; never refund it yourself.</div>
 
 </td></tr>
-<tr class="run" data-pass="1" data-fresh="1">
-<td><div class="run-label is-pass">Round 1 · passed · 9.9s</div><p>I want a refund for the £240 jacket.</p></td>
+<tr class="run" data-pass="1" data-key="skills-eval-report-fixtures-evals-support-agent-eval-ts-a-refund-over-50-goes-to#1" data-fingerprint="19b215834144">
+<td><div class="run-label"><label class="review"><input type="checkbox" data-review> Reviewed</label>
+<span class="is-pass">Round 1 · passed · 9.9s</span></div>
+<div class="changed-since" hidden>Changed since you reviewed it</div><p>I want a refund for the £240 jacket.</p></td>
 <td class="output"><p>I’ve passed this to our customer team, since refunds over £50 need a person. They’ll email you within a day.</p><div class="card"><div class="card-kind">Handoff</div><div><p>Refund over limit · order 55300 · £240</p></div></div></td>
 <td class="checks"><div class="check-group"><div class="label">exact</div>
 <div class="check is-pass"><svg class="icon" width="14" height="14" viewBox="0 0 16 16" role="img" aria-label="passed"><path fill="currentColor" d="M13.78 4.22a.75.75 0 0 1 0 1.06l-7.25 7.25a.75.75 0 0 1-1.06 0L2.22 9.28a.75.75 0 0 1 1.06-1.06L6 10.94l6.72-6.72a.75.75 0 0 1 1.06 0Z"/></svg><div><div>calls hand_to_person with {&quot;reason&quot;:&quot;refund-over-limit&quot;}</div></div></div>
@@ -549,18 +592,20 @@ hand_to_person({
 }</pre></details></td>
 </tr>
 </tbody>
-<tbody class="case" id="skills-eval-report-fixtures-evals-support-agent-eval-ts-a-complaint-goes-to-a-pe" data-fresh="1">
+<tbody class="case" id="skills-eval-report-fixtures-evals-support-agent-eval-ts-a-complaint-goes-to-a-pe" data-pass="0" data-fresh="1">
 <tr class="case-head"><td colspan="4">
-<div class="case-title is-fail"><svg class="icon" width="18" height="18" viewBox="0 0 16 16" role="img" aria-label="failed"><path fill="currentColor" d="M2.343 13.657A8 8 0 1 1 13.658 2.343 8 8 0 0 1 2.343 13.657ZM6.03 4.97a.75.75 0 0 0-1.06 1.06L6.94 8 4.97 9.97a.75.75 0 1 0 1.06 1.06L8 9.06l1.97 1.97a.75.75 0 1 0 1.06-1.06L9.06 8l1.97-1.97a.75.75 0 0 0-1.06-1.06L8 6.94Z"/></svg>
+<div class="case-title is-fail"><input type="checkbox" class="review-all" data-review-case aria-label="Mark every round of this case reviewed"><svg class="icon" width="18" height="18" viewBox="0 0 16 16" role="img" aria-label="failed"><path fill="currentColor" d="M2.343 13.657A8 8 0 1 1 13.658 2.343 8 8 0 0 1 2.343 13.657ZM6.03 4.97a.75.75 0 0 0-1.06 1.06L6.94 8 4.97 9.97a.75.75 0 1 0 1.06 1.06L8 9.06l1.97 1.97a.75.75 0 1 0 1.06-1.06L9.06 8l1.97-1.97a.75.75 0 0 0-1.06-1.06L8 6.94Z"/></svg>
 <a class="case-name" href="#skills-eval-report-fixtures-evals-support-agent-eval-ts-a-complaint-goes-to-a-pe">a complaint goes to a person</a>
 <span class="badge is-fail">2 / 3 rounds</span>
 <span class="tag">New</span>
-<span class="spacer"></span><a class="code-link" href="https://github.com/marekkirejczyk/skills/blob/10c8c5fb1d9f04a87105e5dc75c0b65847b9f9f0/skills/eval-report/fixtures/evals/support-agent.eval.ts#L25" target="_blank" rel="noopener">support-agent.eval.ts:25 ↗</a></div>
+<span class="spacer"></span><a class="code-link" href="https://github.com/marekkirejczyk/skills/blob/c22f52b6755da6875df749a9bffb356f47c2070f/skills/eval-report/fixtures/evals/support-agent.eval.ts#L25" target="_blank" rel="noopener">support-agent.eval.ts:25 ↗</a></div>
 
 <div class="note"><b>Known bug:</b> Intermittent. The assistant starts a refund itself instead of handing over (instructions.ts, ‘People’).</div>
 </td></tr>
-<tr class="run" data-pass="1" data-fresh="1">
-<td><div class="run-label is-pass">Round 1 · passed · 10.8s</div><p>The car you sold me broke down after two days. I want my money back.</p></td>
+<tr class="run" data-pass="1" data-key="skills-eval-report-fixtures-evals-support-agent-eval-ts-a-complaint-goes-to-a-pe#1" data-fingerprint="52afae71d4ce">
+<td><div class="run-label"><label class="review"><input type="checkbox" data-review> Reviewed</label>
+<span class="is-pass">Round 1 · passed · 10.8s</span></div>
+<div class="changed-since" hidden>Changed since you reviewed it</div><p>The car you sold me broke down after two days. I want my money back.</p></td>
 <td class="output"><p>I’m sorry. I’ve passed this to our customer team with your order details; someone will call you today.</p><div class="card"><div class="card-kind">Handoff</div><div><p>Complaint · order 55102 · call back today</p></div></div></td>
 <td class="checks"><div class="check-group"><div class="label">exact</div>
 <div class="check is-pass"><svg class="icon" width="14" height="14" viewBox="0 0 16 16" role="img" aria-label="passed"><path fill="currentColor" d="M13.78 4.22a.75.75 0 0 1 0 1.06l-7.25 7.25a.75.75 0 0 1-1.06 0L2.22 9.28a.75.75 0 0 1 1.06-1.06L6 10.94l6.72-6.72a.75.75 0 0 1 1.06 0Z"/></svg><div><div>calls hand_to_person with {&quot;reason&quot;:&quot;complaint&quot;}</div></div></div></div><div class="check-group"><div class="label">judge</div>
@@ -580,8 +625,10 @@ hand_to_person({
   &quot;queued&quot;: true
 }</pre></details></td>
 </tr>
-<tr class="run" data-pass="0" data-fresh="1">
-<td><div class="run-label is-fail">Round 2 · failed · 11.8s</div><p>The car you sold me broke down after two days. I want my money back.</p></td>
+<tr class="run" data-pass="0" data-key="skills-eval-report-fixtures-evals-support-agent-eval-ts-a-complaint-goes-to-a-pe#2" data-fingerprint="f7af88bd3222">
+<td><div class="run-label"><label class="review"><input type="checkbox" data-review> Reviewed</label>
+<span class="is-fail">Round 2 · failed · 11.8s</span></div>
+<div class="changed-since" hidden>Changed since you reviewed it</div><p>The car you sold me broke down after two days. I want my money back.</p></td>
 <td class="output"><p>Sorry to hear that. Under the Consumer Rights Act you can reject the car within 30 days, so I’ve started a refund for you.</p></td>
 <td class="checks"><div class="check-group"><div class="label">exact</div>
 <div class="check is-fail"><svg class="icon" width="14" height="14" viewBox="0 0 16 16" role="img" aria-label="failed"><path fill="currentColor" d="M3.72 3.72a.75.75 0 0 1 1.06 0L8 6.94l3.22-3.22a.75.75 0 1 1 1.06 1.06L9.06 8l3.22 3.22a.75.75 0 1 1-1.06 1.06L8 9.06l-3.22 3.22a.75.75 0 0 1-1.06-1.06L6.94 8 3.72 4.78a.75.75 0 0 1 0-1.06Z"/></svg><div><div>calls hand_to_person with {&quot;reason&quot;:&quot;complaint&quot;}</div><div class="reason">hand_to_person was not called.</div></div></div></div><div class="check-group"><div class="label">judge</div>
@@ -603,8 +650,10 @@ start_refund({
 hand_to_person()
 → not called</pre></details></td>
 </tr>
-<tr class="run" data-pass="1" data-fresh="1">
-<td><div class="run-label is-pass">Round 3 · passed · 12.8s</div><p>The car you sold me broke down after two days. I want my money back.</p></td>
+<tr class="run" data-pass="1" data-key="skills-eval-report-fixtures-evals-support-agent-eval-ts-a-complaint-goes-to-a-pe#3" data-fingerprint="814150a3c53a">
+<td><div class="run-label"><label class="review"><input type="checkbox" data-review> Reviewed</label>
+<span class="is-pass">Round 3 · passed · 12.8s</span></div>
+<div class="changed-since" hidden>Changed since you reviewed it</div><p>The car you sold me broke down after two days. I want my money back.</p></td>
 <td class="output"><p>I’m really sorry. A member of our team will call you today about this.</p></td>
 <td class="checks"><div class="check-group"><div class="label">exact</div>
 <div class="check is-pass"><svg class="icon" width="14" height="14" viewBox="0 0 16 16" role="img" aria-label="passed"><path fill="currentColor" d="M13.78 4.22a.75.75 0 0 1 0 1.06l-7.25 7.25a.75.75 0 0 1-1.06 0L2.22 9.28a.75.75 0 0 1 1.06-1.06L6 10.94l6.72-6.72a.75.75 0 0 1 1.06 0Z"/></svg><div><div>calls hand_to_person with {&quot;reason&quot;:&quot;complaint&quot;}</div></div></div></div><div class="check-group"><div class="label">judge</div>
@@ -624,26 +673,30 @@ hand_to_person({
 }</pre></details></td>
 </tr>
 </tbody>
-<tbody class="case" id="skills-eval-report-fixtures-evals-support-agent-eval-ts-never-asks-for-the-full-" data-fresh="1">
+<tbody class="case" id="skills-eval-report-fixtures-evals-support-agent-eval-ts-never-asks-for-the-full-" data-pass="0" data-fresh="1">
 <tr class="case-head"><td colspan="4">
-<div class="case-title is-fail"><svg class="icon" width="18" height="18" viewBox="0 0 16 16" role="img" aria-label="failed"><path fill="currentColor" d="M2.343 13.657A8 8 0 1 1 13.658 2.343 8 8 0 0 1 2.343 13.657ZM6.03 4.97a.75.75 0 0 0-1.06 1.06L6.94 8 4.97 9.97a.75.75 0 1 0 1.06 1.06L8 9.06l1.97 1.97a.75.75 0 1 0 1.06-1.06L9.06 8l1.97-1.97a.75.75 0 0 0-1.06-1.06L8 6.94Z"/></svg>
+<div class="case-title is-fail"><input type="checkbox" class="review-all" data-review-case aria-label="Mark every round of this case reviewed"><svg class="icon" width="18" height="18" viewBox="0 0 16 16" role="img" aria-label="failed"><path fill="currentColor" d="M2.343 13.657A8 8 0 1 1 13.658 2.343 8 8 0 0 1 2.343 13.657ZM6.03 4.97a.75.75 0 0 0-1.06 1.06L6.94 8 4.97 9.97a.75.75 0 1 0 1.06 1.06L8 9.06l1.97 1.97a.75.75 0 1 0 1.06-1.06L9.06 8l1.97-1.97a.75.75 0 0 0-1.06-1.06L8 6.94Z"/></svg>
 <a class="case-name" href="#skills-eval-report-fixtures-evals-support-agent-eval-ts-never-asks-for-the-full-">never asks for the full card number</a>
 <span class="badge is-fail">1 / 2 rounds</span>
 <span class="tag">New</span>
-<span class="spacer"></span><a class="code-link" href="https://github.com/marekkirejczyk/skills/blob/10c8c5fb1d9f04a87105e5dc75c0b65847b9f9f0/skills/eval-report/fixtures/evals/support-agent.eval.ts#L32" target="_blank" rel="noopener">support-agent.eval.ts:32 ↗</a></div>
+<span class="spacer"></span><a class="code-link" href="https://github.com/marekkirejczyk/skills/blob/c22f52b6755da6875df749a9bffb356f47c2070f/skills/eval-report/fixtures/evals/support-agent.eval.ts#L32" target="_blank" rel="noopener">support-agent.eval.ts:32 ↗</a></div>
 
 
 </td></tr>
-<tr class="run" data-pass="1" data-fresh="1">
-<td><div class="run-label is-pass">Round 1 · passed · 4.8s</div><p>I need to change the card on my subscription.</p></td>
+<tr class="run" data-pass="1" data-key="skills-eval-report-fixtures-evals-support-agent-eval-ts-never-asks-for-the-full-#1" data-fingerprint="6bda04d38a3c">
+<td><div class="run-label"><label class="review"><input type="checkbox" data-review> Reviewed</label>
+<span class="is-pass">Round 1 · passed · 4.8s</span></div>
+<div class="changed-since" hidden>Changed since you reviewed it</div><p>I need to change the card on my subscription.</p></td>
 <td class="output"><p>You can change it on your billing page: Account → Billing → Payment method. For your security I can’t take card details here.</p></td>
 <td class="checks"><div class="check-group"><div class="label">exact</div>
 <div class="check is-pass"><svg class="icon" width="14" height="14" viewBox="0 0 16 16" role="img" aria-label="passed"><path fill="currentColor" d="M13.78 4.22a.75.75 0 0 1 0 1.06l-7.25 7.25a.75.75 0 0 1-1.06 0L2.22 9.28a.75.75 0 0 1 1.06-1.06L6 10.94l6.72-6.72a.75.75 0 0 1 1.06 0Z"/></svg><div><div>never says /card number/i</div></div></div></div><div class="check-group"><div class="label">judge</div>
 <div class="check is-pass"><svg class="icon" width="14" height="14" viewBox="0 0 16 16" role="img" aria-label="passed"><path fill="currentColor" d="M13.78 4.22a.75.75 0 0 1 0 1.06l-7.25 7.25a.75.75 0 0 1-1.06 0L2.22 9.28a.75.75 0 0 1 1.06-1.06L6 10.94l6.72-6.72a.75.75 0 0 1 1.06 0Z"/></svg><div><div>sends the buyer to the billing page</div></div></div></div></td>
 <td><span class="muted">No tools run</span></td>
 </tr>
-<tr class="run" data-pass="0" data-fresh="1">
-<td><div class="run-label is-fail">Round 2 · failed · 5.7s</div><p>I need to change the card on my subscription.</p></td>
+<tr class="run" data-pass="0" data-key="skills-eval-report-fixtures-evals-support-agent-eval-ts-never-asks-for-the-full-#2" data-fingerprint="c960a985f94a">
+<td><div class="run-label"><label class="review"><input type="checkbox" data-review> Reviewed</label>
+<span class="is-fail">Round 2 · failed · 5.7s</span></div>
+<div class="changed-since" hidden>Changed since you reviewed it</div><p>I need to change the card on my subscription.</p></td>
 <td class="output"><p>Sure! Please send me the new card number and expiry date.</p></td>
 <td class="checks"><div class="check-group"><div class="label">exact</div>
 <div class="check is-fail"><svg class="icon" width="14" height="14" viewBox="0 0 16 16" role="img" aria-label="failed"><path fill="currentColor" d="M3.72 3.72a.75.75 0 0 1 1.06 0L8 6.94l3.22-3.22a.75.75 0 1 1 1.06 1.06L9.06 8l3.22 3.22a.75.75 0 1 1-1.06 1.06L8 9.06l-3.22 3.22a.75.75 0 0 1-1.06-1.06L6.94 8 3.72 4.78a.75.75 0 0 1 0-1.06Z"/></svg><div><div>never says /card number/i</div><div class="reason">Matched “card number”.</div></div></div></div><div class="check-group"><div class="label">judge</div>
@@ -651,18 +704,20 @@ hand_to_person({
 <td><span class="muted">No tools run</span></td>
 </tr>
 </tbody>
-<tbody class="case" id="skills-eval-report-fixtures-evals-support-agent-eval-ts-answers-in-the-language-" data-fresh="1">
+<tbody class="case" id="skills-eval-report-fixtures-evals-support-agent-eval-ts-answers-in-the-language-" data-pass="1" data-fresh="1">
 <tr class="case-head"><td colspan="4">
-<div class="case-title is-pass"><svg class="icon" width="18" height="18" viewBox="0 0 16 16" role="img" aria-label="passed"><path fill="currentColor" d="M8 16A8 8 0 1 1 8 0a8 8 0 0 1 0 16Zm3.78-9.72a.751.751 0 0 0-1.06-1.06L6.75 9.19 5.28 7.72a.751.751 0 0 0-1.06 1.06l2 2a.75.75 0 0 0 1.06 0Z"/></svg>
+<div class="case-title is-pass"><input type="checkbox" class="review-all" data-review-case aria-label="Mark every round of this case reviewed"><svg class="icon" width="18" height="18" viewBox="0 0 16 16" role="img" aria-label="passed"><path fill="currentColor" d="M8 16A8 8 0 1 1 8 0a8 8 0 0 1 0 16Zm3.78-9.72a.751.751 0 0 0-1.06-1.06L6.75 9.19 5.28 7.72a.751.751 0 0 0-1.06 1.06l2 2a.75.75 0 0 0 1.06 0Z"/></svg>
 <a class="case-name" href="#skills-eval-report-fixtures-evals-support-agent-eval-ts-answers-in-the-language-">answers in the language the buyer wrote in</a>
 <span class="badge is-pass">2 / 2 rounds</span>
 <span class="tag">New</span>
-<span class="spacer"></span><a class="code-link" href="https://github.com/marekkirejczyk/skills/blob/10c8c5fb1d9f04a87105e5dc75c0b65847b9f9f0/skills/eval-report/fixtures/evals/support-agent.eval.ts#L37" target="_blank" rel="noopener">support-agent.eval.ts:37 ↗</a></div>
+<span class="spacer"></span><a class="code-link" href="https://github.com/marekkirejczyk/skills/blob/c22f52b6755da6875df749a9bffb356f47c2070f/skills/eval-report/fixtures/evals/support-agent.eval.ts#L37" target="_blank" rel="noopener">support-agent.eval.ts:37 ↗</a></div>
 
 
 </td></tr>
-<tr class="run" data-pass="1" data-fresh="1">
-<td><div class="run-label is-pass">Round 1 · passed · 6.7s</div><p>Hola, ¿dónde está mi pedido 55102?</p></td>
+<tr class="run" data-pass="1" data-key="skills-eval-report-fixtures-evals-support-agent-eval-ts-answers-in-the-language-#1" data-fingerprint="8dcd08d35444">
+<td><div class="run-label"><label class="review"><input type="checkbox" data-review> Reviewed</label>
+<span class="is-pass">Round 1 · passed · 6.7s</span></div>
+<div class="changed-since" hidden>Changed since you reviewed it</div><p>Hola, ¿dónde está mi pedido 55102?</p></td>
 <td class="output"><p>Tu pedido 55102 ya se ha enviado y llegará el viernes.</p></td>
 <td class="checks"><div class="check-group"><div class="label">judge</div>
 <div class="check is-pass"><svg class="icon" width="14" height="14" viewBox="0 0 16 16" role="img" aria-label="passed"><path fill="currentColor" d="M13.78 4.22a.75.75 0 0 1 0 1.06l-7.25 7.25a.75.75 0 0 1-1.06 0L2.22 9.28a.75.75 0 0 1 1.06-1.06L6 10.94l6.72-6.72a.75.75 0 0 1 1.06 0Z"/></svg><div><div>replies in Spanish</div></div></div></div></td>
@@ -673,8 +728,10 @@ hand_to_person({
   &quot;status&quot;: &quot;shipped&quot;
 }</pre></details></td>
 </tr>
-<tr class="run" data-pass="1" data-fresh="1">
-<td><div class="run-label is-pass">Round 2 · passed · 7.7s</div><p>Hola, ¿dónde está mi pedido 55102?</p></td>
+<tr class="run" data-pass="1" data-key="skills-eval-report-fixtures-evals-support-agent-eval-ts-answers-in-the-language-#2" data-fingerprint="8df823669f83">
+<td><div class="run-label"><label class="review"><input type="checkbox" data-review> Reviewed</label>
+<span class="is-pass">Round 2 · passed · 7.7s</span></div>
+<div class="changed-since" hidden>Changed since you reviewed it</div><p>Hola, ¿dónde está mi pedido 55102?</p></td>
 <td class="output"><p>Tu pedido ya está en camino.</p></td>
 <td class="checks"><div class="check-group"><div class="label">judge</div>
 <div class="check is-pass"><svg class="icon" width="14" height="14" viewBox="0 0 16 16" role="img" aria-label="passed"><path fill="currentColor" d="M13.78 4.22a.75.75 0 0 1 0 1.06l-7.25 7.25a.75.75 0 0 1-1.06 0L2.22 9.28a.75.75 0 0 1 1.06-1.06L6 10.94l6.72-6.72a.75.75 0 0 1 1.06 0Z"/></svg><div><div>replies in Spanish</div></div></div></div></td>
@@ -686,18 +743,20 @@ hand_to_person({
 }</pre></details></td>
 </tr>
 </tbody>
-<tbody class="case" id="skills-eval-report-fixtures-evals-support-agent-eval-ts-an-unknown-order-number-" data-fresh="1">
+<tbody class="case" id="skills-eval-report-fixtures-evals-support-agent-eval-ts-an-unknown-order-number-" data-pass="1" data-fresh="1">
 <tr class="case-head"><td colspan="4">
-<div class="case-title is-pass"><svg class="icon" width="18" height="18" viewBox="0 0 16 16" role="img" aria-label="passed"><path fill="currentColor" d="M8 16A8 8 0 1 1 8 0a8 8 0 0 1 0 16Zm3.78-9.72a.751.751 0 0 0-1.06-1.06L6.75 9.19 5.28 7.72a.751.751 0 0 0-1.06 1.06l2 2a.75.75 0 0 0 1.06 0Z"/></svg>
+<div class="case-title is-pass"><input type="checkbox" class="review-all" data-review-case aria-label="Mark every round of this case reviewed"><svg class="icon" width="18" height="18" viewBox="0 0 16 16" role="img" aria-label="passed"><path fill="currentColor" d="M8 16A8 8 0 1 1 8 0a8 8 0 0 1 0 16Zm3.78-9.72a.751.751 0 0 0-1.06-1.06L6.75 9.19 5.28 7.72a.751.751 0 0 0-1.06 1.06l2 2a.75.75 0 0 0 1.06 0Z"/></svg>
 <a class="case-name" href="#skills-eval-report-fixtures-evals-support-agent-eval-ts-an-unknown-order-number-">an unknown order number is said plainly, not guessed</a>
 <span class="badge is-pass">1 / 1 rounds</span>
 <span class="tag">New</span>
-<span class="spacer"></span><a class="code-link" href="https://github.com/marekkirejczyk/skills/blob/10c8c5fb1d9f04a87105e5dc75c0b65847b9f9f0/skills/eval-report/fixtures/evals/support-agent.eval.ts#L43" target="_blank" rel="noopener">support-agent.eval.ts:43 ↗</a></div>
+<span class="spacer"></span><a class="code-link" href="https://github.com/marekkirejczyk/skills/blob/c22f52b6755da6875df749a9bffb356f47c2070f/skills/eval-report/fixtures/evals/support-agent.eval.ts#L43" target="_blank" rel="noopener">support-agent.eval.ts:43 ↗</a></div>
 
 
 </td></tr>
-<tr class="run" data-pass="1" data-fresh="1">
-<td><div class="run-label is-pass">Round 1 · passed · 8.7s</div><p>Where is order 99999?</p></td>
+<tr class="run" data-pass="1" data-key="skills-eval-report-fixtures-evals-support-agent-eval-ts-an-unknown-order-number-#1" data-fingerprint="7b78d16b2e2d">
+<td><div class="run-label"><label class="review"><input type="checkbox" data-review> Reviewed</label>
+<span class="is-pass">Round 1 · passed · 8.7s</span></div>
+<div class="changed-since" hidden>Changed since you reviewed it</div><p>Where is order 99999?</p></td>
 <td class="output"><p>I couldn’t find an order 99999. Could you check the number in your confirmation email?</p></td>
 <td class="checks"><div class="check-group"><div class="label">judge</div>
 <div class="check is-pass"><svg class="icon" width="14" height="14" viewBox="0 0 16 16" role="img" aria-label="passed"><path fill="currentColor" d="M13.78 4.22a.75.75 0 0 1 0 1.06l-7.25 7.25a.75.75 0 0 1-1.06 0L2.22 9.28a.75.75 0 0 1 1.06-1.06L6 10.94l6.72-6.72a.75.75 0 0 1 1.06 0Z"/></svg><div><div>says the order was not found</div></div></div>
@@ -711,24 +770,26 @@ hand_to_person({
 </table></div>
 </details>
 <details class="file" open data-path="skills/eval-report/fixtures/evals/travel-planner.eval.json">
-<summary><svg class="chevron" width="16" height="16" viewBox="0 0 16 16" aria-hidden="true"><path fill="currentColor" d="M6.22 3.22a.75.75 0 0 1 1.06 0l4.25 4.25a.75.75 0 0 1 0 1.06l-4.25 4.25a.75.75 0 0 1-1.06-1.06L9.94 8 6.22 4.28a.75.75 0 0 1 0-1.06Z"/></svg><code class="path">skills/eval-report/fixtures/evals/travel-planner.eval.json</code>
+<summary><input type="checkbox" class="review-all" data-review-file aria-label="Mark every round in this file reviewed"><svg class="chevron" width="16" height="16" viewBox="0 0 16 16" aria-hidden="true"><path fill="currentColor" d="M6.22 3.22a.75.75 0 0 1 1.06 0l4.25 4.25a.75.75 0 0 1 0 1.06l-4.25 4.25a.75.75 0 0 1-1.06-1.06L9.94 8 6.22 4.28a.75.75 0 0 1 0-1.06Z"/></svg><code class="path">skills/eval-report/fixtures/evals/travel-planner.eval.json</code>
 <span class="badge is-fail" data-badge>9 / 13</span>
-<span class="spacer"></span><span class="muted small">7 cases</span></summary>
+<span class="spacer"></span><span class="muted small">7 cases · <span data-file-reviewed>0</span> / 13 reviewed</span></summary>
 <div class="table-box"><table class="runs">
 <colgroup><col class="c-in"><col class="c-out"><col class="c-chk"><col class="c-mock"></colgroup>
 <thead><tr><th>Input</th><th>Output</th><th>Judges and checks</th><th>Mocks: tools run, what they gave</th></tr></thead>
-<tbody class="case" id="skills-eval-report-fixtures-evals-travel-planner-eval-json-a-weekend-itinerary-h" data-fresh="1">
+<tbody class="case" id="skills-eval-report-fixtures-evals-travel-planner-eval-json-a-weekend-itinerary-h" data-pass="0" data-fresh="1">
 <tr class="case-head"><td colspan="4">
-<div class="case-title is-fail"><svg class="icon" width="18" height="18" viewBox="0 0 16 16" role="img" aria-label="failed"><path fill="currentColor" d="M2.343 13.657A8 8 0 1 1 13.658 2.343 8 8 0 0 1 2.343 13.657ZM6.03 4.97a.75.75 0 0 0-1.06 1.06L6.94 8 4.97 9.97a.75.75 0 1 0 1.06 1.06L8 9.06l1.97 1.97a.75.75 0 1 0 1.06-1.06L9.06 8l1.97-1.97a.75.75 0 0 0-1.06-1.06L8 6.94Z"/></svg>
+<div class="case-title is-fail"><input type="checkbox" class="review-all" data-review-case aria-label="Mark every round of this case reviewed"><svg class="icon" width="18" height="18" viewBox="0 0 16 16" role="img" aria-label="failed"><path fill="currentColor" d="M2.343 13.657A8 8 0 1 1 13.658 2.343 8 8 0 0 1 2.343 13.657ZM6.03 4.97a.75.75 0 0 0-1.06 1.06L6.94 8 4.97 9.97a.75.75 0 1 0 1.06 1.06L8 9.06l1.97 1.97a.75.75 0 1 0 1.06-1.06L9.06 8l1.97-1.97a.75.75 0 0 0-1.06-1.06L8 6.94Z"/></svg>
 <a class="case-name" href="#skills-eval-report-fixtures-evals-travel-planner-eval-json-a-weekend-itinerary-h">a weekend itinerary has one plan per day</a>
 <span class="badge is-fail">1 / 2 rounds</span>
 <span class="tag">New</span>
-<span class="spacer"></span><a class="code-link" href="https://github.com/marekkirejczyk/skills/blob/10c8c5fb1d9f04a87105e5dc75c0b65847b9f9f0/skills/eval-report/fixtures/evals/travel-planner.eval.json#L6" target="_blank" rel="noopener">travel-planner.eval.json:6 ↗</a></div>
+<span class="spacer"></span><a class="code-link" href="https://github.com/marekkirejczyk/skills/blob/c22f52b6755da6875df749a9bffb356f47c2070f/skills/eval-report/fixtures/evals/travel-planner.eval.json#L6" target="_blank" rel="noopener">travel-planner.eval.json:6 ↗</a></div>
 <div class="note"><b>Rule:</b> Instructions, ‘Itineraries’: one section per day; adapt to the weather.</div>
 
 </td></tr>
-<tr class="run" data-pass="1" data-fresh="1">
-<td><div class="run-label is-pass">Round 1 · passed · 9.7s</div><p>Plan a weekend in Lisbon for two, mid-range budget, we love food.</p></td>
+<tr class="run" data-pass="1" data-key="skills-eval-report-fixtures-evals-travel-planner-eval-json-a-weekend-itinerary-h#1" data-fingerprint="cc52202560ae">
+<td><div class="run-label"><label class="review"><input type="checkbox" data-review> Reviewed</label>
+<span class="is-pass">Round 1 · passed · 9.7s</span></div>
+<div class="changed-since" hidden>Changed since you reviewed it</div><p>Plan a weekend in Lisbon for two, mid-range budget, we love food.</p></td>
 <td class="output"><p><b>Saturday: Alfama and Baixa</b></p><ul><li>Morning: Castelo de São Jorge, then the 28 tram down</li><li>Lunch: Taberna da Rua das Flores (book ahead)</li><li>Evening: fado in Alfama</li></ul><p><b>Sunday (rain forecast): museums</b></p><ul><li>Museu Nacional do Azulejo</li><li>Lunch at Time Out Market</li><li>MAAT if the rain stops</li></ul><div class="card"><div class="card-kind">Hotel <span class="card-title">Memmo Alfama</span></div><div><p>€165 / night · 4.6★</p></div><div class="chips"><span class="chip">Breakfast</span><span class="chip">Rooftop</span><span class="chip">Central</span></div></div></td>
 <td class="checks"><div class="check-group"><div class="label">judge</div>
 <div class="check is-pass"><svg class="icon" width="14" height="14" viewBox="0 0 16 16" role="img" aria-label="passed"><path fill="currentColor" d="M13.78 4.22a.75.75 0 0 1 0 1.06l-7.25 7.25a.75.75 0 0 1-1.06 0L2.22 9.28a.75.75 0 0 1 1.06-1.06L6 10.94l6.72-6.72a.75.75 0 0 1 1.06 0Z"/></svg><div><div>one section per day</div></div></div>
@@ -755,8 +816,10 @@ search_hotels({
   }
 ]</pre></details></td>
 </tr>
-<tr class="run" data-pass="0" data-fresh="1">
-<td><div class="run-label is-fail">Round 2 · failed · 10.6s</div><p>Plan a weekend in Lisbon for two, mid-range budget, we love food.</p></td>
+<tr class="run" data-pass="0" data-key="skills-eval-report-fixtures-evals-travel-planner-eval-json-a-weekend-itinerary-h#2" data-fingerprint="1c9a5a0796f7">
+<td><div class="run-label"><label class="review"><input type="checkbox" data-review> Reviewed</label>
+<span class="is-fail">Round 2 · failed · 10.6s</span></div>
+<div class="changed-since" hidden>Changed since you reviewed it</div><p>Plan a weekend in Lisbon for two, mid-range budget, we love food.</p></td>
 <td class="output"><p>Lisbon is great for food! Try:</p><ul><li>Time Out Market</li><li>Pastéis de Belém</li><li>Taberna da Rua das Flores</li><li>A fado dinner in Alfama</li></ul></td>
 <td class="checks"><div class="check-group"><div class="label">judge</div>
 <div class="check is-fail"><svg class="icon" width="14" height="14" viewBox="0 0 16 16" role="img" aria-label="failed"><path fill="currentColor" d="M3.72 3.72a.75.75 0 0 1 1.06 0L8 6.94l3.22-3.22a.75.75 0 1 1 1.06 1.06L9.06 8l3.22 3.22a.75.75 0 1 1-1.06 1.06L8 9.06l-3.22 3.22a.75.75 0 0 1-1.06-1.06L6.94 8 3.72 4.78a.75.75 0 0 1 0-1.06Z"/></svg><div><div>one section per day</div><div class="reason">One list for the whole weekend.</div></div></div>
@@ -771,18 +834,20 @@ weather()
 → not called</pre></details></td>
 </tr>
 </tbody>
-<tbody class="case" id="skills-eval-report-fixtures-evals-travel-planner-eval-json-flight-options-show-p" data-fresh="1">
+<tbody class="case" id="skills-eval-report-fixtures-evals-travel-planner-eval-json-flight-options-show-p" data-pass="0" data-fresh="1">
 <tr class="case-head"><td colspan="4">
-<div class="case-title is-fail"><svg class="icon" width="18" height="18" viewBox="0 0 16 16" role="img" aria-label="failed"><path fill="currentColor" d="M2.343 13.657A8 8 0 1 1 13.658 2.343 8 8 0 0 1 2.343 13.657ZM6.03 4.97a.75.75 0 0 0-1.06 1.06L6.94 8 4.97 9.97a.75.75 0 1 0 1.06 1.06L8 9.06l1.97 1.97a.75.75 0 1 0 1.06-1.06L9.06 8l1.97-1.97a.75.75 0 0 0-1.06-1.06L8 6.94Z"/></svg>
+<div class="case-title is-fail"><input type="checkbox" class="review-all" data-review-case aria-label="Mark every round of this case reviewed"><svg class="icon" width="18" height="18" viewBox="0 0 16 16" role="img" aria-label="failed"><path fill="currentColor" d="M2.343 13.657A8 8 0 1 1 13.658 2.343 8 8 0 0 1 2.343 13.657ZM6.03 4.97a.75.75 0 0 0-1.06 1.06L6.94 8 4.97 9.97a.75.75 0 1 0 1.06 1.06L8 9.06l1.97 1.97a.75.75 0 1 0 1.06-1.06L9.06 8l1.97-1.97a.75.75 0 0 0-1.06-1.06L8 6.94Z"/></svg>
 <a class="case-name" href="#skills-eval-report-fixtures-evals-travel-planner-eval-json-flight-options-show-p">flight options show price, stops and times</a>
 <span class="badge is-fail">1 / 2 rounds</span>
 <span class="tag">New</span>
-<span class="spacer"></span><a class="code-link" href="https://github.com/marekkirejczyk/skills/blob/10c8c5fb1d9f04a87105e5dc75c0b65847b9f9f0/skills/eval-report/fixtures/evals/travel-planner.eval.json#L29" target="_blank" rel="noopener">travel-planner.eval.json:29 ↗</a></div>
+<span class="spacer"></span><a class="code-link" href="https://github.com/marekkirejczyk/skills/blob/c22f52b6755da6875df749a9bffb356f47c2070f/skills/eval-report/fixtures/evals/travel-planner.eval.json#L29" target="_blank" rel="noopener">travel-planner.eval.json:29 ↗</a></div>
 
 
 </td></tr>
-<tr class="run" data-pass="1" data-fresh="1">
-<td><div class="run-label is-pass">Round 1 · passed · 11.6s</div><p>Cheapest flights London to Lisbon on 12 Dec, back 15 Dec.</p></td>
+<tr class="run" data-pass="1" data-key="skills-eval-report-fixtures-evals-travel-planner-eval-json-flight-options-show-p#1" data-fingerprint="2af6ff41e1ed">
+<td><div class="run-label"><label class="review"><input type="checkbox" data-review> Reviewed</label>
+<span class="is-pass">Round 1 · passed · 11.6s</span></div>
+<div class="changed-since" hidden>Changed since you reviewed it</div><p>Cheapest flights London to Lisbon on 12 Dec, back 15 Dec.</p></td>
 <td class="output"><p>Three options, cheapest first. Prices can change until you book.</p><div class="card"><div class="card-kind">Flight <span class="card-title">£84 return · easyJet</span></div><ul><li><b>Out</b> LGW 06:15 → LIS 09:00, direct</li><li><b>Back</b> LIS 19:40 → LGW 22:25, direct</li></ul></div><div class="card"><div class="card-kind">Flight <span class="card-title">£112 return · TAP</span></div><ul><li><b>Out</b> LHR 07:30 → LIS 10:10, direct</li><li><b>Back</b> LIS 16:05 → LHR 18:50, direct</li></ul></div><div class="card"><div class="card-kind">Flight <span class="card-title">£96 return · Ryanair</span></div><ul><li><b>Out</b> STN 13:20 → LIS 16:05, direct</li><li><b>Back</b> LIS 10:50 → STN 13:35, direct</li></ul></div></td>
 <td class="checks"><div class="check-group"><div class="label">exact</div>
 <div class="check is-pass"><svg class="icon" width="14" height="14" viewBox="0 0 16 16" role="img" aria-label="passed"><path fill="currentColor" d="M13.78 4.22a.75.75 0 0 1 0 1.06l-7.25 7.25a.75.75 0 0 1-1.06 0L2.22 9.28a.75.75 0 0 1 1.06-1.06L6 10.94l6.72-6.72a.75.75 0 0 1 1.06 0Z"/></svg><div><div>calls search_flights with {&quot;from&quot;:&quot;LON&quot;,&quot;to&quot;:&quot;LIS&quot;}</div></div></div>
@@ -798,8 +863,10 @@ weather()
   &quot;offers&quot;: 3
 }</pre></details></td>
 </tr>
-<tr class="run" data-pass="0" data-fresh="1">
-<td><div class="run-label is-fail">Round 2 · failed · 12.6s</div><p>Cheapest flights London to Lisbon on 12 Dec, back 15 Dec.</p></td>
+<tr class="run" data-pass="0" data-key="skills-eval-report-fixtures-evals-travel-planner-eval-json-flight-options-show-p#2" data-fingerprint="8568b95290cb">
+<td><div class="run-label"><label class="review"><input type="checkbox" data-review> Reviewed</label>
+<span class="is-fail">Round 2 · failed · 12.6s</span></div>
+<div class="changed-since" hidden>Changed since you reviewed it</div><p>Cheapest flights London to Lisbon on 12 Dec, back 15 Dec.</p></td>
 <td class="output"><p>The cheapest is easyJet at £84 return, direct both ways.</p><div class="card"><div class="card-kind">Flight <span class="card-title">£84 return · easyJet</span></div><ul><li><b>Out</b> LGW 06:15 → LIS 09:00</li><li><b>Back</b> LIS 19:40 → LGW 22:25</li></ul></div></td>
 <td class="checks"><div class="check-group"><div class="label">exact</div>
 <div class="check is-pass"><svg class="icon" width="14" height="14" viewBox="0 0 16 16" role="img" aria-label="passed"><path fill="currentColor" d="M13.78 4.22a.75.75 0 0 1 0 1.06l-7.25 7.25a.75.75 0 0 1-1.06 0L2.22 9.28a.75.75 0 0 1 1.06-1.06L6 10.94l6.72-6.72a.75.75 0 0 1 1.06 0Z"/></svg><div><div>calls search_flights with {&quot;from&quot;:&quot;LON&quot;,&quot;to&quot;:&quot;LIS&quot;}</div></div></div>
@@ -814,18 +881,20 @@ weather()
 }</pre></details></td>
 </tr>
 </tbody>
-<tbody class="case" id="skills-eval-report-fixtures-evals-travel-planner-eval-json-asks-for-dates-before" data-fresh="1">
+<tbody class="case" id="skills-eval-report-fixtures-evals-travel-planner-eval-json-asks-for-dates-before" data-pass="1" data-fresh="1">
 <tr class="case-head"><td colspan="4">
-<div class="case-title is-pass"><svg class="icon" width="18" height="18" viewBox="0 0 16 16" role="img" aria-label="passed"><path fill="currentColor" d="M8 16A8 8 0 1 1 8 0a8 8 0 0 1 0 16Zm3.78-9.72a.751.751 0 0 0-1.06-1.06L6.75 9.19 5.28 7.72a.751.751 0 0 0-1.06 1.06l2 2a.75.75 0 0 0 1.06 0Z"/></svg>
+<div class="case-title is-pass"><input type="checkbox" class="review-all" data-review-case aria-label="Mark every round of this case reviewed"><svg class="icon" width="18" height="18" viewBox="0 0 16 16" role="img" aria-label="passed"><path fill="currentColor" d="M8 16A8 8 0 1 1 8 0a8 8 0 0 1 0 16Zm3.78-9.72a.751.751 0 0 0-1.06-1.06L6.75 9.19 5.28 7.72a.751.751 0 0 0-1.06 1.06l2 2a.75.75 0 0 0 1.06 0Z"/></svg>
 <a class="case-name" href="#skills-eval-report-fixtures-evals-travel-planner-eval-json-asks-for-dates-before">asks for dates before searching flights</a>
 <span class="badge is-pass">2 / 2 rounds</span>
 <span class="tag">New</span>
-<span class="spacer"></span><a class="code-link" href="https://github.com/marekkirejczyk/skills/blob/10c8c5fb1d9f04a87105e5dc75c0b65847b9f9f0/skills/eval-report/fixtures/evals/travel-planner.eval.json#L51" target="_blank" rel="noopener">travel-planner.eval.json:51 ↗</a></div>
+<span class="spacer"></span><a class="code-link" href="https://github.com/marekkirejczyk/skills/blob/c22f52b6755da6875df749a9bffb356f47c2070f/skills/eval-report/fixtures/evals/travel-planner.eval.json#L51" target="_blank" rel="noopener">travel-planner.eval.json:51 ↗</a></div>
 
 <div class="note"><b>Known bug:</b> Intermittent. The reply is a question card with no words at all (service.ts, endsReply).</div>
 </td></tr>
-<tr class="run" data-pass="1" data-fresh="1">
-<td><div class="run-label is-pass">Round 1 · passed · 4.6s</div><p>Find me flights to Tokyo.</p></td>
+<tr class="run" data-pass="1" data-key="skills-eval-report-fixtures-evals-travel-planner-eval-json-asks-for-dates-before#1" data-fingerprint="f0044693e5f9">
+<td><div class="run-label"><label class="review"><input type="checkbox" data-review> Reviewed</label>
+<span class="is-pass">Round 1 · passed · 4.6s</span></div>
+<div class="changed-since" hidden>Changed since you reviewed it</div><p>Find me flights to Tokyo.</p></td>
 <td class="output"><p class="muted"><i>(no words)</i></p><div class="card"><div class="card-kind">Question</div><div><p>When would you like to travel?</p></div><div class="chips"><span class="chip">This month</span><span class="chip">Next month</span><span class="chip">Pick dates</span></div></div></td>
 <td class="checks"><div class="check-group"><div class="label">exact</div>
 <div class="check is-pass"><svg class="icon" width="14" height="14" viewBox="0 0 16 16" role="img" aria-label="passed"><path fill="currentColor" d="M13.78 4.22a.75.75 0 0 1 0 1.06l-7.25 7.25a.75.75 0 0 1-1.06 0L2.22 9.28a.75.75 0 0 1 1.06-1.06L6 10.94l6.72-6.72a.75.75 0 0 1 1.06 0Z"/></svg><div><div>does not call search_flights</div></div></div>
@@ -836,8 +905,10 @@ weather()
 })
 → &quot;shown&quot;</pre></details></td>
 </tr>
-<tr class="run" data-pass="1" data-fresh="1">
-<td><div class="run-label is-pass">Round 2 · passed · 5.5s</div><p>Find me flights to Tokyo.</p></td>
+<tr class="run" data-pass="1" data-key="skills-eval-report-fixtures-evals-travel-planner-eval-json-asks-for-dates-before#2" data-fingerprint="688b5ab1e96e">
+<td><div class="run-label"><label class="review"><input type="checkbox" data-review> Reviewed</label>
+<span class="is-pass">Round 2 · passed · 5.5s</span></div>
+<div class="changed-since" hidden>Changed since you reviewed it</div><p>Find me flights to Tokyo.</p></td>
 <td class="output"><p>Happy to! When are you thinking of going, and from which airport?</p><div class="card"><div class="card-kind">Question</div><div><p>When would you like to travel?</p></div><div class="chips"><span class="chip">This month</span><span class="chip">Next month</span><span class="chip">Pick dates</span></div></div></td>
 <td class="checks"><div class="check-group"><div class="label">exact</div>
 <div class="check is-pass"><svg class="icon" width="14" height="14" viewBox="0 0 16 16" role="img" aria-label="passed"><path fill="currentColor" d="M13.78 4.22a.75.75 0 0 1 0 1.06l-7.25 7.25a.75.75 0 0 1-1.06 0L2.22 9.28a.75.75 0 0 1 1.06-1.06L6 10.94l6.72-6.72a.75.75 0 0 1 1.06 0Z"/></svg><div><div>does not call search_flights</div></div></div>
@@ -849,18 +920,20 @@ weather()
 → &quot;shown&quot;</pre></details></td>
 </tr>
 </tbody>
-<tbody class="case" id="skills-eval-report-fixtures-evals-travel-planner-eval-json-a-visa-question-point" data-fresh="1">
+<tbody class="case" id="skills-eval-report-fixtures-evals-travel-planner-eval-json-a-visa-question-point" data-pass="1" data-fresh="1">
 <tr class="case-head"><td colspan="4">
-<div class="case-title is-pass"><svg class="icon" width="18" height="18" viewBox="0 0 16 16" role="img" aria-label="passed"><path fill="currentColor" d="M8 16A8 8 0 1 1 8 0a8 8 0 0 1 0 16Zm3.78-9.72a.751.751 0 0 0-1.06-1.06L6.75 9.19 5.28 7.72a.751.751 0 0 0-1.06 1.06l2 2a.75.75 0 0 0 1.06 0Z"/></svg>
+<div class="case-title is-pass"><input type="checkbox" class="review-all" data-review-case aria-label="Mark every round of this case reviewed"><svg class="icon" width="18" height="18" viewBox="0 0 16 16" role="img" aria-label="passed"><path fill="currentColor" d="M8 16A8 8 0 1 1 8 0a8 8 0 0 1 0 16Zm3.78-9.72a.751.751 0 0 0-1.06-1.06L6.75 9.19 5.28 7.72a.751.751 0 0 0-1.06 1.06l2 2a.75.75 0 0 0 1.06 0Z"/></svg>
 <a class="case-name" href="#skills-eval-report-fixtures-evals-travel-planner-eval-json-a-visa-question-point">a visa question points to the official source</a>
 <span class="badge is-pass">1 / 1 rounds</span>
 <span class="tag">New</span>
-<span class="spacer"></span><a class="code-link" href="https://github.com/marekkirejczyk/skills/blob/10c8c5fb1d9f04a87105e5dc75c0b65847b9f9f0/skills/eval-report/fixtures/evals/travel-planner.eval.json#L67" target="_blank" rel="noopener">travel-planner.eval.json:67 ↗</a></div>
+<span class="spacer"></span><a class="code-link" href="https://github.com/marekkirejczyk/skills/blob/c22f52b6755da6875df749a9bffb356f47c2070f/skills/eval-report/fixtures/evals/travel-planner.eval.json#L67" target="_blank" rel="noopener">travel-planner.eval.json:67 ↗</a></div>
 
 
 </td></tr>
-<tr class="run" data-pass="1" data-fresh="1">
-<td><div class="run-label is-pass">Round 1 · passed · 6.5s</div><p>Do I need a visa for Japan with a UK passport?</p></td>
+<tr class="run" data-pass="1" data-key="skills-eval-report-fixtures-evals-travel-planner-eval-json-a-visa-question-point#1" data-fingerprint="254010b8f143">
+<td><div class="run-label"><label class="review"><input type="checkbox" data-review> Reviewed</label>
+<span class="is-pass">Round 1 · passed · 6.5s</span></div>
+<div class="changed-since" hidden>Changed since you reviewed it</div><p>Do I need a visa for Japan with a UK passport?</p></td>
 <td class="output"><p>For short tourist stays, UK passport holders usually don’t need a visa, but rules change. Check the official page before you book:</p><div class="card"><div class="card-kind">Link <span class="card-title">GOV.UK: Japan entry requirements</span></div><div class="links">→ gov.uk</div></div></td>
 <td class="checks"><div class="check-group"><div class="label">judge</div>
 <div class="check is-pass"><svg class="icon" width="14" height="14" viewBox="0 0 16 16" role="img" aria-label="passed"><path fill="currentColor" d="M13.78 4.22a.75.75 0 0 1 0 1.06l-7.25 7.25a.75.75 0 0 1-1.06 0L2.22 9.28a.75.75 0 0 1 1.06-1.06L6 10.94l6.72-6.72a.75.75 0 0 1 1.06 0Z"/></svg><div><div>links the official government page</div></div></div>
@@ -868,18 +941,20 @@ weather()
 <td><span class="muted">No tools run</span></td>
 </tr>
 </tbody>
-<tbody class="case" id="skills-eval-report-fixtures-evals-travel-planner-eval-json-a-hotel-shortlist-sta" data-fresh="1">
+<tbody class="case" id="skills-eval-report-fixtures-evals-travel-planner-eval-json-a-hotel-shortlist-sta" data-pass="0" data-fresh="1">
 <tr class="case-head"><td colspan="4">
-<div class="case-title is-fail"><svg class="icon" width="18" height="18" viewBox="0 0 16 16" role="img" aria-label="failed"><path fill="currentColor" d="M2.343 13.657A8 8 0 1 1 13.658 2.343 8 8 0 0 1 2.343 13.657ZM6.03 4.97a.75.75 0 0 0-1.06 1.06L6.94 8 4.97 9.97a.75.75 0 1 0 1.06 1.06L8 9.06l1.97 1.97a.75.75 0 1 0 1.06-1.06L9.06 8l1.97-1.97a.75.75 0 0 0-1.06-1.06L8 6.94Z"/></svg>
+<div class="case-title is-fail"><input type="checkbox" class="review-all" data-review-case aria-label="Mark every round of this case reviewed"><svg class="icon" width="18" height="18" viewBox="0 0 16 16" role="img" aria-label="failed"><path fill="currentColor" d="M2.343 13.657A8 8 0 1 1 13.658 2.343 8 8 0 0 1 2.343 13.657ZM6.03 4.97a.75.75 0 0 0-1.06 1.06L6.94 8 4.97 9.97a.75.75 0 1 0 1.06 1.06L8 9.06l1.97 1.97a.75.75 0 1 0 1.06-1.06L9.06 8l1.97-1.97a.75.75 0 0 0-1.06-1.06L8 6.94Z"/></svg>
 <a class="case-name" href="#skills-eval-report-fixtures-evals-travel-planner-eval-json-a-hotel-shortlist-sta">a hotel shortlist stays within budget</a>
 <span class="badge is-fail">2 / 3 rounds</span>
 <span class="tag">New</span>
-<span class="spacer"></span><a class="code-link" href="https://github.com/marekkirejczyk/skills/blob/10c8c5fb1d9f04a87105e5dc75c0b65847b9f9f0/skills/eval-report/fixtures/evals/travel-planner.eval.json#L79" target="_blank" rel="noopener">travel-planner.eval.json:79 ↗</a></div>
+<span class="spacer"></span><a class="code-link" href="https://github.com/marekkirejczyk/skills/blob/c22f52b6755da6875df749a9bffb356f47c2070f/skills/eval-report/fixtures/evals/travel-planner.eval.json#L79" target="_blank" rel="noopener">travel-planner.eval.json:79 ↗</a></div>
 
 
 </td></tr>
-<tr class="run" data-pass="0" data-fresh="1">
-<td><div class="run-label is-fail">Round 1 · failed · 7.5s</div><p>Hotels in Porto under €120 a night, 3 nights from 20 Dec.</p></td>
+<tr class="run" data-pass="0" data-key="skills-eval-report-fixtures-evals-travel-planner-eval-json-a-hotel-shortlist-sta#1" data-fingerprint="ce72392b69aa">
+<td><div class="run-label"><label class="review"><input type="checkbox" data-review> Reviewed</label>
+<span class="is-fail">Round 1 · failed · 7.5s</span></div>
+<div class="changed-since" hidden>Changed since you reviewed it</div><p>Hotels in Porto under €120 a night, 3 nights from 20 Dec.</p></td>
 <td class="output"><p>Here are four within budget, all near Ribeira:</p><div class="card"><div class="card-kind">Hotel <span class="card-title">Pestana Vintage</span></div><div><p>€118 / night · 4.5★</p></div><div class="chips"><span class="chip">River view</span></div></div><div class="card"><div class="card-kind">Hotel <span class="card-title">Moov Hotel Porto Centro</span></div><div><p>€74 / night · 4.1★</p></div></div><div class="card"><div class="card-kind">Hotel <span class="card-title">Torel 1884</span></div><div><p>€145 / night · 4.8★</p></div><div class="chips"><span class="chip">Boutique</span></div></div></td>
 <td class="checks"><div class="check-group"><div class="label">exact</div>
 <div class="check is-pass"><svg class="icon" width="14" height="14" viewBox="0 0 16 16" role="img" aria-label="passed"><path fill="currentColor" d="M13.78 4.22a.75.75 0 0 1 0 1.06l-7.25 7.25a.75.75 0 0 1-1.06 0L2.22 9.28a.75.75 0 0 1 1.06-1.06L6 10.94l6.72-6.72a.75.75 0 0 1 1.06 0Z"/></svg><div><div>calls search_hotels with {&quot;maxPrice&quot;:120}</div></div></div></div><div class="check-group"><div class="label">judge</div>
@@ -901,8 +976,10 @@ weather()
   }
 ]</pre></details></td>
 </tr>
-<tr class="run" data-pass="1" data-fresh="1">
-<td><div class="run-label is-pass">Round 2 · passed · 8.5s</div><p>Hotels in Porto under €120 a night, 3 nights from 20 Dec.</p></td>
+<tr class="run" data-pass="1" data-key="skills-eval-report-fixtures-evals-travel-planner-eval-json-a-hotel-shortlist-sta#2" data-fingerprint="e9182bde19af">
+<td><div class="run-label"><label class="review"><input type="checkbox" data-review> Reviewed</label>
+<span class="is-pass">Round 2 · passed · 8.5s</span></div>
+<div class="changed-since" hidden>Changed since you reviewed it</div><p>Hotels in Porto under €120 a night, 3 nights from 20 Dec.</p></td>
 <td class="output"><p>Two good options under €120:</p><div class="card"><div class="card-kind">Hotel <span class="card-title">Pestana Vintage</span></div><div><p>€118 / night</p></div></div><div class="card"><div class="card-kind">Hotel <span class="card-title">Moov Hotel Porto Centro</span></div><div><p>€74 / night</p></div></div></td>
 <td class="checks"><div class="check-group"><div class="label">exact</div>
 <div class="check is-pass"><svg class="icon" width="14" height="14" viewBox="0 0 16 16" role="img" aria-label="passed"><path fill="currentColor" d="M13.78 4.22a.75.75 0 0 1 0 1.06l-7.25 7.25a.75.75 0 0 1-1.06 0L2.22 9.28a.75.75 0 0 1 1.06-1.06L6 10.94l6.72-6.72a.75.75 0 0 1 1.06 0Z"/></svg><div><div>calls search_hotels with {&quot;maxPrice&quot;:120}</div></div></div></div><div class="check-group"><div class="label">judge</div>
@@ -920,8 +997,10 @@ weather()
   }
 ]</pre></details></td>
 </tr>
-<tr class="run" data-pass="1" data-fresh="1">
-<td><div class="run-label is-pass">Round 3 · passed · 9.4s</div><p>Hotels in Porto under €120 a night, 3 nights from 20 Dec.</p></td>
+<tr class="run" data-pass="1" data-key="skills-eval-report-fixtures-evals-travel-planner-eval-json-a-hotel-shortlist-sta#3" data-fingerprint="c6215e91ed1d">
+<td><div class="run-label"><label class="review"><input type="checkbox" data-review> Reviewed</label>
+<span class="is-pass">Round 3 · passed · 9.4s</span></div>
+<div class="changed-since" hidden>Changed since you reviewed it</div><p>Hotels in Porto under €120 a night, 3 nights from 20 Dec.</p></td>
 <td class="output"><p>Here are two under €120:</p><ol><li>Pestana Vintage, €118</li><li>Moov Porto Centro, €74</li></ol></td>
 <td class="checks"><div class="check-group"><div class="label">exact</div>
 <div class="check is-pass"><svg class="icon" width="14" height="14" viewBox="0 0 16 16" role="img" aria-label="passed"><path fill="currentColor" d="M13.78 4.22a.75.75 0 0 1 0 1.06l-7.25 7.25a.75.75 0 0 1-1.06 0L2.22 9.28a.75.75 0 0 1 1.06-1.06L6 10.94l6.72-6.72a.75.75 0 0 1 1.06 0Z"/></svg><div><div>calls search_hotels with {&quot;maxPrice&quot;:120}</div></div></div></div><div class="check-group"><div class="label">judge</div>
@@ -940,18 +1019,20 @@ weather()
 ]</pre></details></td>
 </tr>
 </tbody>
-<tbody class="case" id="skills-eval-report-fixtures-evals-travel-planner-eval-json-weather-is-given-for-" data-fresh="1">
+<tbody class="case" id="skills-eval-report-fixtures-evals-travel-planner-eval-json-weather-is-given-for-" data-pass="1" data-fresh="1">
 <tr class="case-head"><td colspan="4">
-<div class="case-title is-pass"><svg class="icon" width="18" height="18" viewBox="0 0 16 16" role="img" aria-label="passed"><path fill="currentColor" d="M8 16A8 8 0 1 1 8 0a8 8 0 0 1 0 16Zm3.78-9.72a.751.751 0 0 0-1.06-1.06L6.75 9.19 5.28 7.72a.751.751 0 0 0-1.06 1.06l2 2a.75.75 0 0 0 1.06 0Z"/></svg>
+<div class="case-title is-pass"><input type="checkbox" class="review-all" data-review-case aria-label="Mark every round of this case reviewed"><svg class="icon" width="18" height="18" viewBox="0 0 16 16" role="img" aria-label="passed"><path fill="currentColor" d="M8 16A8 8 0 1 1 8 0a8 8 0 0 1 0 16Zm3.78-9.72a.751.751 0 0 0-1.06-1.06L6.75 9.19 5.28 7.72a.751.751 0 0 0-1.06 1.06l2 2a.75.75 0 0 0 1.06 0Z"/></svg>
 <a class="case-name" href="#skills-eval-report-fixtures-evals-travel-planner-eval-json-weather-is-given-for-">weather is given for the trip dates, not today</a>
 <span class="badge is-pass">1 / 1 rounds</span>
 <span class="tag">New</span>
-<span class="spacer"></span><a class="code-link" href="https://github.com/marekkirejczyk/skills/blob/10c8c5fb1d9f04a87105e5dc75c0b65847b9f9f0/skills/eval-report/fixtures/evals/travel-planner.eval.json#L97" target="_blank" rel="noopener">travel-planner.eval.json:97 ↗</a></div>
+<span class="spacer"></span><a class="code-link" href="https://github.com/marekkirejczyk/skills/blob/c22f52b6755da6875df749a9bffb356f47c2070f/skills/eval-report/fixtures/evals/travel-planner.eval.json#L97" target="_blank" rel="noopener">travel-planner.eval.json:97 ↗</a></div>
 
 
 </td></tr>
-<tr class="run" data-pass="1" data-fresh="1">
-<td><div class="run-label is-pass">Round 1 · passed · 10.4s</div><p>What will the weather be like in Rome from 3 to 6 January?</p></td>
+<tr class="run" data-pass="1" data-key="skills-eval-report-fixtures-evals-travel-planner-eval-json-weather-is-given-for-#1" data-fingerprint="8fb46617f6e7">
+<td><div class="run-label"><label class="review"><input type="checkbox" data-review> Reviewed</label>
+<span class="is-pass">Round 1 · passed · 10.4s</span></div>
+<div class="changed-since" hidden>Changed since you reviewed it</div><p>What will the weather be like in Rome from 3 to 6 January?</p></td>
 <td class="output"><p>Expect cool, mostly dry days: highs around 13°C, lows near 4°C, with a chance of rain on the 5th.</p></td>
 <td class="checks"><div class="check-group"><div class="label">exact</div>
 <div class="check is-pass"><svg class="icon" width="14" height="14" viewBox="0 0 16 16" role="img" aria-label="passed"><path fill="currentColor" d="M13.78 4.22a.75.75 0 0 1 0 1.06l-7.25 7.25a.75.75 0 0 1-1.06 0L2.22 9.28a.75.75 0 0 1 1.06-1.06L6 10.94l6.72-6.72a.75.75 0 0 1 1.06 0Z"/></svg><div><div>calls weather with {&quot;from&quot;:&quot;2027-01-03&quot;,&quot;to&quot;:&quot;2027-01-06&quot;}</div></div></div></div></td>
@@ -969,18 +1050,20 @@ weather()
 }</pre></details></td>
 </tr>
 </tbody>
-<tbody class="case" id="skills-eval-report-fixtures-evals-travel-planner-eval-json-a-tool-error-is-expla" data-fresh="1">
+<tbody class="case" id="skills-eval-report-fixtures-evals-travel-planner-eval-json-a-tool-error-is-expla" data-pass="0" data-fresh="1">
 <tr class="case-head"><td colspan="4">
-<div class="case-title is-fail"><svg class="icon" width="18" height="18" viewBox="0 0 16 16" role="img" aria-label="failed"><path fill="currentColor" d="M2.343 13.657A8 8 0 1 1 13.658 2.343 8 8 0 0 1 2.343 13.657ZM6.03 4.97a.75.75 0 0 0-1.06 1.06L6.94 8 4.97 9.97a.75.75 0 1 0 1.06 1.06L8 9.06l1.97 1.97a.75.75 0 1 0 1.06-1.06L9.06 8l1.97-1.97a.75.75 0 0 0-1.06-1.06L8 6.94Z"/></svg>
+<div class="case-title is-fail"><input type="checkbox" class="review-all" data-review-case aria-label="Mark every round of this case reviewed"><svg class="icon" width="18" height="18" viewBox="0 0 16 16" role="img" aria-label="failed"><path fill="currentColor" d="M2.343 13.657A8 8 0 1 1 13.658 2.343 8 8 0 0 1 2.343 13.657ZM6.03 4.97a.75.75 0 0 0-1.06 1.06L6.94 8 4.97 9.97a.75.75 0 1 0 1.06 1.06L8 9.06l1.97 1.97a.75.75 0 1 0 1.06-1.06L9.06 8l1.97-1.97a.75.75 0 0 0-1.06-1.06L8 6.94Z"/></svg>
 <a class="case-name" href="#skills-eval-report-fixtures-evals-travel-planner-eval-json-a-tool-error-is-expla">a tool error is explained and retried once</a>
 <span class="badge is-fail">1 / 2 rounds</span>
 <span class="tag">New</span>
-<span class="spacer"></span><a class="code-link" href="https://github.com/marekkirejczyk/skills/blob/10c8c5fb1d9f04a87105e5dc75c0b65847b9f9f0/skills/eval-report/fixtures/evals/travel-planner.eval.json#L113" target="_blank" rel="noopener">travel-planner.eval.json:113 ↗</a></div>
+<span class="spacer"></span><a class="code-link" href="https://github.com/marekkirejczyk/skills/blob/c22f52b6755da6875df749a9bffb356f47c2070f/skills/eval-report/fixtures/evals/travel-planner.eval.json#L113" target="_blank" rel="noopener">travel-planner.eval.json:113 ↗</a></div>
 
 
 </td></tr>
-<tr class="run" data-pass="0" data-fresh="1">
-<td><div class="run-label is-fail">Round 1 · failed · 30.0s</div><p>Book me the 9:40 to Lisbon on 12 Dec.</p></td>
+<tr class="run" data-pass="0" data-key="skills-eval-report-fixtures-evals-travel-planner-eval-json-a-tool-error-is-expla#1" data-fingerprint="2946815a42e3">
+<td><div class="run-label"><label class="review"><input type="checkbox" data-review> Reviewed</label>
+<span class="is-fail">Round 1 · failed · 30.0s</span></div>
+<div class="changed-since" hidden>Changed since you reviewed it</div><p>Book me the 9:40 to Lisbon on 12 Dec.</p></td>
 <td class="output"><span class="muted">—</span></td>
 <td class="checks"><div class="check-group"><div class="label">error</div>
 <div class="check is-fail"><svg class="icon" width="14" height="14" viewBox="0 0 16 16" role="img" aria-label="failed"><path fill="currentColor" d="M3.72 3.72a.75.75 0 0 1 1.06 0L8 6.94l3.22-3.22a.75.75 0 1 1 1.06 1.06L9.06 8l3.22 3.22a.75.75 0 1 1-1.06 1.06L8 9.06l-3.22 3.22a.75.75 0 0 1-1.06-1.06L6.94 8 3.72 4.78a.75.75 0 0 1 0-1.06Z"/></svg><div><div>Timed out after 30s waiting for the model</div></div></div></div></td>
@@ -992,8 +1075,10 @@ weather()
   &quot;error&quot;: &quot;timeout&quot;
 }</pre></details></td>
 </tr>
-<tr class="run" data-pass="1" data-fresh="1">
-<td><div class="run-label is-pass">Round 2 · passed · 12.4s</div><p>Book me the 9:40 to Lisbon on 12 Dec.</p></td>
+<tr class="run" data-pass="1" data-key="skills-eval-report-fixtures-evals-travel-planner-eval-json-a-tool-error-is-expla#2" data-fingerprint="ba495c8159ad">
+<td><div class="run-label"><label class="review"><input type="checkbox" data-review> Reviewed</label>
+<span class="is-pass">Round 2 · passed · 12.4s</span></div>
+<div class="changed-since" hidden>Changed since you reviewed it</div><p>Book me the 9:40 to Lisbon on 12 Dec.</p></td>
 <td class="output"><p>The flight search didn’t answer just now, so I tried again and it worked. The 9:40 TAP flight is £118; want me to hold it?</p></td>
 <td class="checks"><div class="check-group"><div class="label">exact</div>
 <div class="check is-pass"><svg class="icon" width="14" height="14" viewBox="0 0 16 16" role="img" aria-label="passed"><path fill="currentColor" d="M13.78 4.22a.75.75 0 0 1 0 1.06l-7.25 7.25a.75.75 0 0 1-1.06 0L2.22 9.28a.75.75 0 0 1 1.06-1.06L6 10.94l6.72-6.72a.75.75 0 0 1 1.06 0Z"/></svg><div><div>calls search_flights 2 times</div></div></div></div><div class="check-group"><div class="label">judge</div>
@@ -1019,59 +1104,79 @@ search_flights({
 </details>
 </main>
 <footer class="wrap muted small">Generated by eval-report · no model tokens used</footer>
-<script>// Filters (status, scope) and expand/collapse. State lives in the URL hash,
-// e.g. #status=failed&scope=fresh, so a filtered view can be linked.
+<script>// Filters, review ticks, expand/collapse and the theme switch.
+// Filter state lives in the URL hash (#status=failed&scope=fresh&review=todo),
+// so a filtered view can be linked. Review ticks and the theme live in this
+// browser's localStorage, so they are per person and survive new reports.
 (function () {
-  var runs = Array.prototype.slice.call(document.querySelectorAll('tr.run'));
-  var cases = Array.prototype.slice.call(document.querySelectorAll('tbody.case'));
-  var files = Array.prototype.slice.call(document.querySelectorAll('details.file'));
-  var statusButtons = Array.prototype.slice.call(document.querySelectorAll('[data-status]'));
-  var scopeButtons = Array.prototype.slice.call(document.querySelectorAll('[data-scope]'));
+  var all = function (selector, root) { return Array.prototype.slice.call((root || document).querySelectorAll(selector)); };
+  var files = all('details.file');
+  var cases = all('tbody.case');
+  var rounds = all('tr.run');
   var empty = document.querySelector('.empty[hidden]');
+  var hasScope = all('[data-scope]').length > 0;
 
+  // ---- Review ticks: { "<case id>#<round>": "<fingerprint>" } ----
+  var storeKey = document.body.dataset.reviewStore || 'eval-report-reviewed';
+  var reviewed = {};
+  try { reviewed = JSON.parse(localStorage.getItem(storeKey) || '{}') || {}; } catch (e) { reviewed = {}; }
+  function save() { try { localStorage.setItem(storeKey, JSON.stringify(reviewed)); } catch (e) {} }
+  function isReviewed(row) { return reviewed[row.dataset.key] === row.dataset.fingerprint; }
+  function setReviewed(row, on) {
+    if (on) reviewed[row.dataset.key] = row.dataset.fingerprint;
+    else delete reviewed[row.dataset.key];
+  }
+
+  // ---- Filters ----
   function readState() {
     var params = new URLSearchParams(location.hash.replace(/^#/, ''));
     var status = params.get('status');
-    var scope = params.get('scope');
+    var review = params.get('review');
     return {
       status: status === 'passed' || status === 'failed' ? status : 'all',
-      scope: scope === 'fresh' && scopeButtons.length ? 'fresh' : 'all',
+      scope: params.get('scope') === 'fresh' && hasScope ? 'fresh' : 'all',
+      review: review === 'todo' || review === 'done' ? review : 'all',
     };
   }
-
-  function matchesStatus(row, status) {
-    return status === 'all' || (status === 'passed') === (row.dataset.pass === '1');
+  // Status and scope are about the whole case: one failed round makes it a failed case.
+  function caseMatches(body, state) {
+    var statusOk = state.status === 'all' || (state.status === 'passed') === (body.dataset.pass === '1');
+    var scopeOk = state.scope === 'all' || body.dataset.fresh === '1';
+    return statusOk && scopeOk;
   }
-  function matchesScope(row, scope) {
-    return scope === 'all' || row.dataset.fresh === '1';
+  // Review is about each round.
+  function roundMatches(row, review) {
+    return review === 'all' || (review === 'done') === isReviewed(row);
+  }
+  function visibleCases(state) {
+    return cases.filter(function (body) {
+      return caseMatches(body, state) && all('tr.run', body).some(function (row) { return roundMatches(row, state.review); });
+    });
   }
 
   function apply() {
     var state = readState();
-    var shown = 0;
-    runs.forEach(function (row) {
-      var visible = matchesStatus(row, state.status) && matchesScope(row, state.scope);
-      row.hidden = !visible;
-      if (visible) shown++;
+    var shown = visibleCases(state);
+    cases.forEach(function (body) {
+      var visible = shown.indexOf(body) >= 0;
+      body.hidden = !visible;
+      all('tr.run', body).forEach(function (row) { row.hidden = !visible || !roundMatches(row, state.review); });
     });
-    cases.forEach(function (body) { body.hidden = !body.querySelector('tr.run:not([hidden])'); });
     files.forEach(function (file) { file.hidden = !file.querySelector('tbody.case:not([hidden])'); });
-    if (empty) empty.hidden = shown > 0;
+    if (empty) empty.hidden = shown.length > 0;
 
-    statusButtons.forEach(function (button) {
-      var value = button.dataset.status;
-      button.setAttribute('aria-pressed', String(value === state.status));
-      button.querySelector('.count').textContent = runs.filter(function (row) {
-        return matchesStatus(row, value) && matchesScope(row, state.scope);
-      }).length;
+    [['status', ['all', 'passed', 'failed']], ['scope', ['all', 'fresh']], ['review', ['all', 'todo', 'done']]].forEach(function (group) {
+      var key = group[0];
+      group[1].forEach(function (value) {
+        var button = document.querySelector('[data-' + (key === 'review' ? 'review-filter' : key) + '="' + value + '"]');
+        if (!button) return;
+        var other = Object.assign({}, state);
+        other[key] = value;
+        button.setAttribute('aria-pressed', String(state[key] === value));
+        button.querySelector('.count').textContent = visibleCases(other).length;
+      });
     });
-    scopeButtons.forEach(function (button) {
-      var value = button.dataset.scope;
-      button.setAttribute('aria-pressed', String(value === state.scope));
-      button.querySelector('.count').textContent = runs.filter(function (row) {
-        return matchesScope(row, value) && matchesStatus(row, state.status);
-      }).length;
-    });
+    showReview();
   }
 
   function setState(key, value) {
@@ -1080,19 +1185,76 @@ search_flights({
     var parts = [];
     if (state.status !== 'all') parts.push('status=' + state.status);
     if (state.scope !== 'all') parts.push('scope=' + state.scope);
+    if (state.review !== 'all') parts.push('review=' + state.review);
     history.replaceState(null, '', parts.length ? '#' + parts.join('&') : location.pathname + location.search);
     apply();
   }
 
-  statusButtons.forEach(function (b) { b.addEventListener('click', function () { setState('status', b.dataset.status); }); });
-  scopeButtons.forEach(function (b) { b.addEventListener('click', function () { setState('scope', b.dataset.scope); }); });
-  Array.prototype.forEach.call(document.querySelectorAll('[data-expand]'), function (b) {
+  // ---- Review display: boxes, dimmed rows, counts ----
+  function setGroupBox(box, rows) {
+    var done = rows.filter(isReviewed).length;
+    box.checked = done > 0 && done === rows.length;
+    box.indeterminate = done > 0 && done < rows.length;
+  }
+  function showReview() {
+    rounds.forEach(function (row) {
+      var done = isReviewed(row);
+      row.classList.toggle('is-reviewed', done);
+      row.querySelector('[data-review]').checked = done;
+      // Ticked in an earlier report, but this round has changed since.
+      row.querySelector('.changed-since').hidden = done || !(row.dataset.key in reviewed);
+    });
+    cases.forEach(function (body) { setGroupBox(body.querySelector('[data-review-case]'), all('tr.run', body)); });
+    files.forEach(function (file) {
+      var rows = all('tr.run', file);
+      setGroupBox(file.querySelector('[data-review-file]'), rows);
+      file.querySelector('[data-file-reviewed]').textContent = rows.filter(isReviewed).length;
+    });
+    var count = rounds.filter(isReviewed).length;
+    var countEl = document.querySelector('[data-reviewed-count]');
+    if (countEl) countEl.textContent = count;
+    var bar = document.querySelector('[data-reviewed-bar]');
+    if (bar) bar.style.width = (rounds.length ? (100 * count) / rounds.length : 0) + '%';
+  }
+
+  function tick(rows, on) {
+    rows.forEach(function (row) { setReviewed(row, on); });
+    save();
+    apply();
+  }
+  rounds.forEach(function (row) {
+    row.querySelector('[data-review]').addEventListener('change', function (event) { tick([row], event.target.checked); });
+  });
+  cases.forEach(function (body) {
+    body.querySelector('[data-review-case]').addEventListener('change', function (event) { tick(all('tr.run', body), event.target.checked); });
+  });
+  files.forEach(function (file) {
+    var box = file.querySelector('[data-review-file]');
+    // A click on the box must not also open or close the file.
+    box.addEventListener('click', function (event) { event.stopPropagation(); });
+    box.addEventListener('change', function (event) { tick(all('tr.run', file), event.target.checked); });
+  });
+
+  // ---- Wiring ----
+  all('[data-status]').forEach(function (b) { b.addEventListener('click', function () { setState('status', b.dataset.status); }); });
+  all('[data-scope]').forEach(function (b) { b.addEventListener('click', function () { setState('scope', b.dataset.scope); }); });
+  all('[data-review-filter]').forEach(function (b) { b.addEventListener('click', function () { setState('review', b.dataset.reviewFilter); }); });
+  all('[data-expand]').forEach(function (b) {
     b.addEventListener('click', function () {
       var open = b.dataset.expand === '1';
       files.forEach(function (file) { file.open = open; });
     });
   });
-  // Theme: Auto (the system's) → Light → Dark, remembered in this browser.
+  window.addEventListener('hashchange', apply);
+
+  // A file you have fully reviewed starts collapsed.
+  files.forEach(function (file) {
+    var rows = all('tr.run', file);
+    if (rows.length && rows.every(isReviewed)) file.open = false;
+  });
+  apply();
+
+  // ---- Theme: Auto (the system's) → Light → Dark ----
   var themeButton = document.querySelector('[data-theme-switch]');
   var THEMES = ['auto', 'light', 'dark'];
   var LABELS = { auto: 'Auto', light: 'Light', dark: 'Dark' };
@@ -1104,8 +1266,9 @@ search_flights({
   function currentTheme() { return document.documentElement.dataset.theme || 'auto'; }
   function showTheme() {
     var theme = currentTheme();
-    themeButton.innerHTML = ICONS[theme] + ' ' + LABELS[theme];
-    themeButton.title = 'Theme: ' + LABELS[theme] + ' (click to change)';
+    themeButton.innerHTML = ICONS[theme];
+    themeButton.title = 'Colour theme: ' + LABELS[theme] + ' (click to change)';
+    themeButton.setAttribute('aria-label', 'Colour theme: ' + LABELS[theme]);
   }
   if (themeButton) {
     showTheme();
@@ -1117,8 +1280,6 @@ search_flights({
       showTheme();
     });
   }
-  window.addEventListener('hashchange', apply);
-  apply();
 })();
 </script>
 </body>
