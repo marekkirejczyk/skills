@@ -78,7 +78,7 @@ Finds concepts implemented more than once, even when the copies are written diff
 
 ## /eval-report: evals you can review in a minute
 
-One static HTML page per eval run, built for scrolling: green and red pass totals at the top, a collapsible group per eval file, and one row per round with its input, output, every judge and check on a green or red background, and the tools it mocked with what they gave. Filters show only the failed rounds, or only the cases new or changed in a commit or PR. Each case links to its code on GitHub.
+One static HTML page per eval run, built for scrolling: green and red pass totals at the top, a collapsible group per eval file, and one row per round with its input, output, every judge and check on a green or red background, and the tools it mocked with what they gave. Filters show only the failed cases (one failed round is enough), or only the cases new or changed in a commit or PR. Tick rounds, cases or files as reviewed: the ticks stay in your browser across reports, and clear when a round's output changes. Each case links to its code on GitHub.
 
 ```
 /eval-report                     # run every eval, report on all of them

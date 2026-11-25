@@ -1,7 +1,7 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { buildReport } from '../scripts/lib/load.mjs';
-import { formatDuration, formatText, renderHtml, renderInput, renderOutput, summarizeResult } from '../scripts/lib/render-html.mjs';
+import { fingerprint, formatDuration, formatText, renderHtml, renderInput, renderOutput, summarizeResult } from '../scripts/lib/render-html.mjs';
 
 test('formatText makes paragraphs, lists, bold and code, and escapes HTML', () => {
   assert.equal(formatText('Hi **you**\n\n- one\n- `two`\n1. three'),
@@ -73,4 +73,30 @@ test('the page has a theme switch, and dark colours for both the system setting 
   assert.match(html, /data-theme-switch/);
   assert.match(html, /:root:not\(\[data-theme="light"\]\)/);
   assert.match(html, /:root\[data-theme="dark"\]/);
+});
+
+test('a case with one failed round is a failed case, for colour and for the filter', () => {
+  const html = renderHtml(buildReport([
+    { file: 'a', name: 'flaky', checks: [{ label: 'x', pass: true }] },
+    { file: 'a', name: 'flaky', checks: [{ label: 'x', pass: false }] },
+  ]));
+  assert.match(html, /<tbody class="case" id="a-flaky" data-pass="0"/);
+  assert.match(html, /<div class="case-title is-fail">/);
+});
+
+test('every round, case and file has a review box, and the store is per repository', () => {
+  const report = sample();
+  report.meta.repo = 'o/r';
+  const html = renderHtml(report);
+  assert.equal((html.match(/data-review>/g) || []).length, 2);
+  assert.equal((html.match(/data-review-case aria-label/g) || []).length, 2);
+  assert.match(html, /data-review-file/);
+  assert.match(html, /data-review-store="eval-report-reviewed:o\/r"/);
+  assert.match(html, /data-key="a-eval-ts-ok#1" data-fingerprint="[0-9a-f]{12}"/);
+});
+
+test('the fingerprint of a round changes when its output changes, and only then', () => {
+  const run = { input: 'q', output: { text: 'a' }, checks: [], mocks: [] };
+  assert.equal(fingerprint(run), fingerprint({ ...run }));
+  assert.notEqual(fingerprint(run), fingerprint({ ...run, output: { text: 'b' } }));
 });

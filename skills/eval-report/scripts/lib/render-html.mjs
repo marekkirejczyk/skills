@@ -1,5 +1,6 @@
 // Renders the report model as one static HTML page. The page's style and
 // filter script live in ../../assets and are inlined, so the file stands alone.
+import { createHash } from 'node:crypto';
 import { readFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import { stats } from './load.mjs';
@@ -159,9 +160,17 @@ function renderMocks(mocks) {
   return `${lines}<details class="raw"><summary>Arguments and results</summary><pre class="json">${escape(raw)}</pre></details>`;
 }
 
-function renderRun(run, fresh) {
-  return `<tr class="run" data-pass="${run.pass ? 1 : 0}" data-fresh="${fresh ? 1 : 0}">
-<td><div class="run-label ${run.pass ? 'is-pass' : 'is-fail'}">Round ${escape(run.round)} · ${run.pass ? 'passed' : 'failed'}${run.durationMs != null ? ` · ${formatDuration(run.durationMs)}` : ''}</div>${renderInput(run.input)}</td>
+// A review tick belongs to this exact round: if its input, output, checks or
+// tools change in a later run, the fingerprint changes and the tick clears.
+export function fingerprint(run) {
+  return createHash('sha1').update(JSON.stringify([run.input, run.output, run.checks, run.mocks])).digest('hex').slice(0, 12);
+}
+
+function renderRun(run, evalCase) {
+  return `<tr class="run" data-pass="${run.pass ? 1 : 0}" data-key="${escape(`${evalCase.id}#${run.round}`)}" data-fingerprint="${fingerprint(run)}">
+<td><div class="run-label"><label class="review"><input type="checkbox" data-review> Reviewed</label>
+<span class="${run.pass ? 'is-pass' : 'is-fail'}">Round ${escape(run.round)} · ${run.pass ? 'passed' : 'failed'}${run.durationMs != null ? ` · ${formatDuration(run.durationMs)}` : ''}</span></div>
+<div class="changed-since" hidden>Changed since you reviewed it</div>${renderInput(run.input)}</td>
 <td class="output">${renderOutput(run.output)}</td>
 <td class="checks">${renderChecks(run.checks)}</td>
 <td>${renderMocks(run.mocks)}</td>
@@ -173,9 +182,9 @@ function renderCase(evalCase) {
   const code = evalCase.codeUrl
     ? `<a class="code-link" href="${escape(evalCase.codeUrl)}" target="_blank" rel="noopener">${escape(evalCase.fileName)}${evalCase.line ? `:${evalCase.line}` : ''} ↗</a>`
     : `<span class="code-link muted">${escape(evalCase.fileName)}${evalCase.line ? `:${evalCase.line}` : ''}</span>`;
-  return `<tbody class="case" id="${escape(evalCase.id)}" data-fresh="${fresh ? 1 : 0}">
+  return `<tbody class="case" id="${escape(evalCase.id)}" data-pass="${evalCase.pass ? 1 : 0}" data-fresh="${fresh ? 1 : 0}">
 <tr class="case-head"><td colspan="4">
-<div class="case-title ${evalCase.pass ? 'is-pass' : 'is-fail'}">${evalCase.pass ? ICON.passBig : ICON.failBig}
+<div class="case-title ${evalCase.pass ? 'is-pass' : 'is-fail'}"><input type="checkbox" class="review-all" data-review-case aria-label="Mark every round of this case reviewed">${evalCase.pass ? ICON.passBig : ICON.failBig}
 <a class="case-name" href="#${escape(evalCase.id)}">${escape(evalCase.name)}</a>
 <span class="badge ${passClass(evalCase.runsPassed, evalCase.runs.length)}">${evalCase.runsPassed} / ${evalCase.runs.length} rounds</span>
 ${fresh ? `<span class="tag">${fresh === 'new' ? 'New' : 'Changed'}</span>` : ''}
@@ -183,16 +192,16 @@ ${fresh ? `<span class="tag">${fresh === 'new' ? 'New' : 'Changed'}</span>` : ''
 ${evalCase.rule ? `<div class="note"><b>Rule:</b> ${escape(evalCase.rule)}</div>` : ''}
 ${evalCase.knownBug ? `<div class="note"><b>Known bug:</b> ${escape(evalCase.knownBug)}</div>` : ''}
 </td></tr>
-${evalCase.runs.map((run) => renderRun(run, fresh)).join('\n')}
+${evalCase.runs.map((run) => renderRun(run, evalCase)).join('\n')}
 </tbody>`;
 }
 
 function renderFile(file) {
   for (const evalCase of file.cases) evalCase.fileName = file.path.split('/').pop();
   return `<details class="file" open data-path="${escape(file.path)}">
-<summary>${ICON.chevron}<code class="path">${escape(file.path)}</code>
+<summary><input type="checkbox" class="review-all" data-review-file aria-label="Mark every round in this file reviewed">${ICON.chevron}<code class="path">${escape(file.path)}</code>
 <span class="badge ${passClass(file.runsPassed, file.runs)}" data-badge>${file.runsPassed} / ${file.runs}</span>
-<span class="spacer"></span><span class="muted small">${file.cases.length} ${file.cases.length === 1 ? 'case' : 'cases'}</span></summary>
+<span class="spacer"></span><span class="muted small">${file.cases.length} ${file.cases.length === 1 ? 'case' : 'cases'} · <span data-file-reviewed>0</span> / ${file.runs} reviewed</span></summary>
 <div class="table-box"><table class="runs">
 <colgroup><col class="c-in"><col class="c-out"><col class="c-chk"><col class="c-mock"></colgroup>
 <thead><tr><th>Input</th><th>Output</th><th>Judges and checks</th><th>Mocks: tools run, what they gave</th></tr></thead>
@@ -230,7 +239,7 @@ export function renderHtml(report, { scope = null } = {}) {
 <script>try { var t = localStorage.getItem('eval-report-theme'); if (t === 'light' || t === 'dark') document.documentElement.dataset.theme = t; } catch (e) {}</script>
 <style>${css()}</style>
 </head>
-<body>
+<body data-review-store="${escape(`eval-report-reviewed:${meta.repo || 'local'}`)}">
 <header class="top"><div class="wrap top-row">
 <div class="top-text">
 <div class="context">${headerContext(meta)}</div>
@@ -244,6 +253,9 @@ export function renderHtml(report, { scope = null } = {}) {
 <div class="tile"><div class="label">Cases passed</div>
 <div class="big"><span class="${passClass(totals.casesPassed, totals.cases)}">${totals.casesPassed}</span><span class="of">/ ${totals.cases}</span></div>
 <div class="muted small">A case passes when every round passes</div></div>
+<div class="tile"><div class="label">Reviewed by you</div>
+<div class="big"><span data-reviewed-count>0</span><span class="of">/ ${totals.runs}</span></div>
+<div class="bar review-bar"><div data-reviewed-bar style="width:0%"></div></div></div>
 ${scope ? `<div class="tile"><div class="label">New or changed in ${escape(scopeLabel)}</div>
 <div class="big"><span class="${passClass(totals.freshRunsPassed, totals.freshRuns)}">${totals.freshRunsPassed}</span><span class="of">/ ${totals.freshRuns}</span></div>
 <div class="muted small">${totals.freshCases} ${totals.freshCases === 1 ? 'case' : 'cases'}</div></div>` : ''}
@@ -255,12 +267,15 @@ ${scope ? `<div class="tile"><div class="label">New or changed in ${escape(scope
 ${scope ? `<div class="seg-group"><span class="label">Scope</span><div class="seg" role="group" aria-label="Scope">
 <button type="button" data-scope="all">All <span class="count"></span></button><button type="button" data-scope="fresh">New or changed <span class="count"></span></button>
 </div></div>` : ''}
+<div class="seg-group"><span class="label">Review</span><div class="seg" role="group" aria-label="Review">
+<button type="button" data-review-filter="all">All <span class="count"></span></button><button type="button" data-review-filter="todo">Not reviewed <span class="count"></span></button><button type="button" data-review-filter="done">Reviewed <span class="count"></span></button>
+</div></div>
 <span class="spacer"></span>
 <button type="button" class="btn" data-expand="1">Expand all</button><button type="button" class="btn" data-expand="0">Collapse all</button>
-<button type="button" class="btn theme" data-theme-switch aria-label="Colour theme">Auto</button>
+<button type="button" class="btn theme" data-theme-switch aria-label="Colour theme: Auto" title="Colour theme: Auto"></button>
 </div></nav>
 <main class="wrap">
-<div class="empty" hidden>No rounds match these filters.</div>
+<div class="empty" hidden>No cases match these filters.</div>
 ${report.files.length ? report.files.map(renderFile).join('\n') : '<div class="empty">No eval results.</div>'}
 </main>
 <footer class="wrap muted small">Generated by eval-report · no model tokens used</footer>

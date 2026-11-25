@@ -1,56 +1,76 @@
-// Filters (status, scope) and expand/collapse. State lives in the URL hash,
-// e.g. #status=failed&scope=fresh, so a filtered view can be linked.
+// Filters, review ticks, expand/collapse and the theme switch.
+// Filter state lives in the URL hash (#status=failed&scope=fresh&review=todo),
+// so a filtered view can be linked. Review ticks and the theme live in this
+// browser's localStorage, so they are per person and survive new reports.
 (function () {
-  var runs = Array.prototype.slice.call(document.querySelectorAll('tr.run'));
-  var cases = Array.prototype.slice.call(document.querySelectorAll('tbody.case'));
-  var files = Array.prototype.slice.call(document.querySelectorAll('details.file'));
-  var statusButtons = Array.prototype.slice.call(document.querySelectorAll('[data-status]'));
-  var scopeButtons = Array.prototype.slice.call(document.querySelectorAll('[data-scope]'));
+  var all = function (selector, root) { return Array.prototype.slice.call((root || document).querySelectorAll(selector)); };
+  var files = all('details.file');
+  var cases = all('tbody.case');
+  var rounds = all('tr.run');
   var empty = document.querySelector('.empty[hidden]');
+  var hasScope = all('[data-scope]').length > 0;
 
+  // ---- Review ticks: { "<case id>#<round>": "<fingerprint>" } ----
+  var storeKey = document.body.dataset.reviewStore || 'eval-report-reviewed';
+  var reviewed = {};
+  try { reviewed = JSON.parse(localStorage.getItem(storeKey) || '{}') || {}; } catch (e) { reviewed = {}; }
+  function save() { try { localStorage.setItem(storeKey, JSON.stringify(reviewed)); } catch (e) {} }
+  function isReviewed(row) { return reviewed[row.dataset.key] === row.dataset.fingerprint; }
+  function setReviewed(row, on) {
+    if (on) reviewed[row.dataset.key] = row.dataset.fingerprint;
+    else delete reviewed[row.dataset.key];
+  }
+
+  // ---- Filters ----
   function readState() {
     var params = new URLSearchParams(location.hash.replace(/^#/, ''));
     var status = params.get('status');
-    var scope = params.get('scope');
+    var review = params.get('review');
     return {
       status: status === 'passed' || status === 'failed' ? status : 'all',
-      scope: scope === 'fresh' && scopeButtons.length ? 'fresh' : 'all',
+      scope: params.get('scope') === 'fresh' && hasScope ? 'fresh' : 'all',
+      review: review === 'todo' || review === 'done' ? review : 'all',
     };
   }
-
-  function matchesStatus(row, status) {
-    return status === 'all' || (status === 'passed') === (row.dataset.pass === '1');
+  // Status and scope are about the whole case: one failed round makes it a failed case.
+  function caseMatches(body, state) {
+    var statusOk = state.status === 'all' || (state.status === 'passed') === (body.dataset.pass === '1');
+    var scopeOk = state.scope === 'all' || body.dataset.fresh === '1';
+    return statusOk && scopeOk;
   }
-  function matchesScope(row, scope) {
-    return scope === 'all' || row.dataset.fresh === '1';
+  // Review is about each round.
+  function roundMatches(row, review) {
+    return review === 'all' || (review === 'done') === isReviewed(row);
+  }
+  function visibleCases(state) {
+    return cases.filter(function (body) {
+      return caseMatches(body, state) && all('tr.run', body).some(function (row) { return roundMatches(row, state.review); });
+    });
   }
 
   function apply() {
     var state = readState();
-    var shown = 0;
-    runs.forEach(function (row) {
-      var visible = matchesStatus(row, state.status) && matchesScope(row, state.scope);
-      row.hidden = !visible;
-      if (visible) shown++;
+    var shown = visibleCases(state);
+    cases.forEach(function (body) {
+      var visible = shown.indexOf(body) >= 0;
+      body.hidden = !visible;
+      all('tr.run', body).forEach(function (row) { row.hidden = !visible || !roundMatches(row, state.review); });
     });
-    cases.forEach(function (body) { body.hidden = !body.querySelector('tr.run:not([hidden])'); });
     files.forEach(function (file) { file.hidden = !file.querySelector('tbody.case:not([hidden])'); });
-    if (empty) empty.hidden = shown > 0;
+    if (empty) empty.hidden = shown.length > 0;
 
-    statusButtons.forEach(function (button) {
-      var value = button.dataset.status;
-      button.setAttribute('aria-pressed', String(value === state.status));
-      button.querySelector('.count').textContent = runs.filter(function (row) {
-        return matchesStatus(row, value) && matchesScope(row, state.scope);
-      }).length;
+    [['status', ['all', 'passed', 'failed']], ['scope', ['all', 'fresh']], ['review', ['all', 'todo', 'done']]].forEach(function (group) {
+      var key = group[0];
+      group[1].forEach(function (value) {
+        var button = document.querySelector('[data-' + (key === 'review' ? 'review-filter' : key) + '="' + value + '"]');
+        if (!button) return;
+        var other = Object.assign({}, state);
+        other[key] = value;
+        button.setAttribute('aria-pressed', String(state[key] === value));
+        button.querySelector('.count').textContent = visibleCases(other).length;
+      });
     });
-    scopeButtons.forEach(function (button) {
-      var value = button.dataset.scope;
-      button.setAttribute('aria-pressed', String(value === state.scope));
-      button.querySelector('.count').textContent = runs.filter(function (row) {
-        return matchesScope(row, value) && matchesStatus(row, state.status);
-      }).length;
-    });
+    showReview();
   }
 
   function setState(key, value) {
@@ -59,19 +79,76 @@
     var parts = [];
     if (state.status !== 'all') parts.push('status=' + state.status);
     if (state.scope !== 'all') parts.push('scope=' + state.scope);
+    if (state.review !== 'all') parts.push('review=' + state.review);
     history.replaceState(null, '', parts.length ? '#' + parts.join('&') : location.pathname + location.search);
     apply();
   }
 
-  statusButtons.forEach(function (b) { b.addEventListener('click', function () { setState('status', b.dataset.status); }); });
-  scopeButtons.forEach(function (b) { b.addEventListener('click', function () { setState('scope', b.dataset.scope); }); });
-  Array.prototype.forEach.call(document.querySelectorAll('[data-expand]'), function (b) {
+  // ---- Review display: boxes, dimmed rows, counts ----
+  function setGroupBox(box, rows) {
+    var done = rows.filter(isReviewed).length;
+    box.checked = done > 0 && done === rows.length;
+    box.indeterminate = done > 0 && done < rows.length;
+  }
+  function showReview() {
+    rounds.forEach(function (row) {
+      var done = isReviewed(row);
+      row.classList.toggle('is-reviewed', done);
+      row.querySelector('[data-review]').checked = done;
+      // Ticked in an earlier report, but this round has changed since.
+      row.querySelector('.changed-since').hidden = done || !(row.dataset.key in reviewed);
+    });
+    cases.forEach(function (body) { setGroupBox(body.querySelector('[data-review-case]'), all('tr.run', body)); });
+    files.forEach(function (file) {
+      var rows = all('tr.run', file);
+      setGroupBox(file.querySelector('[data-review-file]'), rows);
+      file.querySelector('[data-file-reviewed]').textContent = rows.filter(isReviewed).length;
+    });
+    var count = rounds.filter(isReviewed).length;
+    var countEl = document.querySelector('[data-reviewed-count]');
+    if (countEl) countEl.textContent = count;
+    var bar = document.querySelector('[data-reviewed-bar]');
+    if (bar) bar.style.width = (rounds.length ? (100 * count) / rounds.length : 0) + '%';
+  }
+
+  function tick(rows, on) {
+    rows.forEach(function (row) { setReviewed(row, on); });
+    save();
+    apply();
+  }
+  rounds.forEach(function (row) {
+    row.querySelector('[data-review]').addEventListener('change', function (event) { tick([row], event.target.checked); });
+  });
+  cases.forEach(function (body) {
+    body.querySelector('[data-review-case]').addEventListener('change', function (event) { tick(all('tr.run', body), event.target.checked); });
+  });
+  files.forEach(function (file) {
+    var box = file.querySelector('[data-review-file]');
+    // A click on the box must not also open or close the file.
+    box.addEventListener('click', function (event) { event.stopPropagation(); });
+    box.addEventListener('change', function (event) { tick(all('tr.run', file), event.target.checked); });
+  });
+
+  // ---- Wiring ----
+  all('[data-status]').forEach(function (b) { b.addEventListener('click', function () { setState('status', b.dataset.status); }); });
+  all('[data-scope]').forEach(function (b) { b.addEventListener('click', function () { setState('scope', b.dataset.scope); }); });
+  all('[data-review-filter]').forEach(function (b) { b.addEventListener('click', function () { setState('review', b.dataset.reviewFilter); }); });
+  all('[data-expand]').forEach(function (b) {
     b.addEventListener('click', function () {
       var open = b.dataset.expand === '1';
       files.forEach(function (file) { file.open = open; });
     });
   });
-  // Theme: Auto (the system's) → Light → Dark, remembered in this browser.
+  window.addEventListener('hashchange', apply);
+
+  // A file you have fully reviewed starts collapsed.
+  files.forEach(function (file) {
+    var rows = all('tr.run', file);
+    if (rows.length && rows.every(isReviewed)) file.open = false;
+  });
+  apply();
+
+  // ---- Theme: Auto (the system's) → Light → Dark ----
   var themeButton = document.querySelector('[data-theme-switch]');
   var THEMES = ['auto', 'light', 'dark'];
   var LABELS = { auto: 'Auto', light: 'Light', dark: 'Dark' };
@@ -83,8 +160,9 @@
   function currentTheme() { return document.documentElement.dataset.theme || 'auto'; }
   function showTheme() {
     var theme = currentTheme();
-    themeButton.innerHTML = ICONS[theme] + ' ' + LABELS[theme];
-    themeButton.title = 'Theme: ' + LABELS[theme] + ' (click to change)';
+    themeButton.innerHTML = ICONS[theme];
+    themeButton.title = 'Colour theme: ' + LABELS[theme] + ' (click to change)';
+    themeButton.setAttribute('aria-label', 'Colour theme: ' + LABELS[theme]);
   }
   if (themeButton) {
     showTheme();
@@ -96,6 +174,4 @@
       showTheme();
     });
   }
-  window.addEventListener('hashchange', apply);
-  apply();
 })();
