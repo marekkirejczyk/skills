@@ -40,7 +40,7 @@ export default [
         buyer('Hi, I returned a car last week.'),
         assistant('Sorry it didn’t work out. Which email did you order with?'),
         buyer('buyer@example.com'),
-        assistant('Thanks. Was it the 2017 Ford Focus delivered on 20 November?'),
+        assistant('Thanks. Was it this one?', [{ type: 'card', title: 'Order 55102', body: '2017 Ford Focus, delivered on 20 November', options: ['Yes', 'No'] }]),
         buyer('Yes. When will I get the money?'),
       ],
       output: 'Your refund of **£8,450** was sent on 24 November. Banks usually take 3–5 working days, so it should arrive by 29 November.',

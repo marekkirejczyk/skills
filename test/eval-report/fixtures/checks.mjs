@@ -4,5 +4,5 @@ export const judge = (name, passed = true, reason) => ({ kind: 'judge', name, pa
 export const exact = (name, passed = true, reason) => ({ kind: 'exact', name, passed, reason });
 export const mock = (tool, args, result, extra = {}) => ({ tool, args, result, ...extra });
 export const buyer = (text) => ({ role: 'buyer', text });
-export const assistant = (text) => ({ role: 'assistant', text });
+export const assistant = (text, blocks) => ({ role: 'assistant', text, ...(blocks ? { blocks } : {}) });
 export const EVERY_REPLY = exact('the 6 rules for every reply');
