@@ -67,3 +67,10 @@ test('the scope filter and tile appear only when a scope is given', () => {
   assert.match(scoped, /data-scope="fresh"/);
   assert.match(scoped, /New or changed in this PR/);
 });
+
+test('the page has a theme switch, and dark colours for both the system setting and the switch', () => {
+  const html = renderHtml(sample());
+  assert.match(html, /data-theme-switch/);
+  assert.match(html, /:root:not\(\[data-theme="light"\]\)/);
+  assert.match(html, /:root\[data-theme="dark"\]/);
+});

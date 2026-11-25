@@ -227,6 +227,7 @@ export function renderHtml(report, { scope = null } = {}) {
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>${escape(title)}</title>
+<script>try { var t = localStorage.getItem('eval-report-theme'); if (t === 'light' || t === 'dark') document.documentElement.dataset.theme = t; } catch (e) {}</script>
 <style>${css()}</style>
 </head>
 <body>
@@ -256,6 +257,7 @@ ${scope ? `<div class="seg-group"><span class="label">Scope</span><div class="se
 </div></div>` : ''}
 <span class="spacer"></span>
 <button type="button" class="btn" data-expand="1">Expand all</button><button type="button" class="btn" data-expand="0">Collapse all</button>
+<button type="button" class="btn theme" data-theme-switch aria-label="Colour theme">Auto</button>
 </div></nav>
 <main class="wrap">
 <div class="empty" hidden>No rounds match these filters.</div>
