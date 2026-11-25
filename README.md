@@ -78,7 +78,7 @@ Finds concepts implemented more than once, even when the copies are written diff
 
 ## /eval-report: evals you can review in a minute
 
-Runs your evals and builds one static HTML page from what they recorded: pass counts at the top, a collapsible section per eval file, and a row per run with its input, output, judges and checks (green or red), and the tools it called with what they gave. Filter to failed runs, or to cases new or changed in the commit or PR; each case links to its code. A script does the work, so it costs no tokens.
+Runs your evals and builds one static HTML page from what they recorded: pass counts at the top, a collapsible section per eval file, and a row per run with its input, output, judges and checks (green or red), and the tools it called with what they gave. Filter to failed runs, to cases new or changed in the commit or PR, or to what you haven't reviewed yet: tick runs as reviewed, and a tick clears itself when that run's result changes. Each case links to its code; light and dark themes. A script does the work, so it costs no tokens.
 
 ```
 /eval-report                  # every eval

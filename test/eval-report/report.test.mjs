@@ -6,6 +6,7 @@ import { execFileSync } from 'node:child_process';
 import { mkdtempSync, readFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
+import { runFingerprint } from '../../skills/eval-report/scripts/lib/report.mjs';
 
 const CLI = 'skills/eval-report/scripts/eval-report.mjs';
 const CONFIG = 'test/eval-report/fixtures/eval-report.json';
@@ -42,8 +43,29 @@ describe('eval-report.mjs run on the fixture evals', () => {
     assert.doesNotMatch(page, /data-filter="scope"/);
   });
 
+  it('has a review tick per run, keyed by file, case and round', () => {
+    assert.equal(page.match(/class="review-box" data-review-run/g).length, 28);
+    assert.match(page, /data-key="test\/eval-report\/fixtures\/evals\/cars-search.eval.mjs::a full postcode and distance go into the searches#2"/);
+  });
+
   it('loads nothing from the network', () => {
     assert.doesNotMatch(page, /<(script|link)[^>]+(src|href)="http/);
+  });
+});
+
+describe('runFingerprint', () => {
+  const run = { input: 'hi', output: 'hello', error: '', checks: [{ name: 'a', passed: true }], mocks: [], durationMs: 10 };
+
+  it('is the same for the same round', () => {
+    assert.equal(runFingerprint(run), runFingerprint({ ...run }));
+  });
+
+  it('ignores how long the round took', () => {
+    assert.equal(runFingerprint(run), runFingerprint({ ...run, durationMs: 99 }));
+  });
+
+  it('changes when the output changes', () => {
+    assert.notEqual(runFingerprint(run), runFingerprint({ ...run, output: 'hello!' }));
   });
 });
 
