@@ -4,7 +4,7 @@ A **browser test** drives a real browser with Playwright through the whole app, 
 
 Browser tests are the slowest and the fewest. **Push down** leaves here one journey per critical flow and what needs a real browser, so each decision and edge case is proved at a faster level, and these tests prove that the pieces work together.
 
-Browser tests are **optional**. This file applies to the browser tests already in scope, and its **Cases** to the flows they cover. A project or flow without browser tests stays without them, and a missing one is not a gap.
+Browser tests are **optional**. This file applies to the browser tests already in scope, and its **Cases** to the flows they cover. A project or flow without browser tests stays without them, and a missing one is not a gap. **Never add the first browser test to a project**, nor Playwright, its config or a `webServer`: a case only a browser could prove goes in the report as untested.
 
 ## Rules
 

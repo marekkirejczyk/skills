@@ -18,6 +18,8 @@ Each **test type** has its own file next to this one: what the type checks, its 
 
 Web component tests have no file here. **Push down** and the speed table apply to them, and those that stay are left as written.
 
+**Never add browser tests to a project that has none.** No Playwright, no browser test files: write no browser test, add no Playwright dependency or config, and leave `browser.md` unread. A case only a browser could prove goes in the report as untested.
+
 ## Goal
 
 The **scope** is what you were asked to write or refactor tests for: a file, a class, or a branch's changes. You are done when all four hold:
