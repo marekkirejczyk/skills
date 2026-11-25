@@ -48,7 +48,7 @@ function checkGroups(checks) {
     <div class="label">${capitalize(kind)}</div>
     ${items.map((check) => html`<div class="check ${check.passed ? 'pass' : 'fail'}${check.about ? ' has-about' : ''}"${check.about ? html` title="${check.about}"` : ''}>
       ${check.passed ? CHECK_PASS : CHECK_FAIL}
-      <div><div>${check.name}</div>${check.reason ? html`<div class="why">${check.reason}</div>` : ''}</div>
+      <div>${check.about ? html`<button type="button" class="about-button" aria-expanded="false">${check.name}</button>` : html`<div>${check.name}</div>`}${check.reason ? html`<div class="why">${check.reason}</div>` : ''}</div>
     </div>`)}
   </div>`);
 }

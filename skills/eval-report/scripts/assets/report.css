@@ -105,6 +105,9 @@ dl.pairs .json, li > .json { margin: 2px 0 4px; }
 .check.pass { background: var(--pass-bg); }
 .check.fail { background: var(--fail-bg); }
 .check.has-about { cursor: help; }
+.about-button { font: inherit; color: inherit; text-align: left; background: none; border: 0; min-height: 0; padding: 0; cursor: help; display: block; }
+.about-bubble { position: fixed; z-index: 10; box-sizing: border-box; background: light-dark(#1f2328, #f0f6fc); color: light-dark(#ffffff, #1f2328); border-radius: 6px; padding: 8px 10px; font-size: 12px; line-height: 1.5; white-space: pre-line; box-shadow: 0 8px 24px rgb(0 0 0 / 0.2); }
+.about-bubble[hidden] { display: none; }
 .why { font-size: 12px; color: var(--fail-text); margin-top: 2px; }
 .mock { font-size: 13px; margin-bottom: 4px; }
 .fake { font-size: 12px; color: var(--muted); font-style: italic; }

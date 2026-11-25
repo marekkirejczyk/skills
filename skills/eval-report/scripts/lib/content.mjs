@@ -54,21 +54,23 @@ export function summarizeValue(value, maxLength = 60) {
 const isPlain = (value) => value === null || ['string', 'number', 'boolean'].includes(typeof value);
 
 // One value of the JSON: a line for a plain one, a fold for an object or a list with
-// anything in it. `label` is the key it sits under, `comma` what follows it.
-function jsonNode(value, label, comma) {
+// anything in it. `key` is the key it sits under (its place, in a list), `label` how
+// that is written, `comma` what follows it. The key names the fold, so the page can
+// remember which ones a reader shut.
+function jsonNode(value, key, label, comma) {
   if (value === null || typeof value !== 'object') return html`<div class="json-line">${label}${JSON.stringify(value) ?? 'null'}${comma}</div>`;
   const isList = Array.isArray(value);
   const [opening, closing] = isList ? ['[', ']'] : ['{', '}'];
-  const entries = isList ? value.map((item) => ['', item]) : Object.entries(value).map(([key, item]) => [`${JSON.stringify(key)}: `, item]);
+  const entries = isList ? value.map((item, index) => [String(index), '', item]) : Object.entries(value).map(([name, item]) => [name, `${JSON.stringify(name)}: `, item]);
   if (entries.length === 0) return html`<div class="json-line">${label}${opening}${closing}${comma}</div>`;
-  const children = entries.map(([childLabel, item], index) => jsonNode(item, childLabel, index < entries.length - 1 ? ',' : ''));
-  return html`<details class="json-fold" open><summary data-folded=" … ${closing}${comma}">${label}${opening}</summary><div class="json-children">${children}</div><div class="json-line">${closing}${comma}</div></details>`;
+  const children = entries.map(([name, childLabel, item], index) => jsonNode(item, name, childLabel, index < entries.length - 1 ? ',' : ''));
+  return html`<details class="json-fold" data-key="${key}" open><summary data-folded=" … ${closing}${comma}">${label}${opening}</summary><div class="json-children">${children}</div><div class="json-line">${closing}${comma}</div></details>`;
 }
 
 // JSON as it is written, indented by two spaces, where each object and list folds
 // away under its first line. The indent is the stylesheet's, not spaces.
 export function renderJson(value) {
-  return html`<div class="json">${jsonNode(value, '', '')}</div>`;
+  return html`<div class="json">${jsonNode(value, '', '', '')}</div>`;
 }
 
 // A value inside a list or a pair: plain as it is, anything else as JSON.
