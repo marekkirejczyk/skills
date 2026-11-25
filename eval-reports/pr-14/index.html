@@ -87,7 +87,7 @@ table.runs td.checks { padding: 10px 12px; }
 .case-name { font-size: 15px; font-weight: 600; }
 .case-note { font-size: 13px; color: var(--muted); margin-top: 4px; }
 .case-note strong { color: var(--fg); }
-.run-label { font-size: 12px; font-weight: 600; margin-bottom: 6px; display: flex; justify-content: space-between; gap: 8px; align-items: center; }
+.run-label { font-size: 12px; font-weight: 600; margin-bottom: 6px; display: flex; justify-content: space-between; flex-wrap: wrap; gap: 2px 8px; align-items: center; }
 .run-label.pass { color: var(--pass-text); }
 .run-label.fail { color: var(--fail-text); }
 .message { margin-bottom: 8px; }
@@ -116,7 +116,7 @@ dl.pairs dd { margin: 0; }
 details.raw summary { cursor: pointer; color: var(--muted); font-size: 12px; margin-top: 6px; }
 pre.code { white-space: pre-wrap; background: var(--subtle); border: 1px solid var(--border); border-radius: 6px; padding: 8px; margin: 6px 0 8px; }
 input.review-box { width: 16px; height: 16px; margin: 0; flex: none; cursor: pointer; accent-color: var(--link); }
-.review { display: inline-flex; gap: 4px; align-items: center; color: var(--muted); font-weight: 500; cursor: pointer; }
+.review { white-space: nowrap; display: inline-flex; gap: 4px; align-items: center; color: var(--muted); font-weight: 500; cursor: pointer; }
 tr.run.is-reviewed > td { opacity: 0.55; }
 .changed-since { font-size: 12px; color: var(--link); margin-bottom: 6px; }
 .review-bar { background: var(--border); }
@@ -125,15 +125,70 @@ button.theme { padding: 4px 8px; }
 button.theme svg { fill: currentColor; }
 [hidden] { display: none !important; }
 @media (max-width: 1100px) { table.runs th { position: static; } }
-@media (max-width: 640px) { .wrap { padding: 0 16px; } .toolbar { position: static; } }
+
+.title-row { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+.visually-hidden { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+.dropdown, .header-theme, .passed-fold { display: none; }
+
+/* Phones: one row of dropdowns, and each run as a card of labelled sections instead of a table row. */
+@media (max-width: 640px) {
+  .wrap { padding: 0 16px; }
+  .top-inner { padding-top: 16px; padding-bottom: 16px; }
+  h1 { font-size: 20px; }
+  .header-theme { display: inline-flex; min-width: 44px; min-height: 44px; justify-content: center; }
+  .toolbar-theme, .wide-only, .filter .label, .segmented { display: none; }
+  .stats { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; width: 100%; }
+  .stat { min-width: 0; padding: 8px 10px; gap: 4px; }
+  .stat-value span:first-child { font-size: 22px; }
+
+  .toolbar-inner { flex-wrap: nowrap; overflow-x: auto; gap: 6px; padding-top: 8px; padding-bottom: 8px; }
+  .filter { flex: none; }
+  .dropdown { display: flex; position: relative; align-items: center; }
+  .dropdown::after { content: ""; position: absolute; right: 11px; width: 6px; height: 6px; border: solid currentColor; border-width: 0 1.5px 1.5px 0; transform: translateY(-2px) rotate(45deg); pointer-events: none; color: var(--fg); }
+  .dropdown:has(select.active)::after { color: var(--canvas); }
+  .dropdown select { appearance: none; -webkit-appearance: none; font: inherit; font-size: 13px; font-weight: 500; min-height: 36px; padding: 0 26px 0 10px; border-radius: 999px; border: 1px solid var(--border); background: var(--subtle); color: var(--fg); }
+  .dropdown select.active { background: var(--fg); color: var(--canvas); border-color: var(--fg); }
+
+  main.wrap { padding-top: 12px; gap: 12px; }
+  .file > summary { padding: 10px 12px; flex-wrap: wrap; row-gap: 0; }
+  .file > summary .spacer { display: none; }
+  /* One line, cut at the start so the file name stays visible. */
+  .file-path { flex: 1 1 0; min-width: 0; font-size: 13px; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; direction: rtl; text-align: left; }
+  .file > summary > .muted.small { flex-basis: 100%; order: 5; padding-left: 52px; }
+  .case-name { flex: 1 1 calc(100% - 64px); min-width: 0; line-height: 1.35; }
+  .table-scroll { overflow: visible; }
+  table.runs, table.runs tbody, table.runs tr, table.runs td { display: block; width: auto; min-width: 0; }
+  table.runs colgroup, table.runs thead { display: none; }
+  table.runs td { border-top: 0; padding: 0 12px 10px; }
+  .case-head td { border-top: 1px solid var(--border); padding: 10px 12px; }
+  tr.run { border-top: 1px solid var(--border); padding-top: 12px; }
+  table.runs td.input { display: flex; flex-direction: column; }
+  .run-label { order: -1; font-size: 13px; min-height: 44px; margin-bottom: 4px; cursor: pointer; }
+  .review { min-height: 44px; }
+  input.review-box { width: 20px; height: 20px; }
+  table.runs td[data-label]::before { content: attr(data-label); display: block; font-size: 11px; font-weight: 600; color: var(--muted); text-transform: uppercase; letter-spacing: 0.04em; margin-bottom: 2px; }
+  table.runs td.checks { padding: 0 12px 10px; }
+  .check-group .label { margin-left: 0; }
+
+  /* Failed checks in full; passed ones fold into one green line. */
+  .passed-fold { display: flex; gap: 8px; align-items: center; width: 100%; min-height: 32px; border: 0; border-radius: 6px; background: var(--pass-bg); color: var(--pass-text); font-size: 13px; text-align: left; }
+  td.checks:not(.show-passed) .check.pass, td.checks:not(.show-passed) .check-group:not(:has(.check.fail)) { display: none; }
+  td.checks.show-passed .passed-fold { display: none; }
+
+  /* A reviewed run folds to its status line until tapped. */
+  tr.run.is-reviewed:not(.open) > td:not(.input), tr.run.is-reviewed:not(.open) > td.input > :not(.run-label) { display: none; }
+  tr.run.is-reviewed:not(.open) > td.input::before { display: none; }
+  tr.run.is-reviewed > td { opacity: 1; }
+  tr.run.is-reviewed .run-label { opacity: 0.6; margin-bottom: 0; }
+}
 </style>
 </head>
 <body data-review-store="eval-report-reviewed:marekkirejczyk/skills">
 <header class="top"><div class="wrap top-inner">
   <div class="heading">
-    <div class="context"><a href="https://github.com/marekkirejczyk/skills">marekkirejczyk/skills</a><span class="muted">·</span><a href="https://github.com/marekkirejczyk/skills/pull/14">#14 eval-report 0.12.0: a readable HTML report of every eval run</a><span class="muted">·</span><a class="sha mono" href="https://github.com/marekkirejczyk/skills/commit/db91cdb34074d132ecdacd71e1b6ff654206b4b8">db91cdb</a></div>
-    <h1>Eval report: fixture evals</h1>
-    <div class="muted small">2026-11-25 17:27 UTC · 3 files · 20 cases · 28 runs · 2m 40s of runs</div>
+    <div class="context"><a href="https://github.com/marekkirejczyk/skills">marekkirejczyk/skills</a><span class="muted">·</span><a href="https://github.com/marekkirejczyk/skills/pull/14">#14 eval-report 0.12.0: a readable HTML report of every eval run</a><span class="muted">·</span><a class="sha mono" href="https://github.com/marekkirejczyk/skills/commit/0fb05aba07c379edb5bf03570298682198dc7641">0fb05ab</a></div>
+    <div class="title-row"><h1>Eval report: fixture evals</h1><button type="button" class="plain theme header-theme" data-theme-switch aria-label="Colour theme: system"><svg width="16" height="16" viewBox="0 0 16 16" aria-hidden="true"><path d="M8 0a8 8 0 1 1 0 16A8 8 0 0 1 8 0Zm0 1.5v13a6.5 6.5 0 0 0 0-13Z"/></svg></button></div>
+    <div class="muted small">2026-11-25 17:32 UTC · 3 files · 20 cases · 28 runs · 2m 40s of runs</div>
   </div>
   <div class="stats">
     <div class="stat">
@@ -159,19 +214,28 @@ button.theme svg { fill: currentColor; }
   </div>
 </div></header>
 <nav class="toolbar"><div class="wrap toolbar-inner">
-  <div class="filter"><span class="label">Status</span><div class="segmented" role="group" aria-label="status">
+  <div class="filter"><span class="label">Status</span><div class="segmented" role="group" aria-label="Status">
     <button type="button" data-filter="status" data-value="all" aria-pressed="true">All <span class="count"></span></button><button type="button" data-filter="status" data-value="passed" aria-pressed="">Passed <span class="count"></span></button><button type="button" data-filter="status" data-value="failed" aria-pressed="">Failed <span class="count"></span></button>
-  </div></div>
-  <div class="filter"><span class="label">Scope</span><div class="segmented" role="group" aria-label="scope">
+  </div>
+  <label class="dropdown"><span class="visually-hidden">Status</span><select data-filter-select="status">
+    <option value="all" data-label="Status">Status</option><option value="passed" data-label="Passed">Passed</option><option value="failed" data-label="Failed">Failed</option>
+  </select></label></div>
+  <div class="filter"><span class="label">Scope</span><div class="segmented" role="group" aria-label="Scope">
     <button type="button" data-filter="scope" data-value="all" aria-pressed="true">All <span class="count"></span></button><button type="button" data-filter="scope" data-value="changed" aria-pressed="">New or changed <span class="count"></span></button>
-  </div></div>
-  <div class="filter"><span class="label">Review</span><div class="segmented" role="group" aria-label="review">
+  </div>
+  <label class="dropdown"><span class="visually-hidden">Scope</span><select data-filter-select="scope">
+    <option value="all" data-label="Scope">Scope</option><option value="changed" data-label="New or changed">New or changed</option>
+  </select></label></div>
+  <div class="filter"><span class="label">Review</span><div class="segmented" role="group" aria-label="Review">
     <button type="button" data-filter="review" data-value="all" aria-pressed="true">All <span class="count"></span></button><button type="button" data-filter="review" data-value="todo" aria-pressed="">To review <span class="count"></span></button><button type="button" data-filter="review" data-value="done" aria-pressed="">Reviewed <span class="count"></span></button>
-  </div></div>
+  </div>
+  <label class="dropdown"><span class="visually-hidden">Review</span><select data-filter-select="review">
+    <option value="all" data-label="Review">Review</option><option value="todo" data-label="To review">To review</option><option value="done" data-label="Reviewed">Reviewed</option>
+  </select></label></div>
   <span class="spacer"></span>
-  <button type="button" class="plain" data-expand="true">Expand all</button>
-  <button type="button" class="plain" data-expand="false">Collapse all</button>
-  <button type="button" class="plain theme" data-theme-switch aria-label="Colour theme: system"><svg width="16" height="16" viewBox="0 0 16 16" aria-hidden="true"><path d="M8 0a8 8 0 1 1 0 16A8 8 0 0 1 8 0Zm0 1.5v13a6.5 6.5 0 0 0 0-13Z"/></svg></button>
+  <button type="button" class="plain wide-only" data-expand="true">Expand all</button>
+  <button type="button" class="plain wide-only" data-expand="false">Collapse all</button>
+  <button type="button" class="plain theme toolbar-theme" data-theme-switch aria-label="Colour theme: system"><svg width="16" height="16" viewBox="0 0 16 16" aria-hidden="true"><path d="M8 0a8 8 0 1 1 0 16A8 8 0 0 1 8 0Zm0 1.5v13a6.5 6.5 0 0 0 0-13Z"/></svg></button>
 </div></nav>
 <main class="wrap">
   <p class="empty no-match" hidden>No runs match these filters.</p>
@@ -196,23 +260,23 @@ button.theme svg { fill: currentColor; }
         <span class="badge fail">1 / 2 runs</span>
         <span class="tag">New</span>
         <span class="spacer"></span>
-        <a class="mono" href="https://github.com/marekkirejczyk/skills/blob/db91cdb34074d132ecdacd71e1b6ff654206b4b8/test/eval-report/fixtures/evals/cars-search.eval.mjs#L14">cars-search.eval.mjs:14 ↗</a>
+        <a class="mono" href="https://github.com/marekkirejczyk/skills/blob/0fb05aba07c379edb5bf03570298682198dc7641/test/eval-report/fixtures/evals/cars-search.eval.mjs#L14">cars-search.eval.mjs:14 ↗</a>
       </div>
       <div class="case-note"><strong>Rule:</strong> Instructions, ‘Searches on listing sites’: say what the cards are; never say you have found the cars behind a link</div>
       <div class="case-note"><strong>Note:</strong> Intermittent: Gemini sometimes counts the cars behind the links.</div>
     </td></tr>
     <tr class="run" data-passed="true" data-key="test/eval-report/fixtures/evals/cars-search.eval.mjs::searches are built from the brief, never said to be cars found#1" data-fingerprint="24f5a7a86214">
-    <td>
+    <td class="input" data-label="Input">
       <div class="run-label pass"><span>Run 1 · passed · 4.7s</span><label class="review"><input type="checkbox" class="review-box" data-review-run aria-label="Reviewed"> Reviewed</label></div>
       <div class="changed-since" hidden>Changed since you reviewed it</div>
       <p>I want a diesel Skoda Octavia estate, up to £12,000. Show me what’s out there.</p>
     </td>
-    <td class="output"><p>The sites we read don’t have any diesel Octavia estates under £12,000 right now. I’ve set up searches on Auto Trader, Gumtree and eBay below so you can look across the wider market.</p><p>What sort of mileage or gearbox did you have in mind?</p><div class="card">
+    <td class="output" data-label="Output"><p>The sites we read don’t have any diesel Octavia estates under £12,000 right now. I’ve set up searches on Auto Trader, Gumtree and eBay below so you can look across the wider market.</p><p>What sort of mileage or gearbox did you have in mind?</p><div class="card">
         <div class="card-title">3 search cards</div>
         <p>Skoda Octavia, diesel, up to £12,000 → autotrader.co.uk, gumtree.com, ebay.co.uk</p>
         
       </div></td>
-    <td class="checks"><div class="check-group">
+    <td class="checks" data-label="Judges and checks"><div class="check-group">
     <div class="label">Judge</div>
     <div class="check pass">
       <svg class="icon pass" width="14" height="14" viewBox="0 0 16 16" role="img" aria-label="passed"><path d="M13.78 4.22a.75.75 0 0 1 0 1.06l-7.25 7.25a.75.75 0 0 1-1.06 0L2.22 9.28a.75.75 0 0 1 1.06-1.06L6 10.94l6.72-6.72a.75.75 0 0 1 1.06 0Z"/></svg>
@@ -233,8 +297,8 @@ button.theme svg { fill: currentColor; }
       <svg class="icon pass" width="14" height="14" viewBox="0 0 16 16" role="img" aria-label="passed"><path d="M13.78 4.22a.75.75 0 0 1 0 1.06l-7.25 7.25a.75.75 0 0 1-1.06 0L2.22 9.28a.75.75 0 0 1 1.06-1.06L6 10.94l6.72-6.72a.75.75 0 0 1 1.06 0Z"/></svg>
       <div><div>the 6 rules for every reply</div></div>
     </div>
-  </div></td>
-    <td><div class="mock">
+  </div><button type="button" class="passed-fold" data-passed-fold><svg class="icon pass" width="14" height="14" viewBox="0 0 16 16" role="img" aria-label="passed"><path d="M13.78 4.22a.75.75 0 0 1 0 1.06l-7.25 7.25a.75.75 0 0 1-1.06 0L2.22 9.28a.75.75 0 0 1 1.06-1.06L6 10.94l6.72-6.72a.75.75 0 0 1 1.06 0Z"/></svg> 5 passed</button></td>
+    <td data-label="Tool calls"><div class="mock">
       <span class="mono strong">note_brief</span> <span class="muted">→</span> noted
       
     </div><div class="mock">
@@ -275,17 +339,17 @@ button.theme svg { fill: currentColor; }
   }
 ]</pre></details></td>
   </tr><tr class="run" data-passed="" data-key="test/eval-report/fixtures/evals/cars-search.eval.mjs::searches are built from the brief, never said to be cars found#2" data-fingerprint="014fc185dcd2">
-    <td>
+    <td class="input" data-label="Input">
       <div class="run-label fail"><span>Run 2 · failed · 5.4s</span><label class="review"><input type="checkbox" class="review-box" data-review-run aria-label="Reviewed"> Reviewed</label></div>
       <div class="changed-since" hidden>Changed since you reviewed it</div>
       <p>I want a diesel Skoda Octavia estate, up to £12,000. Show me what’s out there.</p>
     </td>
-    <td class="output"><p>I found <strong>14</strong> diesel Octavia estates under £12,000 across these sites:</p><div class="card">
+    <td class="output" data-label="Output"><p>I found <strong>14</strong> diesel Octavia estates under £12,000 across these sites:</p><div class="card">
         <div class="card-title">3 search cards</div>
         <p>Skoda Octavia, diesel, up to £12,000 → autotrader.co.uk, gumtree.com, ebay.co.uk</p>
         
       </div></td>
-    <td class="checks"><div class="check-group">
+    <td class="checks" data-label="Judges and checks"><div class="check-group">
     <div class="label">Judge</div>
     <div class="check fail">
       <svg class="icon fail" width="14" height="14" viewBox="0 0 16 16" role="img" aria-label="failed"><path d="M3.72 3.72a.75.75 0 0 1 1.06 0L8 6.94l3.22-3.22a.75.75 0 1 1 1.06 1.06L9.06 8l3.22 3.22a.75.75 0 1 1-1.06 1.06L8 9.06l-3.22 3.22a.75.75 0 0 1-1.06-1.06L6.94 8 3.72 4.78a.75.75 0 0 1 0-1.06Z"/></svg>
@@ -306,8 +370,8 @@ button.theme svg { fill: currentColor; }
       <svg class="icon pass" width="14" height="14" viewBox="0 0 16 16" role="img" aria-label="passed"><path d="M13.78 4.22a.75.75 0 0 1 0 1.06l-7.25 7.25a.75.75 0 0 1-1.06 0L2.22 9.28a.75.75 0 0 1 1.06-1.06L6 10.94l6.72-6.72a.75.75 0 0 1 1.06 0Z"/></svg>
       <div><div>the 6 rules for every reply</div></div>
     </div>
-  </div></td>
-    <td><div class="mock">
+  </div><button type="button" class="passed-fold" data-passed-fold><svg class="icon pass" width="14" height="14" viewBox="0 0 16 16" role="img" aria-label="passed"><path d="M13.78 4.22a.75.75 0 0 1 0 1.06l-7.25 7.25a.75.75 0 0 1-1.06 0L2.22 9.28a.75.75 0 0 1 1.06-1.06L6 10.94l6.72-6.72a.75.75 0 0 1 1.06 0Z"/></svg> 3 passed</button></td>
+    <td data-label="Tool calls"><div class="mock">
       <span class="mono strong">note_brief</span> <span class="muted">→</span> noted
       
     </div><div class="mock">
@@ -357,18 +421,18 @@ button.theme svg { fill: currentColor; }
         <span class="badge pass">2 / 2 runs</span>
         <span class="tag">New</span>
         <span class="spacer"></span>
-        <a class="mono" href="https://github.com/marekkirejczyk/skills/blob/db91cdb34074d132ecdacd71e1b6ff654206b4b8/test/eval-report/fixtures/evals/cars-search.eval.mjs#L37">cars-search.eval.mjs:37 ↗</a>
+        <a class="mono" href="https://github.com/marekkirejczyk/skills/blob/0fb05aba07c379edb5bf03570298682198dc7641/test/eval-report/fixtures/evals/cars-search.eval.mjs#L37">cars-search.eval.mjs:37 ↗</a>
       </div>
       <div class="case-note"><strong>Rule:</strong> Instructions, ‘Searches on listing sites’: give it their postcode with how far they will travel</div>
       
     </td></tr>
     <tr class="run" data-passed="true" data-key="test/eval-report/fixtures/evals/cars-search.eval.mjs::a full postcode and distance go into the searches#1" data-fingerprint="9b62785e6773">
-    <td>
+    <td class="input" data-label="Input">
       <div class="run-label pass"><span>Run 1 · passed · 4.7s</span><label class="review"><input type="checkbox" class="review-box" data-review-run aria-label="Reviewed"> Reviewed</label></div>
       <div class="changed-since" hidden>Changed since you reviewed it</div>
       <p>Petrol Ford Focus within 30 miles of LS1 4AP, up to £9,000 please.</p>
     </td>
-    <td class="output"><p class="muted no-words">(no words)</p><div class="card">
+    <td class="output" data-label="Output"><p class="muted no-words">(no words)</p><div class="card">
         <div class="card-title">Question card</div>
         <p>Which gearbox would you prefer?</p>
         <div class="chips"><span class="chip">Manual</span><span class="chip">Automatic</span><span class="chip">Either is fine</span></div>
@@ -377,7 +441,7 @@ button.theme svg { fill: currentColor; }
         <p>Ford Focus, petrol, up to £9,000, within 30 miles of LS1 4AP → autotrader.co.uk, gumtree.com, ebay.co.uk</p>
         
       </div></td>
-    <td class="checks"><div class="check-group">
+    <td class="checks" data-label="Judges and checks"><div class="check-group">
     <div class="label">Exact</div>
     <div class="check pass">
       <svg class="icon pass" width="14" height="14" viewBox="0 0 16 16" role="img" aria-label="passed"><path d="M13.78 4.22a.75.75 0 0 1 0 1.06l-7.25 7.25a.75.75 0 0 1-1.06 0L2.22 9.28a.75.75 0 0 1 1.06-1.06L6 10.94l6.72-6.72a.75.75 0 0 1 1.06 0Z"/></svg>
@@ -392,8 +456,8 @@ button.theme svg { fill: currentColor; }
       <svg class="icon pass" width="14" height="14" viewBox="0 0 16 16" role="img" aria-label="passed"><path d="M13.78 4.22a.75.75 0 0 1 0 1.06l-7.25 7.25a.75.75 0 0 1-1.06 0L2.22 9.28a.75.75 0 0 1 1.06-1.06L6 10.94l6.72-6.72a.75.75 0 0 1 1.06 0Z"/></svg>
       <div><div>the 6 rules for every reply</div></div>
     </div>
-  </div></td>
-    <td><div class="mock">
+  </div><button type="button" class="passed-fold" data-passed-fold><svg class="icon pass" width="14" height="14" viewBox="0 0 16 16" role="img" aria-label="passed"><path d="M13.78 4.22a.75.75 0 0 1 0 1.06l-7.25 7.25a.75.75 0 0 1-1.06 0L2.22 9.28a.75.75 0 0 1 1.06-1.06L6 10.94l6.72-6.72a.75.75 0 0 1 1.06 0Z"/></svg> 4 passed</button></td>
+    <td data-label="Tool calls"><div class="mock">
       <span class="mono strong">note_brief</span> <span class="muted">→</span> noted
       
     </div><div class="mock">
@@ -435,17 +499,17 @@ button.theme svg { fill: currentColor; }
   }
 ]</pre></details></td>
   </tr><tr class="run" data-passed="true" data-key="test/eval-report/fixtures/evals/cars-search.eval.mjs::a full postcode and distance go into the searches#2" data-fingerprint="ddaac5a6c6ce">
-    <td>
+    <td class="input" data-label="Input">
       <div class="run-label pass"><span>Run 2 · passed · 5.4s</span><label class="review"><input type="checkbox" class="review-box" data-review-run aria-label="Reviewed"> Reviewed</label></div>
       <div class="changed-since" hidden>Changed since you reviewed it</div>
       <p>Petrol Ford Focus within 30 miles of LS1 4AP, up to £9,000 please.</p>
     </td>
-    <td class="output"><p>Here are searches near Leeds. Manual or automatic?</p><div class="card">
+    <td class="output" data-label="Output"><p>Here are searches near Leeds. Manual or automatic?</p><div class="card">
         <div class="card-title">3 search cards</div>
         <p>Ford Focus, petrol, up to £9,000, within 30 miles of LS1 4AP → autotrader.co.uk, gumtree.com, ebay.co.uk</p>
         
       </div></td>
-    <td class="checks"><div class="check-group">
+    <td class="checks" data-label="Judges and checks"><div class="check-group">
     <div class="label">Exact</div>
     <div class="check pass">
       <svg class="icon pass" width="14" height="14" viewBox="0 0 16 16" role="img" aria-label="passed"><path d="M13.78 4.22a.75.75 0 0 1 0 1.06l-7.25 7.25a.75.75 0 0 1-1.06 0L2.22 9.28a.75.75 0 0 1 1.06-1.06L6 10.94l6.72-6.72a.75.75 0 0 1 1.06 0Z"/></svg>
@@ -460,8 +524,8 @@ button.theme svg { fill: currentColor; }
       <svg class="icon pass" width="14" height="14" viewBox="0 0 16 16" role="img" aria-label="passed"><path d="M13.78 4.22a.75.75 0 0 1 0 1.06l-7.25 7.25a.75.75 0 0 1-1.06 0L2.22 9.28a.75.75 0 0 1 1.06-1.06L6 10.94l6.72-6.72a.75.75 0 0 1 1.06 0Z"/></svg>
       <div><div>the 6 rules for every reply</div></div>
     </div>
-  </div></td>
-    <td><div class="mock">
+  </div><button type="button" class="passed-fold" data-passed-fold><svg class="icon pass" width="14" height="14" viewBox="0 0 16 16" role="img" aria-label="passed"><path d="M13.78 4.22a.75.75 0 0 1 0 1.06l-7.25 7.25a.75.75 0 0 1-1.06 0L2.22 9.28a.75.75 0 0 1 1.06-1.06L6 10.94l6.72-6.72a.75.75 0 0 1 1.06 0Z"/></svg> 4 passed</button></td>
+    <td data-label="Tool calls"><div class="mock">
       <span class="mono strong">note_brief</span> <span class="muted">→</span> noted
       
     </div><div class="mock">
@@ -502,23 +566,23 @@ button.theme svg { fill: currentColor; }
         <span class="badge pass">1 / 1 runs</span>
         <span class="tag">New</span>
         <span class="spacer"></span>
-        <a class="mono" href="https://github.com/marekkirejczyk/skills/blob/db91cdb34074d132ecdacd71e1b6ff654206b4b8/test/eval-report/fixtures/evals/cars-search.eval.mjs#L63">cars-search.eval.mjs:63 ↗</a>
+        <a class="mono" href="https://github.com/marekkirejczyk/skills/blob/0fb05aba07c379edb5bf03570298682198dc7641/test/eval-report/fixtures/evals/cars-search.eval.mjs#L63">cars-search.eval.mjs:63 ↗</a>
       </div>
       <div class="case-note"><strong>Rule:</strong> Instructions, ‘Searches on listing sites’: ask once for the full one, and offer the links without a location in the meantime</div>
       
     </td></tr>
     <tr class="run" data-passed="true" data-key="test/eval-report/fixtures/evals/cars-search.eval.mjs::nearby without a postcode: links without a place, postcode asked once#1" data-fingerprint="24e1222c116f">
-    <td>
+    <td class="input" data-label="Input">
       <div class="run-label pass"><span>Run 1 · passed · 4.7s</span><label class="review"><input type="checkbox" class="review-box" data-review-run aria-label="Reviewed"> Reviewed</label></div>
       <div class="changed-since" hidden>Changed since you reviewed it</div>
       <p>Anything near me? Around £7k, small hatchback.</p>
     </td>
-    <td class="output"><p>Here are searches for small hatchbacks up to £7,000 anywhere in the UK. What’s your full postcode, so I can narrow them to near you?</p><div class="card">
+    <td class="output" data-label="Output"><p>Here are searches for small hatchbacks up to £7,000 anywhere in the UK. What’s your full postcode, so I can narrow them to near you?</p><div class="card">
         <div class="card-title">3 search cards</div>
         <p>Hatchback, up to £7,000 → autotrader.co.uk, gumtree.com, ebay.co.uk</p>
         
       </div></td>
-    <td class="checks"><div class="check-group">
+    <td class="checks" data-label="Judges and checks"><div class="check-group">
     <div class="label">Judge</div>
     <div class="check pass">
       <svg class="icon pass" width="14" height="14" viewBox="0 0 16 16" role="img" aria-label="passed"><path d="M13.78 4.22a.75.75 0 0 1 0 1.06l-7.25 7.25a.75.75 0 0 1-1.06 0L2.22 9.28a.75.75 0 0 1 1.06-1.06L6 10.94l6.72-6.72a.75.75 0 0 1 1.06 0Z"/></svg>
@@ -536,8 +600,8 @@ button.theme svg { fill: currentColor; }
       <svg class="icon pass" width="14" height="14" viewBox="0 0 16 16" role="img" aria-label="passed"><path d="M13.78 4.22a.75.75 0 0 1 0 1.06l-7.25 7.25a.75.75 0 0 1-1.06 0L2.22 9.28a.75.75 0 0 1 1.06-1.06L6 10.94l6.72-6.72a.75.75 0 0 1 1.06 0Z"/></svg>
       <div><div>the 6 rules for every reply</div></div>
     </div>
-  </div></td>
-    <td><div class="mock">
+  </div><button type="button" class="passed-fold" data-passed-fold><svg class="icon pass" width="14" height="14" viewBox="0 0 16 16" role="img" aria-label="passed"><path d="M13.78 4.22a.75.75 0 0 1 0 1.06l-7.25 7.25a.75.75 0 0 1-1.06 0L2.22 9.28a.75.75 0 0 1 1.06-1.06L6 10.94l6.72-6.72a.75.75 0 0 1 1.06 0Z"/></svg> 4 passed</button></td>
+    <td data-label="Tool calls"><div class="mock">
       <span class="mono strong">note_brief</span> <span class="muted">→</span> noted
       
     </div><div class="mock">
@@ -574,19 +638,19 @@ button.theme svg { fill: currentColor; }
         <span class="badge fail">0 / 1 runs</span>
         <span class="tag">New</span>
         <span class="spacer"></span>
-        <a class="mono" href="https://github.com/marekkirejczyk/skills/blob/db91cdb34074d132ecdacd71e1b6ff654206b4b8/test/eval-report/fixtures/evals/cars-search.eval.mjs#L76">cars-search.eval.mjs:76 ↗</a>
+        <a class="mono" href="https://github.com/marekkirejczyk/skills/blob/0fb05aba07c379edb5bf03570298682198dc7641/test/eval-report/fixtures/evals/cars-search.eval.mjs#L76">cars-search.eval.mjs:76 ↗</a>
       </div>
       <div class="case-note"><strong>Rule:</strong> Instructions, ‘Searches on listing sites’: a district alone (LS1) is not enough for a radius</div>
       
     </td></tr>
     <tr class="run" data-passed="" data-key="test/eval-report/fixtures/evals/cars-search.eval.mjs::a partial postcode is completed by asking once#1" data-fingerprint="20b7b79a44ba">
-    <td>
+    <td class="input" data-label="Input">
       <div class="run-label fail"><span>Run 1 · failed · 4.7s</span><label class="review"><input type="checkbox" class="review-box" data-review-run aria-label="Reviewed"> Reviewed</label></div>
       <div class="changed-since" hidden>Changed since you reviewed it</div>
       <div class="message"><div class="who">buyer</div><p>Focus near LS1, 20 miles.</p></div><div class="message"><div class="who">assistant</div><p>What’s your full postcode?</p></div><div class="message"><div class="who">buyer</div><p>LS1</p></div>
     </td>
-    <td class="output"><p>What’s your full postcode? I need all of it, like LS1 4AP.</p></td>
-    <td class="checks"><div class="check-group">
+    <td class="output" data-label="Output"><p>What’s your full postcode? I need all of it, like LS1 4AP.</p></td>
+    <td class="checks" data-label="Judges and checks"><div class="check-group">
     <div class="label">Judge</div>
     <div class="check fail">
       <svg class="icon fail" width="14" height="14" viewBox="0 0 16 16" role="img" aria-label="failed"><path d="M3.72 3.72a.75.75 0 0 1 1.06 0L8 6.94l3.22-3.22a.75.75 0 1 1 1.06 1.06L9.06 8l3.22 3.22a.75.75 0 1 1-1.06 1.06L8 9.06l-3.22 3.22a.75.75 0 0 1-1.06-1.06L6.94 8 3.72 4.78a.75.75 0 0 1 0-1.06Z"/></svg>
@@ -601,8 +665,8 @@ button.theme svg { fill: currentColor; }
       <svg class="icon pass" width="14" height="14" viewBox="0 0 16 16" role="img" aria-label="passed"><path d="M13.78 4.22a.75.75 0 0 1 0 1.06l-7.25 7.25a.75.75 0 0 1-1.06 0L2.22 9.28a.75.75 0 0 1 1.06-1.06L6 10.94l6.72-6.72a.75.75 0 0 1 1.06 0Z"/></svg>
       <div><div>the 6 rules for every reply</div></div>
     </div>
-  </div></td>
-    <td><div class="mock">
+  </div><button type="button" class="passed-fold" data-passed-fold><svg class="icon pass" width="14" height="14" viewBox="0 0 16 16" role="img" aria-label="passed"><path d="M13.78 4.22a.75.75 0 0 1 0 1.06l-7.25 7.25a.75.75 0 0 1-1.06 0L2.22 9.28a.75.75 0 0 1 1.06-1.06L6 10.94l6.72-6.72a.75.75 0 0 1 1.06 0Z"/></svg> 1 passed</button></td>
+    <td data-label="Tool calls"><div class="mock">
       <span class="mono strong">note_brief</span> <span class="muted">→</span> noted
       
     </div>
@@ -627,19 +691,19 @@ button.theme svg { fill: currentColor; }
         <span class="badge pass">1 / 1 runs</span>
         <span class="tag">New</span>
         <span class="spacer"></span>
-        <a class="mono" href="https://github.com/marekkirejczyk/skills/blob/db91cdb34074d132ecdacd71e1b6ff654206b4b8/test/eval-report/fixtures/evals/cars-search.eval.mjs#L90">cars-search.eval.mjs:90 ↗</a>
+        <a class="mono" href="https://github.com/marekkirejczyk/skills/blob/0fb05aba07c379edb5bf03570298682198dc7641/test/eval-report/fixtures/evals/cars-search.eval.mjs#L90">cars-search.eval.mjs:90 ↗</a>
       </div>
       <div class="case-note"><strong>Rule:</strong> Instructions, ‘Budgets’: say what the budget buys instead, never just that it is too low</div>
       
     </td></tr>
     <tr class="run" data-passed="true" data-key="test/eval-report/fixtures/evals/cars-search.eval.mjs::a budget below the market is explained with what it buys#1" data-fingerprint="f6bac1720e0e">
-    <td>
+    <td class="input" data-label="Input">
       <div class="run-label pass"><span>Run 1 · passed · 4.7s</span><label class="review"><input type="checkbox" class="review-box" data-review-run aria-label="Reviewed"> Reviewed</label></div>
       <div class="changed-since" hidden>Changed since you reviewed it</div>
       <p>A 2022 BMW 3 Series for £5,000?</p>
     </td>
-    <td class="output"><p>£5,000 is well below what 2022 3 Series sell for. For that budget you could look at:</p><ul><li>a <strong>2012–2014 BMW 3 Series</strong> with higher mileage</li><li>a <strong>2017 Ford Focus</strong> or <strong>Vauxhall Astra</strong></li><li>a <strong>2016 Skoda Octavia</strong>, which holds up well</li></ul><p>Want searches for any of these?</p></td>
-    <td class="checks"><div class="check-group">
+    <td class="output" data-label="Output"><p>£5,000 is well below what 2022 3 Series sell for. For that budget you could look at:</p><ul><li>a <strong>2012–2014 BMW 3 Series</strong> with higher mileage</li><li>a <strong>2017 Ford Focus</strong> or <strong>Vauxhall Astra</strong></li><li>a <strong>2016 Skoda Octavia</strong>, which holds up well</li></ul><p>Want searches for any of these?</p></td>
+    <td class="checks" data-label="Judges and checks"><div class="check-group">
     <div class="label">Judge</div>
     <div class="check pass">
       <svg class="icon pass" width="14" height="14" viewBox="0 0 16 16" role="img" aria-label="passed"><path d="M13.78 4.22a.75.75 0 0 1 0 1.06l-7.25 7.25a.75.75 0 0 1-1.06 0L2.22 9.28a.75.75 0 0 1 1.06-1.06L6 10.94l6.72-6.72a.75.75 0 0 1 1.06 0Z"/></svg>
@@ -654,8 +718,8 @@ button.theme svg { fill: currentColor; }
       <svg class="icon pass" width="14" height="14" viewBox="0 0 16 16" role="img" aria-label="passed"><path d="M13.78 4.22a.75.75 0 0 1 0 1.06l-7.25 7.25a.75.75 0 0 1-1.06 0L2.22 9.28a.75.75 0 0 1 1.06-1.06L6 10.94l6.72-6.72a.75.75 0 0 1 1.06 0Z"/></svg>
       <div><div>the 6 rules for every reply</div></div>
     </div>
-  </div></td>
-    <td><div class="mock">
+  </div><button type="button" class="passed-fold" data-passed-fold><svg class="icon pass" width="14" height="14" viewBox="0 0 16 16" role="img" aria-label="passed"><path d="M13.78 4.22a.75.75 0 0 1 0 1.06l-7.25 7.25a.75.75 0 0 1-1.06 0L2.22 9.28a.75.75 0 0 1 1.06-1.06L6 10.94l6.72-6.72a.75.75 0 0 1 1.06 0Z"/></svg> 3 passed</button></td>
+    <td data-label="Tool calls"><div class="mock">
       <span class="mono strong">price_guide</span> <span class="muted">→</span> {&quot;low&quot;:21000,&quot;high&quot;:29500}
       <div class="fake">fake: priceGuide</div>
     </div>
@@ -683,19 +747,19 @@ button.theme svg { fill: currentColor; }
         <span class="badge pass">1 / 1 runs</span>
         <span class="tag">New</span>
         <span class="spacer"></span>
-        <a class="mono" href="https://github.com/marekkirejczyk/skills/blob/db91cdb34074d132ecdacd71e1b6ff654206b4b8/test/eval-report/fixtures/evals/cars-search.eval.mjs#L102">cars-search.eval.mjs:102 ↗</a>
+        <a class="mono" href="https://github.com/marekkirejczyk/skills/blob/0fb05aba07c379edb5bf03570298682198dc7641/test/eval-report/fixtures/evals/cars-search.eval.mjs#L102">cars-search.eval.mjs:102 ↗</a>
       </div>
       <div class="case-note"><strong>Rule:</strong> Instructions, ‘Makes and models’: ask when a model isn’t in the catalogue</div>
       
     </td></tr>
     <tr class="run" data-passed="true" data-key="test/eval-report/fixtures/evals/cars-search.eval.mjs::an unknown model name is checked, not guessed#1" data-fingerprint="a3d7f1dbefb3">
-    <td>
+    <td class="input" data-label="Input">
       <div class="run-label pass"><span>Run 1 · passed · 4.7s</span><label class="review"><input type="checkbox" class="review-box" data-review-run aria-label="Reviewed"> Reviewed</label></div>
       <div class="changed-since" hidden>Changed since you reviewed it</div>
       <dl class="pairs"><dt>make</dt><dd>Skoda</dd><dt>model</dt><dd>Octavio</dd><dt>fuel</dt><dd>diesel</dd><dt>channel</dt><dd>web-form</dd></dl>
     </td>
-    <td class="output"><p>I couldn’t find a Skoda “Octavio”. Did you mean the <strong>Octavia</strong>?</p></td>
-    <td class="checks"><div class="check-group">
+    <td class="output" data-label="Output"><p>I couldn’t find a Skoda “Octavio”. Did you mean the <strong>Octavia</strong>?</p></td>
+    <td class="checks" data-label="Judges and checks"><div class="check-group">
     <div class="label">Exact</div>
     <div class="check pass">
       <svg class="icon pass" width="14" height="14" viewBox="0 0 16 16" role="img" aria-label="passed"><path d="M13.78 4.22a.75.75 0 0 1 0 1.06l-7.25 7.25a.75.75 0 0 1-1.06 0L2.22 9.28a.75.75 0 0 1 1.06-1.06L6 10.94l6.72-6.72a.75.75 0 0 1 1.06 0Z"/></svg>
@@ -710,8 +774,8 @@ button.theme svg { fill: currentColor; }
       <svg class="icon pass" width="14" height="14" viewBox="0 0 16 16" role="img" aria-label="passed"><path d="M13.78 4.22a.75.75 0 0 1 0 1.06l-7.25 7.25a.75.75 0 0 1-1.06 0L2.22 9.28a.75.75 0 0 1 1.06-1.06L6 10.94l6.72-6.72a.75.75 0 0 1 1.06 0Z"/></svg>
       <div><div>Suggests the closest real model</div></div>
     </div>
-  </div></td>
-    <td><div class="mock">
+  </div><button type="button" class="passed-fold" data-passed-fold><svg class="icon pass" width="14" height="14" viewBox="0 0 16 16" role="img" aria-label="passed"><path d="M13.78 4.22a.75.75 0 0 1 0 1.06l-7.25 7.25a.75.75 0 0 1-1.06 0L2.22 9.28a.75.75 0 0 1 1.06-1.06L6 10.94l6.72-6.72a.75.75 0 0 1 1.06 0Z"/></svg> 3 passed</button></td>
+    <td data-label="Tool calls"><div class="mock">
       <span class="mono strong">lookup_model</span> <span class="muted">→</span> {&quot;match&quot;:null,&quot;closest&quot;:[&quot;Octavia&quot;]}
       
     </div>
@@ -740,23 +804,23 @@ button.theme svg { fill: currentColor; }
         <span class="badge pass">3 / 3 runs</span>
         <span class="tag">New</span>
         <span class="spacer"></span>
-        <a class="mono" href="https://github.com/marekkirejczyk/skills/blob/db91cdb34074d132ecdacd71e1b6ff654206b4b8/test/eval-report/fixtures/evals/cars-search.eval.mjs#L112">cars-search.eval.mjs:112 ↗</a>
+        <a class="mono" href="https://github.com/marekkirejczyk/skills/blob/0fb05aba07c379edb5bf03570298682198dc7641/test/eval-report/fixtures/evals/cars-search.eval.mjs#L112">cars-search.eval.mjs:112 ↗</a>
       </div>
       <div class="case-note"><strong>Rule:</strong> Instructions, ‘Searches on listing sites’: put a stated range into the filters</div>
       
     </td></tr>
     <tr class="run" data-passed="true" data-key="test/eval-report/fixtures/evals/cars-search.eval.mjs::an electric car search carries the minimum range#1" data-fingerprint="1e3bc0558746">
-    <td>
+    <td class="input" data-label="Input">
       <div class="run-label pass"><span>Run 1 · passed · 3.5s</span><label class="review"><input type="checkbox" class="review-box" data-review-run aria-label="Reviewed"> Reviewed</label></div>
       <div class="changed-since" hidden>Changed since you reviewed it</div>
       <p>Electric, at least 250 miles of range, under £20k.</p>
     </td>
-    <td class="output"><p>Here are searches for electric cars with 250+ miles of range under £20,000.</p><div class="card">
+    <td class="output" data-label="Output"><p>Here are searches for electric cars with 250+ miles of range under £20,000.</p><div class="card">
         <div class="card-title">3 search cards</div>
         <p>Electric, 250+ miles range, up to £20,000 → autotrader.co.uk, gumtree.com, ebay.co.uk</p>
         
       </div></td>
-    <td class="checks"><div class="check-group">
+    <td class="checks" data-label="Judges and checks"><div class="check-group">
     <div class="label">Exact</div>
     <div class="check pass">
       <svg class="icon pass" width="14" height="14" viewBox="0 0 16 16" role="img" aria-label="passed"><path d="M13.78 4.22a.75.75 0 0 1 0 1.06l-7.25 7.25a.75.75 0 0 1-1.06 0L2.22 9.28a.75.75 0 0 1 1.06-1.06L6 10.94l6.72-6.72a.75.75 0 0 1 1.06 0Z"/></svg>
@@ -765,8 +829,8 @@ button.theme svg { fill: currentColor; }
       <svg class="icon pass" width="14" height="14" viewBox="0 0 16 16" role="img" aria-label="passed"><path d="M13.78 4.22a.75.75 0 0 1 0 1.06l-7.25 7.25a.75.75 0 0 1-1.06 0L2.22 9.28a.75.75 0 0 1 1.06-1.06L6 10.94l6.72-6.72a.75.75 0 0 1 1.06 0Z"/></svg>
       <div><div>the 6 rules for every reply</div></div>
     </div>
-  </div></td>
-    <td><div class="mock">
+  </div><button type="button" class="passed-fold" data-passed-fold><svg class="icon pass" width="14" height="14" viewBox="0 0 16 16" role="img" aria-label="passed"><path d="M13.78 4.22a.75.75 0 0 1 0 1.06l-7.25 7.25a.75.75 0 0 1-1.06 0L2.22 9.28a.75.75 0 0 1 1.06-1.06L6 10.94l6.72-6.72a.75.75 0 0 1 1.06 0Z"/></svg> 2 passed</button></td>
+    <td data-label="Tool calls"><div class="mock">
       <span class="mono strong">search_links</span> <span class="muted">→</span> shown
       
     </div>
@@ -784,17 +848,17 @@ button.theme svg { fill: currentColor; }
   }
 ]</pre></details></td>
   </tr><tr class="run" data-passed="true" data-key="test/eval-report/fixtures/evals/cars-search.eval.mjs::an electric car search carries the minimum range#2" data-fingerprint="1e3bc0558746">
-    <td>
+    <td class="input" data-label="Input">
       <div class="run-label pass"><span>Run 2 · passed · 3.9s</span><label class="review"><input type="checkbox" class="review-box" data-review-run aria-label="Reviewed"> Reviewed</label></div>
       <div class="changed-since" hidden>Changed since you reviewed it</div>
       <p>Electric, at least 250 miles of range, under £20k.</p>
     </td>
-    <td class="output"><p>Here are searches for electric cars with 250+ miles of range under £20,000.</p><div class="card">
+    <td class="output" data-label="Output"><p>Here are searches for electric cars with 250+ miles of range under £20,000.</p><div class="card">
         <div class="card-title">3 search cards</div>
         <p>Electric, 250+ miles range, up to £20,000 → autotrader.co.uk, gumtree.com, ebay.co.uk</p>
         
       </div></td>
-    <td class="checks"><div class="check-group">
+    <td class="checks" data-label="Judges and checks"><div class="check-group">
     <div class="label">Exact</div>
     <div class="check pass">
       <svg class="icon pass" width="14" height="14" viewBox="0 0 16 16" role="img" aria-label="passed"><path d="M13.78 4.22a.75.75 0 0 1 0 1.06l-7.25 7.25a.75.75 0 0 1-1.06 0L2.22 9.28a.75.75 0 0 1 1.06-1.06L6 10.94l6.72-6.72a.75.75 0 0 1 1.06 0Z"/></svg>
@@ -803,8 +867,8 @@ button.theme svg { fill: currentColor; }
       <svg class="icon pass" width="14" height="14" viewBox="0 0 16 16" role="img" aria-label="passed"><path d="M13.78 4.22a.75.75 0 0 1 0 1.06l-7.25 7.25a.75.75 0 0 1-1.06 0L2.22 9.28a.75.75 0 0 1 1.06-1.06L6 10.94l6.72-6.72a.75.75 0 0 1 1.06 0Z"/></svg>
       <div><div>the 6 rules for every reply</div></div>
     </div>
-  </div></td>
-    <td><div class="mock">
+  </div><button type="button" class="passed-fold" data-passed-fold><svg class="icon pass" width="14" height="14" viewBox="0 0 16 16" role="img" aria-label="passed"><path d="M13.78 4.22a.75.75 0 0 1 0 1.06l-7.25 7.25a.75.75 0 0 1-1.06 0L2.22 9.28a.75.75 0 0 1 1.06-1.06L6 10.94l6.72-6.72a.75.75 0 0 1 1.06 0Z"/></svg> 2 passed</button></td>
+    <td data-label="Tool calls"><div class="mock">
       <span class="mono strong">search_links</span> <span class="muted">→</span> shown
       
     </div>
@@ -822,17 +886,17 @@ button.theme svg { fill: currentColor; }
   }
 ]</pre></details></td>
   </tr><tr class="run" data-passed="true" data-key="test/eval-report/fixtures/evals/cars-search.eval.mjs::an electric car search carries the minimum range#3" data-fingerprint="1e3bc0558746">
-    <td>
+    <td class="input" data-label="Input">
       <div class="run-label pass"><span>Run 3 · passed · 4.3s</span><label class="review"><input type="checkbox" class="review-box" data-review-run aria-label="Reviewed"> Reviewed</label></div>
       <div class="changed-since" hidden>Changed since you reviewed it</div>
       <p>Electric, at least 250 miles of range, under £20k.</p>
     </td>
-    <td class="output"><p>Here are searches for electric cars with 250+ miles of range under £20,000.</p><div class="card">
+    <td class="output" data-label="Output"><p>Here are searches for electric cars with 250+ miles of range under £20,000.</p><div class="card">
         <div class="card-title">3 search cards</div>
         <p>Electric, 250+ miles range, up to £20,000 → autotrader.co.uk, gumtree.com, ebay.co.uk</p>
         
       </div></td>
-    <td class="checks"><div class="check-group">
+    <td class="checks" data-label="Judges and checks"><div class="check-group">
     <div class="label">Exact</div>
     <div class="check pass">
       <svg class="icon pass" width="14" height="14" viewBox="0 0 16 16" role="img" aria-label="passed"><path d="M13.78 4.22a.75.75 0 0 1 0 1.06l-7.25 7.25a.75.75 0 0 1-1.06 0L2.22 9.28a.75.75 0 0 1 1.06-1.06L6 10.94l6.72-6.72a.75.75 0 0 1 1.06 0Z"/></svg>
@@ -841,8 +905,8 @@ button.theme svg { fill: currentColor; }
       <svg class="icon pass" width="14" height="14" viewBox="0 0 16 16" role="img" aria-label="passed"><path d="M13.78 4.22a.75.75 0 0 1 0 1.06l-7.25 7.25a.75.75 0 0 1-1.06 0L2.22 9.28a.75.75 0 0 1 1.06-1.06L6 10.94l6.72-6.72a.75.75 0 0 1 1.06 0Z"/></svg>
       <div><div>the 6 rules for every reply</div></div>
     </div>
-  </div></td>
-    <td><div class="mock">
+  </div><button type="button" class="passed-fold" data-passed-fold><svg class="icon pass" width="14" height="14" viewBox="0 0 16 16" role="img" aria-label="passed"><path d="M13.78 4.22a.75.75 0 0 1 0 1.06l-7.25 7.25a.75.75 0 0 1-1.06 0L2.22 9.28a.75.75 0 0 1 1.06-1.06L6 10.94l6.72-6.72a.75.75 0 0 1 1.06 0Z"/></svg> 2 passed</button></td>
+    <td data-label="Tool calls"><div class="mock">
       <span class="mono strong">search_links</span> <span class="muted">→</span> shown
       
     </div>
@@ -869,19 +933,19 @@ button.theme svg { fill: currentColor; }
         <span class="badge fail">0 / 1 runs</span>
         <span class="tag">New</span>
         <span class="spacer"></span>
-        <a class="mono" href="https://github.com/marekkirejczyk/skills/blob/db91cdb34074d132ecdacd71e1b6ff654206b4b8/test/eval-report/fixtures/evals/cars-search.eval.mjs#L124">cars-search.eval.mjs:124 ↗</a>
+        <a class="mono" href="https://github.com/marekkirejczyk/skills/blob/0fb05aba07c379edb5bf03570298682198dc7641/test/eval-report/fixtures/evals/cars-search.eval.mjs#L124">cars-search.eval.mjs:124 ↗</a>
       </div>
       <div class="case-note"><strong>Rule:</strong> Instructions, ‘Errors’: say a site didn’t answer and offer to retry</div>
       
     </td></tr>
     <tr class="run" data-passed="" data-key="test/eval-report/fixtures/evals/cars-search.eval.mjs::a search tool timeout is told to the buyer#1" data-fingerprint="d45b39e61c44">
-    <td>
+    <td class="input" data-label="Input">
       <div class="run-label fail"><span>Run 1 · failed · 30.4s</span><label class="review"><input type="checkbox" class="review-box" data-review-run aria-label="Reviewed"> Reviewed</label></div>
       <div class="changed-since" hidden>Changed since you reviewed it</div>
       <p>Any Toyota Yaris hybrids under £10k?</p>
     </td>
-    <td class="output"><div class="crash"><strong>Error</strong> search_links timed out after 30s; the eval stopped before a reply</div></td>
-    <td class="checks"><div class="check-group">
+    <td class="output" data-label="Output"><div class="crash"><strong>Error</strong> search_links timed out after 30s; the eval stopped before a reply</div></td>
+    <td class="checks" data-label="Judges and checks"><div class="check-group">
     <div class="label">Exact</div>
     <div class="check fail">
       <svg class="icon fail" width="14" height="14" viewBox="0 0 16 16" role="img" aria-label="failed"><path d="M3.72 3.72a.75.75 0 0 1 1.06 0L8 6.94l3.22-3.22a.75.75 0 1 1 1.06 1.06L9.06 8l3.22 3.22a.75.75 0 1 1-1.06 1.06L8 9.06l-3.22 3.22a.75.75 0 0 1-1.06-1.06L6.94 8 3.72 4.78a.75.75 0 0 1 0-1.06Z"/></svg>
@@ -890,8 +954,8 @@ button.theme svg { fill: currentColor; }
       <svg class="icon pass" width="14" height="14" viewBox="0 0 16 16" role="img" aria-label="passed"><path d="M13.78 4.22a.75.75 0 0 1 0 1.06l-7.25 7.25a.75.75 0 0 1-1.06 0L2.22 9.28a.75.75 0 0 1 1.06-1.06L6 10.94l6.72-6.72a.75.75 0 0 1 1.06 0Z"/></svg>
       <div><div>the 6 rules for every reply</div></div>
     </div>
-  </div></td>
-    <td><div class="mock">
+  </div><button type="button" class="passed-fold" data-passed-fold><svg class="icon pass" width="14" height="14" viewBox="0 0 16 16" role="img" aria-label="passed"><path d="M13.78 4.22a.75.75 0 0 1 0 1.06l-7.25 7.25a.75.75 0 0 1-1.06 0L2.22 9.28a.75.75 0 0 1 1.06-1.06L6 10.94l6.72-6.72a.75.75 0 0 1 1.06 0Z"/></svg> 1 passed</button></td>
+    <td data-label="Tool calls"><div class="mock">
       <span class="mono strong">search_links</span> <span class="muted">→</span> timed out
       
     </div>
@@ -933,22 +997,22 @@ button.theme svg { fill: currentColor; }
         <span class="badge fail">1 / 2 runs</span>
         <span class="tag">New</span>
         <span class="spacer"></span>
-        <a class="mono" href="https://github.com/marekkirejczyk/skills/blob/db91cdb34074d132ecdacd71e1b6ff654206b4b8/test/eval-report/fixtures/evals/finance-quote.eval.mjs#L10">finance-quote.eval.mjs:10 ↗</a>
+        <a class="mono" href="https://github.com/marekkirejczyk/skills/blob/0fb05aba07c379edb5bf03570298682198dc7641/test/eval-report/fixtures/evals/finance-quote.eval.mjs#L10">finance-quote.eval.mjs:10 ↗</a>
       </div>
       <div class="case-note"><strong>Rule:</strong> Instructions, ‘Finance’: never quote a rate before check_eligibility returns</div>
       
     </td></tr>
     <tr class="run" data-passed="" data-key="test/eval-report/fixtures/evals/finance-quote.eval.mjs::APR is quoted only after the eligibility check#1" data-fingerprint="ccdd69b28dd1">
-    <td>
+    <td class="input" data-label="Input">
       <div class="run-label fail"><span>Run 1 · failed · 4.7s</span><label class="review"><input type="checkbox" class="review-box" data-review-run aria-label="Reviewed"> Reviewed</label></div>
       <div class="changed-since" hidden>Changed since you reviewed it</div>
       <div class="message"><div class="who">buyer</div><p>What would monthly payments be on the £10,995 Golf?</p></div><div class="message"><div class="who">assistant</div><p>Over how many years?</p></div><div class="message"><div class="who">buyer</div><p>Four, with £1,500 down.</p></div>
     </td>
-    <td class="output"><p>Here’s a rough idea, before any credit check:</p><div class="card">
+    <td class="output" data-label="Output"><p>Here’s a rough idea, before any credit check:</p><div class="card">
         
         <ul><li><strong>Deposit</strong> £1,500</li><li><strong>Term</strong> 48 months</li><li><strong>APR</strong> 9.9% representative</li><li><strong>Monthly</strong> £239.40</li></ul>
       </div></td>
-    <td class="checks"><div class="check-group">
+    <td class="checks" data-label="Judges and checks"><div class="check-group">
     <div class="label">Judge</div>
     <div class="check fail">
       <svg class="icon fail" width="14" height="14" viewBox="0 0 16 16" role="img" aria-label="failed"><path d="M3.72 3.72a.75.75 0 0 1 1.06 0L8 6.94l3.22-3.22a.75.75 0 1 1 1.06 1.06L9.06 8l3.22 3.22a.75.75 0 1 1-1.06 1.06L8 9.06l-3.22 3.22a.75.75 0 0 1-1.06-1.06L6.94 8 3.72 4.78a.75.75 0 0 1 0-1.06Z"/></svg>
@@ -963,8 +1027,8 @@ button.theme svg { fill: currentColor; }
       <svg class="icon pass" width="14" height="14" viewBox="0 0 16 16" role="img" aria-label="passed"><path d="M13.78 4.22a.75.75 0 0 1 0 1.06l-7.25 7.25a.75.75 0 0 1-1.06 0L2.22 9.28a.75.75 0 0 1 1.06-1.06L6 10.94l6.72-6.72a.75.75 0 0 1 1.06 0Z"/></svg>
       <div><div>the 6 rules for every reply</div></div>
     </div>
-  </div></td>
-    <td><div class="mock">
+  </div><button type="button" class="passed-fold" data-passed-fold><svg class="icon pass" width="14" height="14" viewBox="0 0 16 16" role="img" aria-label="passed"><path d="M13.78 4.22a.75.75 0 0 1 0 1.06l-7.25 7.25a.75.75 0 0 1-1.06 0L2.22 9.28a.75.75 0 0 1 1.06-1.06L6 10.94l6.72-6.72a.75.75 0 0 1 1.06 0Z"/></svg> 1 passed</button></td>
+    <td data-label="Tool calls"><div class="mock">
       <span class="mono strong">quote_finance</span> <span class="muted">→</span> {&quot;apr&quot;:9.9,&quot;monthly&quot;:239.4}
       
     </div><div class="mock">
@@ -989,17 +1053,17 @@ button.theme svg { fill: currentColor; }
   }
 ]</pre></details></td>
   </tr><tr class="run" data-passed="true" data-key="test/eval-report/fixtures/evals/finance-quote.eval.mjs::APR is quoted only after the eligibility check#2" data-fingerprint="d4fda2ff086b">
-    <td>
+    <td class="input" data-label="Input">
       <div class="run-label pass"><span>Run 2 · passed · 5.4s</span><label class="review"><input type="checkbox" class="review-box" data-review-run aria-label="Reviewed"> Reviewed</label></div>
       <div class="changed-since" hidden>Changed since you reviewed it</div>
       <div class="message"><div class="who">buyer</div><p>What would monthly payments be on the £10,995 Golf?</p></div><div class="message"><div class="who">assistant</div><p>Over how many years?</p></div><div class="message"><div class="who">buyer</div><p>Four, with £1,500 down.</p></div>
     </td>
-    <td class="output"><p>I’ll check what you’re eligible for first; it won’t affect your credit score.</p><div class="card">
+    <td class="output" data-label="Output"><p>I’ll check what you’re eligible for first; it won’t affect your credit score.</p><div class="card">
         <div class="card-title">Eligibility form</div>
         <p>Name, date of birth, address for the last 3 years</p>
         
       </div></td>
-    <td class="checks"><div class="check-group">
+    <td class="checks" data-label="Judges and checks"><div class="check-group">
     <div class="label">Judge</div>
     <div class="check pass">
       <svg class="icon pass" width="14" height="14" viewBox="0 0 16 16" role="img" aria-label="passed"><path d="M13.78 4.22a.75.75 0 0 1 0 1.06l-7.25 7.25a.75.75 0 0 1-1.06 0L2.22 9.28a.75.75 0 0 1 1.06-1.06L6 10.94l6.72-6.72a.75.75 0 0 1 1.06 0Z"/></svg>
@@ -1014,8 +1078,8 @@ button.theme svg { fill: currentColor; }
       <svg class="icon pass" width="14" height="14" viewBox="0 0 16 16" role="img" aria-label="passed"><path d="M13.78 4.22a.75.75 0 0 1 0 1.06l-7.25 7.25a.75.75 0 0 1-1.06 0L2.22 9.28a.75.75 0 0 1 1.06-1.06L6 10.94l6.72-6.72a.75.75 0 0 1 1.06 0Z"/></svg>
       <div><div>the 6 rules for every reply</div></div>
     </div>
-  </div></td>
-    <td><div class="mock">
+  </div><button type="button" class="passed-fold" data-passed-fold><svg class="icon pass" width="14" height="14" viewBox="0 0 16 16" role="img" aria-label="passed"><path d="M13.78 4.22a.75.75 0 0 1 0 1.06l-7.25 7.25a.75.75 0 0 1-1.06 0L2.22 9.28a.75.75 0 0 1 1.06-1.06L6 10.94l6.72-6.72a.75.75 0 0 1 1.06 0Z"/></svg> 3 passed</button></td>
+    <td data-label="Tool calls"><div class="mock">
       <span class="mono strong">check_eligibility</span> <span class="muted">→</span> {&quot;form&quot;:&quot;shown&quot;}
       <div class="fake">fake: softSearch</div>
     </div>
@@ -1038,19 +1102,19 @@ button.theme svg { fill: currentColor; }
         <span class="badge pass">1 / 1 runs</span>
         <span class="tag">New</span>
         <span class="spacer"></span>
-        <a class="mono" href="https://github.com/marekkirejczyk/skills/blob/db91cdb34074d132ecdacd71e1b6ff654206b4b8/test/eval-report/fixtures/evals/finance-quote.eval.mjs#L36">finance-quote.eval.mjs:36 ↗</a>
+        <a class="mono" href="https://github.com/marekkirejczyk/skills/blob/0fb05aba07c379edb5bf03570298682198dc7641/test/eval-report/fixtures/evals/finance-quote.eval.mjs#L36">finance-quote.eval.mjs:36 ↗</a>
       </div>
       <div class="case-note"><strong>Rule:</strong> Instructions, ‘Finance’: say plainly it was declined, and offer what is still possible</div>
       
     </td></tr>
     <tr class="run" data-passed="true" data-key="test/eval-report/fixtures/evals/finance-quote.eval.mjs::a declined credit check is told kindly, with a next step#1" data-fingerprint="a050407ec062">
-    <td>
+    <td class="input" data-label="Input">
       <div class="run-label pass"><span>Run 1 · passed · 4.7s</span><label class="review"><input type="checkbox" class="review-box" data-review-run aria-label="Reviewed"> Reviewed</label></div>
       <div class="changed-since" hidden>Changed since you reviewed it</div>
       <p>Did I get approved?</p>
     </td>
-    <td class="output"><p>Not this time, sorry: the lender couldn’t offer finance on this car.</p><p>You could still buy it outright, or I can look for cars under £6,000 that other lenders cover.</p></td>
-    <td class="checks"><div class="check-group">
+    <td class="output" data-label="Output"><p>Not this time, sorry: the lender couldn’t offer finance on this car.</p><p>You could still buy it outright, or I can look for cars under £6,000 that other lenders cover.</p></td>
+    <td class="checks" data-label="Judges and checks"><div class="check-group">
     <div class="label">Judge</div>
     <div class="check pass">
       <svg class="icon pass" width="14" height="14" viewBox="0 0 16 16" role="img" aria-label="passed"><path d="M13.78 4.22a.75.75 0 0 1 0 1.06l-7.25 7.25a.75.75 0 0 1-1.06 0L2.22 9.28a.75.75 0 0 1 1.06-1.06L6 10.94l6.72-6.72a.75.75 0 0 1 1.06 0Z"/></svg>
@@ -1065,8 +1129,8 @@ button.theme svg { fill: currentColor; }
       <svg class="icon pass" width="14" height="14" viewBox="0 0 16 16" role="img" aria-label="passed"><path d="M13.78 4.22a.75.75 0 0 1 0 1.06l-7.25 7.25a.75.75 0 0 1-1.06 0L2.22 9.28a.75.75 0 0 1 1.06-1.06L6 10.94l6.72-6.72a.75.75 0 0 1 1.06 0Z"/></svg>
       <div><div>the 6 rules for every reply</div></div>
     </div>
-  </div></td>
-    <td><div class="mock">
+  </div><button type="button" class="passed-fold" data-passed-fold><svg class="icon pass" width="14" height="14" viewBox="0 0 16 16" role="img" aria-label="passed"><path d="M13.78 4.22a.75.75 0 0 1 0 1.06l-7.25 7.25a.75.75 0 0 1-1.06 0L2.22 9.28a.75.75 0 0 1 1.06-1.06L6 10.94l6.72-6.72a.75.75 0 0 1 1.06 0Z"/></svg> 3 passed</button></td>
+    <td data-label="Tool calls"><div class="mock">
       <span class="mono strong">check_eligibility</span> <span class="muted">→</span> {&quot;status&quot;:&quot;declined&quot;}
       <div class="fake">fake: declined</div>
     </div>
@@ -1091,23 +1155,23 @@ button.theme svg { fill: currentColor; }
         <span class="badge pass">1 / 1 runs</span>
         <span class="tag">New</span>
         <span class="spacer"></span>
-        <a class="mono" href="https://github.com/marekkirejczyk/skills/blob/db91cdb34074d132ecdacd71e1b6ff654206b4b8/test/eval-report/fixtures/evals/finance-quote.eval.mjs#L46">finance-quote.eval.mjs:46 ↗</a>
+        <a class="mono" href="https://github.com/marekkirejczyk/skills/blob/0fb05aba07c379edb5bf03570298682198dc7641/test/eval-report/fixtures/evals/finance-quote.eval.mjs#L46">finance-quote.eval.mjs:46 ↗</a>
       </div>
       <div class="case-note"><strong>Rule:</strong> Instructions, ‘Finance’: show HP and PCP side by side once eligible</div>
       
     </td></tr>
     <tr class="run" data-passed="true" data-key="test/eval-report/fixtures/evals/finance-quote.eval.mjs::finance options are compared in a table#1" data-fingerprint="6d5ce85da0ba">
-    <td>
+    <td class="input" data-label="Input">
       <div class="run-label pass"><span>Run 1 · passed · 4.7s</span><label class="review"><input type="checkbox" class="review-box" data-review-run aria-label="Reviewed"> Reviewed</label></div>
       <div class="changed-since" hidden>Changed since you reviewed it</div>
       <p>Compare HP and PCP for me on the Golf.</p>
     </td>
-    <td class="output"><p>You’re eligible with this lender. Side by side:</p><div class="card table-card">
+    <td class="output" data-label="Output"><p>You’re eligible with this lender. Side by side:</p><div class="card table-card">
         <div class="card-title">Golf, £10,995, £1,500 down, 48 months</div>
         <table class="mini"><thead><tr><th></th><th>HP</th><th>PCP</th></tr></thead>
         <tbody><tr><td>Monthly</td><td>£239.40</td><td>£176.10</td></tr><tr><td>Final payment</td><td>£0</td><td>£3,850</td></tr><tr><td>Total payable</td><td>£12,991</td><td>£13,803</td></tr><tr><td>You own it</td><td>After the last payment</td><td>If you pay the final payment</td></tr></tbody></table>
       </div></td>
-    <td class="checks"><div class="check-group">
+    <td class="checks" data-label="Judges and checks"><div class="check-group">
     <div class="label">Judge</div>
     <div class="check pass">
       <svg class="icon pass" width="14" height="14" viewBox="0 0 16 16" role="img" aria-label="passed"><path d="M13.78 4.22a.75.75 0 0 1 0 1.06l-7.25 7.25a.75.75 0 0 1-1.06 0L2.22 9.28a.75.75 0 0 1 1.06-1.06L6 10.94l6.72-6.72a.75.75 0 0 1 1.06 0Z"/></svg>
@@ -1122,8 +1186,8 @@ button.theme svg { fill: currentColor; }
       <svg class="icon pass" width="14" height="14" viewBox="0 0 16 16" role="img" aria-label="passed"><path d="M13.78 4.22a.75.75 0 0 1 0 1.06l-7.25 7.25a.75.75 0 0 1-1.06 0L2.22 9.28a.75.75 0 0 1 1.06-1.06L6 10.94l6.72-6.72a.75.75 0 0 1 1.06 0Z"/></svg>
       <div><div>the 6 rules for every reply</div></div>
     </div>
-  </div></td>
-    <td><div class="mock">
+  </div><button type="button" class="passed-fold" data-passed-fold><svg class="icon pass" width="14" height="14" viewBox="0 0 16 16" role="img" aria-label="passed"><path d="M13.78 4.22a.75.75 0 0 1 0 1.06l-7.25 7.25a.75.75 0 0 1-1.06 0L2.22 9.28a.75.75 0 0 1 1.06-1.06L6 10.94l6.72-6.72a.75.75 0 0 1 1.06 0Z"/></svg> 3 passed</button></td>
+    <td data-label="Tool calls"><div class="mock">
       <span class="mono strong">check_eligibility</span> <span class="muted">→</span> {&quot;status&quot;:&quot;approved&quot;,&quot;apr&quot;:9.9}
       <div class="fake">fake: approved</div>
     </div><div class="mock">
@@ -1182,19 +1246,19 @@ button.theme svg { fill: currentColor; }
         <span class="badge pass">1 / 1 runs</span>
         <span class="tag">New</span>
         <span class="spacer"></span>
-        <a class="mono" href="https://github.com/marekkirejczyk/skills/blob/db91cdb34074d132ecdacd71e1b6ff654206b4b8/test/eval-report/fixtures/evals/finance-quote.eval.mjs#L63">finance-quote.eval.mjs:63 ↗</a>
+        <a class="mono" href="https://github.com/marekkirejczyk/skills/blob/0fb05aba07c379edb5bf03570298682198dc7641/test/eval-report/fixtures/evals/finance-quote.eval.mjs#L63">finance-quote.eval.mjs:63 ↗</a>
       </div>
       
       
     </td></tr>
     <tr class="run" data-passed="true" data-key="test/eval-report/fixtures/evals/finance-quote.eval.mjs::a deposit above the price is questioned#1" data-fingerprint="84f35476a09c">
-    <td>
+    <td class="input" data-label="Input">
       <div class="run-label pass"><span>Run 1 · passed · 4.7s</span><label class="review"><input type="checkbox" class="review-box" data-review-run aria-label="Reviewed"> Reviewed</label></div>
       <div class="changed-since" hidden>Changed since you reviewed it</div>
       <p>I’ll put down £12,000 on the £10,995 Golf.</p>
     </td>
-    <td class="output"><p>That deposit is more than the car’s price. Did you mean £1,200?</p></td>
-    <td class="checks"><div class="check-group">
+    <td class="output" data-label="Output"><p>That deposit is more than the car’s price. Did you mean £1,200?</p></td>
+    <td class="checks" data-label="Judges and checks"><div class="check-group">
     <div class="label">Judge</div>
     <div class="check pass">
       <svg class="icon pass" width="14" height="14" viewBox="0 0 16 16" role="img" aria-label="passed"><path d="M13.78 4.22a.75.75 0 0 1 0 1.06l-7.25 7.25a.75.75 0 0 1-1.06 0L2.22 9.28a.75.75 0 0 1 1.06-1.06L6 10.94l6.72-6.72a.75.75 0 0 1 1.06 0Z"/></svg>
@@ -1209,8 +1273,8 @@ button.theme svg { fill: currentColor; }
       <svg class="icon pass" width="14" height="14" viewBox="0 0 16 16" role="img" aria-label="passed"><path d="M13.78 4.22a.75.75 0 0 1 0 1.06l-7.25 7.25a.75.75 0 0 1-1.06 0L2.22 9.28a.75.75 0 0 1 1.06-1.06L6 10.94l6.72-6.72a.75.75 0 0 1 1.06 0Z"/></svg>
       <div><div>the 6 rules for every reply</div></div>
     </div>
-  </div></td>
-    <td><span class="muted">No tools run</span></td>
+  </div><button type="button" class="passed-fold" data-passed-fold><svg class="icon pass" width="14" height="14" viewBox="0 0 16 16" role="img" aria-label="passed"><path d="M13.78 4.22a.75.75 0 0 1 0 1.06l-7.25 7.25a.75.75 0 0 1-1.06 0L2.22 9.28a.75.75 0 0 1 1.06-1.06L6 10.94l6.72-6.72a.75.75 0 0 1 1.06 0Z"/></svg> 3 passed</button></td>
+    <td data-label="Tool calls"><span class="muted">No tools run</span></td>
   </tr>
   </tbody><tbody class="case" data-fresh="true">
     <tr class="case-head"><td colspan="4">
@@ -1221,19 +1285,19 @@ button.theme svg { fill: currentColor; }
         <span class="badge fail">1 / 2 runs</span>
         <span class="tag">New</span>
         <span class="spacer"></span>
-        <a class="mono" href="https://github.com/marekkirejczyk/skills/blob/db91cdb34074d132ecdacd71e1b6ff654206b4b8/test/eval-report/fixtures/evals/finance-quote.eval.mjs#L72">finance-quote.eval.mjs:72 ↗</a>
+        <a class="mono" href="https://github.com/marekkirejczyk/skills/blob/0fb05aba07c379edb5bf03570298682198dc7641/test/eval-report/fixtures/evals/finance-quote.eval.mjs#L72">finance-quote.eval.mjs:72 ↗</a>
       </div>
       <div class="case-note"><strong>Rule:</strong> Instructions, ‘Finance’: explain, never recommend which product to take</div>
       
     </td></tr>
     <tr class="run" data-passed="true" data-key="test/eval-report/fixtures/evals/finance-quote.eval.mjs::no financial advice, only facts about the products#1" data-fingerprint="b3b6def85231">
-    <td>
+    <td class="input" data-label="Input">
       <div class="run-label pass"><span>Run 1 · passed · 4.7s</span><label class="review"><input type="checkbox" class="review-box" data-review-run aria-label="Reviewed"> Reviewed</label></div>
       <div class="changed-since" hidden>Changed since you reviewed it</div>
       <p>Which is better for me, HP or PCP?</p>
     </td>
-    <td class="output"><p>It depends on what you want at the end:</p><ol><li><strong>HP</strong>: you own the car after the last payment.</li><li><strong>PCP</strong>: lower monthly payments, then pay the final amount, hand it back or swap.</li></ol><p>I can’t tell you which to choose, but I can show both for your car.</p></td>
-    <td class="checks"><div class="check-group">
+    <td class="output" data-label="Output"><p>It depends on what you want at the end:</p><ol><li><strong>HP</strong>: you own the car after the last payment.</li><li><strong>PCP</strong>: lower monthly payments, then pay the final amount, hand it back or swap.</li></ol><p>I can’t tell you which to choose, but I can show both for your car.</p></td>
+    <td class="checks" data-label="Judges and checks"><div class="check-group">
     <div class="label">Judge</div>
     <div class="check pass">
       <svg class="icon pass" width="14" height="14" viewBox="0 0 16 16" role="img" aria-label="passed"><path d="M13.78 4.22a.75.75 0 0 1 0 1.06l-7.25 7.25a.75.75 0 0 1-1.06 0L2.22 9.28a.75.75 0 0 1 1.06-1.06L6 10.94l6.72-6.72a.75.75 0 0 1 1.06 0Z"/></svg>
@@ -1248,16 +1312,16 @@ button.theme svg { fill: currentColor; }
       <svg class="icon pass" width="14" height="14" viewBox="0 0 16 16" role="img" aria-label="passed"><path d="M13.78 4.22a.75.75 0 0 1 0 1.06l-7.25 7.25a.75.75 0 0 1-1.06 0L2.22 9.28a.75.75 0 0 1 1.06-1.06L6 10.94l6.72-6.72a.75.75 0 0 1 1.06 0Z"/></svg>
       <div><div>the 6 rules for every reply</div></div>
     </div>
-  </div></td>
-    <td><span class="muted">No tools run</span></td>
+  </div><button type="button" class="passed-fold" data-passed-fold><svg class="icon pass" width="14" height="14" viewBox="0 0 16 16" role="img" aria-label="passed"><path d="M13.78 4.22a.75.75 0 0 1 0 1.06l-7.25 7.25a.75.75 0 0 1-1.06 0L2.22 9.28a.75.75 0 0 1 1.06-1.06L6 10.94l6.72-6.72a.75.75 0 0 1 1.06 0Z"/></svg> 3 passed</button></td>
+    <td data-label="Tool calls"><span class="muted">No tools run</span></td>
   </tr><tr class="run" data-passed="" data-key="test/eval-report/fixtures/evals/finance-quote.eval.mjs::no financial advice, only facts about the products#2" data-fingerprint="04d28d6e0636">
-    <td>
+    <td class="input" data-label="Input">
       <div class="run-label fail"><span>Run 2 · failed · 5.4s</span><label class="review"><input type="checkbox" class="review-box" data-review-run aria-label="Reviewed"> Reviewed</label></div>
       <div class="changed-since" hidden>Changed since you reviewed it</div>
       <p>Which is better for me, HP or PCP?</p>
     </td>
-    <td class="output"><p>Go for PCP: it’s cheaper each month and most people choose it.</p></td>
-    <td class="checks"><div class="check-group">
+    <td class="output" data-label="Output"><p>Go for PCP: it’s cheaper each month and most people choose it.</p></td>
+    <td class="checks" data-label="Judges and checks"><div class="check-group">
     <div class="label">Judge</div>
     <div class="check fail">
       <svg class="icon fail" width="14" height="14" viewBox="0 0 16 16" role="img" aria-label="failed"><path d="M3.72 3.72a.75.75 0 0 1 1.06 0L8 6.94l3.22-3.22a.75.75 0 1 1 1.06 1.06L9.06 8l3.22 3.22a.75.75 0 1 1-1.06 1.06L8 9.06l-3.22 3.22a.75.75 0 0 1-1.06-1.06L6.94 8 3.72 4.78a.75.75 0 0 1 0-1.06Z"/></svg>
@@ -1272,8 +1336,8 @@ button.theme svg { fill: currentColor; }
       <svg class="icon pass" width="14" height="14" viewBox="0 0 16 16" role="img" aria-label="passed"><path d="M13.78 4.22a.75.75 0 0 1 0 1.06l-7.25 7.25a.75.75 0 0 1-1.06 0L2.22 9.28a.75.75 0 0 1 1.06-1.06L6 10.94l6.72-6.72a.75.75 0 0 1 1.06 0Z"/></svg>
       <div><div>the 6 rules for every reply</div></div>
     </div>
-  </div></td>
-    <td><span class="muted">No tools run</span></td>
+  </div><button type="button" class="passed-fold" data-passed-fold><svg class="icon pass" width="14" height="14" viewBox="0 0 16 16" role="img" aria-label="passed"><path d="M13.78 4.22a.75.75 0 0 1 0 1.06l-7.25 7.25a.75.75 0 0 1-1.06 0L2.22 9.28a.75.75 0 0 1 1.06-1.06L6 10.94l6.72-6.72a.75.75 0 0 1 1.06 0Z"/></svg> 1 passed</button></td>
+    <td data-label="Tool calls"><span class="muted">No tools run</span></td>
   </tr>
   </tbody><tbody class="case" data-fresh="true">
     <tr class="case-head"><td colspan="4">
@@ -1284,19 +1348,19 @@ button.theme svg { fill: currentColor; }
         <span class="badge pass">1 / 1 runs</span>
         <span class="tag">New</span>
         <span class="spacer"></span>
-        <a class="mono" href="https://github.com/marekkirejczyk/skills/blob/db91cdb34074d132ecdacd71e1b6ff654206b4b8/test/eval-report/fixtures/evals/finance-quote.eval.mjs#L85">finance-quote.eval.mjs:85 ↗</a>
+        <a class="mono" href="https://github.com/marekkirejczyk/skills/blob/0fb05aba07c379edb5bf03570298682198dc7641/test/eval-report/fixtures/evals/finance-quote.eval.mjs#L85">finance-quote.eval.mjs:85 ↗</a>
       </div>
       
       
     </td></tr>
     <tr class="run" data-passed="true" data-key="test/eval-report/fixtures/evals/finance-quote.eval.mjs::money is written in pounds with thousands separators#1" data-fingerprint="99bbd74d8d24">
-    <td>
+    <td class="input" data-label="Input">
       <div class="run-label pass"><span>Run 1 · passed · 4.7s</span><label class="review"><input type="checkbox" class="review-box" data-review-run aria-label="Reviewed"> Reviewed</label></div>
       <div class="changed-since" hidden>Changed since you reviewed it</div>
       <p>How much is the Golf all in on HP?</p>
     </td>
-    <td class="output"><p>On HP you’d pay <strong>£12,991</strong> in total: £1,500 down and 48 payments of £239.40.</p></td>
-    <td class="checks"><div class="check-group">
+    <td class="output" data-label="Output"><p>On HP you’d pay <strong>£12,991</strong> in total: £1,500 down and 48 payments of £239.40.</p></td>
+    <td class="checks" data-label="Judges and checks"><div class="check-group">
     <div class="label">Exact</div>
     <div class="check pass">
       <svg class="icon pass" width="14" height="14" viewBox="0 0 16 16" role="img" aria-label="passed"><path d="M13.78 4.22a.75.75 0 0 1 0 1.06l-7.25 7.25a.75.75 0 0 1-1.06 0L2.22 9.28a.75.75 0 0 1 1.06-1.06L6 10.94l6.72-6.72a.75.75 0 0 1 1.06 0Z"/></svg>
@@ -1305,8 +1369,8 @@ button.theme svg { fill: currentColor; }
       <svg class="icon pass" width="14" height="14" viewBox="0 0 16 16" role="img" aria-label="passed"><path d="M13.78 4.22a.75.75 0 0 1 0 1.06l-7.25 7.25a.75.75 0 0 1-1.06 0L2.22 9.28a.75.75 0 0 1 1.06-1.06L6 10.94l6.72-6.72a.75.75 0 0 1 1.06 0Z"/></svg>
       <div><div>the 6 rules for every reply</div></div>
     </div>
-  </div></td>
-    <td><div class="mock">
+  </div><button type="button" class="passed-fold" data-passed-fold><svg class="icon pass" width="14" height="14" viewBox="0 0 16 16" role="img" aria-label="passed"><path d="M13.78 4.22a.75.75 0 0 1 0 1.06l-7.25 7.25a.75.75 0 0 1-1.06 0L2.22 9.28a.75.75 0 0 1 1.06-1.06L6 10.94l6.72-6.72a.75.75 0 0 1 1.06 0Z"/></svg> 2 passed</button></td>
+    <td data-label="Tool calls"><div class="mock">
       <span class="mono strong">quote_finance</span> <span class="muted">→</span> {&quot;monthly&quot;:239.4,&quot;total&quot;:12991}
       
     </div>
@@ -1335,22 +1399,22 @@ button.theme svg { fill: currentColor; }
         <span class="badge fail">0 / 1 runs</span>
         <span class="tag">New</span>
         <span class="spacer"></span>
-        <a class="mono" href="https://github.com/marekkirejczyk/skills/blob/db91cdb34074d132ecdacd71e1b6ff654206b4b8/test/eval-report/fixtures/evals/finance-quote.eval.mjs#L94">finance-quote.eval.mjs:94 ↗</a>
+        <a class="mono" href="https://github.com/marekkirejczyk/skills/blob/0fb05aba07c379edb5bf03570298682198dc7641/test/eval-report/fixtures/evals/finance-quote.eval.mjs#L94">finance-quote.eval.mjs:94 ↗</a>
       </div>
       <div class="case-note"><strong>Rule:</strong> Instructions, ‘Finance’: the final payment of a PCP is named and explained the first time it appears</div>
       
     </td></tr>
     <tr class="run" data-passed="" data-key="test/eval-report/fixtures/evals/finance-quote.eval.mjs::a balloon payment is explained before it is quoted#1" data-fingerprint="a579f5a37688">
-    <td>
+    <td class="input" data-label="Input">
       <div class="run-label fail"><span>Run 1 · failed · 4.7s</span><label class="review"><input type="checkbox" class="review-box" data-review-run aria-label="Reviewed"> Reviewed</label></div>
       <div class="changed-since" hidden>Changed since you reviewed it</div>
       <p>What’s the PCP on the Golf?</p>
     </td>
-    <td class="output"><p>PCP on the Golf:</p><div class="card">
+    <td class="output" data-label="Output"><p>PCP on the Golf:</p><div class="card">
         
         <ul><li><strong>Monthly</strong> £176.10</li><li><strong>Balloon</strong> £3,850</li></ul>
       </div></td>
-    <td class="checks"><div class="check-group">
+    <td class="checks" data-label="Judges and checks"><div class="check-group">
     <div class="label">Judge</div>
     <div class="check fail">
       <svg class="icon fail" width="14" height="14" viewBox="0 0 16 16" role="img" aria-label="failed"><path d="M3.72 3.72a.75.75 0 0 1 1.06 0L8 6.94l3.22-3.22a.75.75 0 1 1 1.06 1.06L9.06 8l3.22 3.22a.75.75 0 1 1-1.06 1.06L8 9.06l-3.22 3.22a.75.75 0 0 1-1.06-1.06L6.94 8 3.72 4.78a.75.75 0 0 1 0-1.06Z"/></svg>
@@ -1362,8 +1426,8 @@ button.theme svg { fill: currentColor; }
       <svg class="icon pass" width="14" height="14" viewBox="0 0 16 16" role="img" aria-label="passed"><path d="M13.78 4.22a.75.75 0 0 1 0 1.06l-7.25 7.25a.75.75 0 0 1-1.06 0L2.22 9.28a.75.75 0 0 1 1.06-1.06L6 10.94l6.72-6.72a.75.75 0 0 1 1.06 0Z"/></svg>
       <div><div>the 6 rules for every reply</div></div>
     </div>
-  </div></td>
-    <td><div class="mock">
+  </div><button type="button" class="passed-fold" data-passed-fold><svg class="icon pass" width="14" height="14" viewBox="0 0 16 16" role="img" aria-label="passed"><path d="M13.78 4.22a.75.75 0 0 1 0 1.06l-7.25 7.25a.75.75 0 0 1-1.06 0L2.22 9.28a.75.75 0 0 1 1.06-1.06L6 10.94l6.72-6.72a.75.75 0 0 1 1.06 0Z"/></svg> 1 passed</button></td>
+    <td data-label="Tool calls"><div class="mock">
       <span class="mono strong">quote_finance</span> <span class="muted">→</span> {&quot;monthly&quot;:176.1,&quot;balloon&quot;:3850}
       
     </div>
@@ -1406,23 +1470,23 @@ button.theme svg { fill: currentColor; }
         <span class="badge fail">1 / 2 runs</span>
         <span class="tag">New</span>
         <span class="spacer"></span>
-        <a class="mono" href="https://github.com/marekkirejczyk/skills/blob/db91cdb34074d132ecdacd71e1b6ff654206b4b8/test/eval-report/fixtures/evals/support-handoff.eval.mjs#L11">support-handoff.eval.mjs:11 ↗</a>
+        <a class="mono" href="https://github.com/marekkirejczyk/skills/blob/0fb05aba07c379edb5bf03570298682198dc7641/test/eval-report/fixtures/evals/support-handoff.eval.mjs#L11">support-handoff.eval.mjs:11 ↗</a>
       </div>
       <div class="case-note"><strong>Rule:</strong> Instructions, ‘People’: a complaint is never handled by the assistant</div>
       
     </td></tr>
     <tr class="run" data-passed="true" data-key="test/eval-report/fixtures/evals/support-handoff.eval.mjs::a complaint goes to a person#1" data-fingerprint="cc4718aa9641">
-    <td>
+    <td class="input" data-label="Input">
       <div class="run-label pass"><span>Run 1 · passed · 4.7s</span><label class="review"><input type="checkbox" class="review-box" data-review-run aria-label="Reviewed"> Reviewed</label></div>
       <div class="changed-since" hidden>Changed since you reviewed it</div>
       <p>The car you sold me broke down after two days. I want my money back.</p>
     </td>
-    <td class="output"><p>I’m sorry. I’ve passed this to our customer team with your order details; someone will call you today.</p><div class="card">
+    <td class="output" data-label="Output"><p>I’m sorry. I’ve passed this to our customer team with your order details; someone will call you today.</p><div class="card">
         <div class="card-title">Handoff card</div>
         <p>Complaint · order 55102 · call back today</p>
         
       </div></td>
-    <td class="checks"><div class="check-group">
+    <td class="checks" data-label="Judges and checks"><div class="check-group">
     <div class="label">Judge</div>
     <div class="check pass">
       <svg class="icon pass" width="14" height="14" viewBox="0 0 16 16" role="img" aria-label="passed"><path d="M13.78 4.22a.75.75 0 0 1 0 1.06l-7.25 7.25a.75.75 0 0 1-1.06 0L2.22 9.28a.75.75 0 0 1 1.06-1.06L6 10.94l6.72-6.72a.75.75 0 0 1 1.06 0Z"/></svg>
@@ -1437,8 +1501,8 @@ button.theme svg { fill: currentColor; }
       <svg class="icon pass" width="14" height="14" viewBox="0 0 16 16" role="img" aria-label="passed"><path d="M13.78 4.22a.75.75 0 0 1 0 1.06l-7.25 7.25a.75.75 0 0 1-1.06 0L2.22 9.28a.75.75 0 0 1 1.06-1.06L6 10.94l6.72-6.72a.75.75 0 0 1 1.06 0Z"/></svg>
       <div><div>the 6 rules for every reply</div></div>
     </div>
-  </div></td>
-    <td><div class="mock">
+  </div><button type="button" class="passed-fold" data-passed-fold><svg class="icon pass" width="14" height="14" viewBox="0 0 16 16" role="img" aria-label="passed"><path d="M13.78 4.22a.75.75 0 0 1 0 1.06l-7.25 7.25a.75.75 0 0 1-1.06 0L2.22 9.28a.75.75 0 0 1 1.06-1.06L6 10.94l6.72-6.72a.75.75 0 0 1 1.06 0Z"/></svg> 3 passed</button></td>
+    <td data-label="Tool calls"><div class="mock">
       <span class="mono strong">lookup_order</span> <span class="muted">→</span> order 55102
       
     </div><div class="mock">
@@ -1469,13 +1533,13 @@ button.theme svg { fill: currentColor; }
   }
 ]</pre></details></td>
   </tr><tr class="run" data-passed="" data-key="test/eval-report/fixtures/evals/support-handoff.eval.mjs::a complaint goes to a person#2" data-fingerprint="c10eda50d730">
-    <td>
+    <td class="input" data-label="Input">
       <div class="run-label fail"><span>Run 2 · failed · 5.4s</span><label class="review"><input type="checkbox" class="review-box" data-review-run aria-label="Reviewed"> Reviewed</label></div>
       <div class="changed-since" hidden>Changed since you reviewed it</div>
       <p>The car you sold me broke down after two days. I want my money back.</p>
     </td>
-    <td class="output"><p>Sorry to hear that. Under the Consumer Rights Act you can reject the car within 30 days, so I’ve started a refund for you.</p></td>
-    <td class="checks"><div class="check-group">
+    <td class="output" data-label="Output"><p>Sorry to hear that. Under the Consumer Rights Act you can reject the car within 30 days, so I’ve started a refund for you.</p></td>
+    <td class="checks" data-label="Judges and checks"><div class="check-group">
     <div class="label">Judge</div>
     <div class="check pass">
       <svg class="icon pass" width="14" height="14" viewBox="0 0 16 16" role="img" aria-label="passed"><path d="M13.78 4.22a.75.75 0 0 1 0 1.06l-7.25 7.25a.75.75 0 0 1-1.06 0L2.22 9.28a.75.75 0 0 1 1.06-1.06L6 10.94l6.72-6.72a.75.75 0 0 1 1.06 0Z"/></svg>
@@ -1490,8 +1554,8 @@ button.theme svg { fill: currentColor; }
       <svg class="icon pass" width="14" height="14" viewBox="0 0 16 16" role="img" aria-label="passed"><path d="M13.78 4.22a.75.75 0 0 1 0 1.06l-7.25 7.25a.75.75 0 0 1-1.06 0L2.22 9.28a.75.75 0 0 1 1.06-1.06L6 10.94l6.72-6.72a.75.75 0 0 1 1.06 0Z"/></svg>
       <div><div>the 6 rules for every reply</div></div>
     </div>
-  </div></td>
-    <td><div class="mock">
+  </div><button type="button" class="passed-fold" data-passed-fold><svg class="icon pass" width="14" height="14" viewBox="0 0 16 16" role="img" aria-label="passed"><path d="M13.78 4.22a.75.75 0 0 1 0 1.06l-7.25 7.25a.75.75 0 0 1-1.06 0L2.22 9.28a.75.75 0 0 1 1.06-1.06L6 10.94l6.72-6.72a.75.75 0 0 1 1.06 0Z"/></svg> 2 passed</button></td>
+    <td data-label="Tool calls"><div class="mock">
       <span class="mono strong">lookup_order</span> <span class="muted">→</span> order 55102
       
     </div><div class="mock">
@@ -1530,19 +1594,19 @@ button.theme svg { fill: currentColor; }
         <span class="badge pass">1 / 1 runs</span>
         <span class="tag">New</span>
         <span class="spacer"></span>
-        <a class="mono" href="https://github.com/marekkirejczyk/skills/blob/db91cdb34074d132ecdacd71e1b6ff654206b4b8/test/eval-report/fixtures/evals/support-handoff.eval.mjs#L28">support-handoff.eval.mjs:28 ↗</a>
+        <a class="mono" href="https://github.com/marekkirejczyk/skills/blob/0fb05aba07c379edb5bf03570298682198dc7641/test/eval-report/fixtures/evals/support-handoff.eval.mjs#L28">support-handoff.eval.mjs:28 ↗</a>
       </div>
       
       
     </td></tr>
     <tr class="run" data-passed="true" data-key="test/eval-report/fixtures/evals/support-handoff.eval.mjs::opening hours come from the branch tool#1" data-fingerprint="6ea02c828c8b">
-    <td>
+    <td class="input" data-label="Input">
       <div class="run-label pass"><span>Run 1 · passed · 4.7s</span><label class="review"><input type="checkbox" class="review-box" data-review-run aria-label="Reviewed"> Reviewed</label></div>
       <div class="changed-since" hidden>Changed since you reviewed it</div>
       <p>Are you open on Sunday?</p>
     </td>
-    <td class="output"><p>The Leeds branch is open <strong>10:00–16:00</strong> on Sundays.</p></td>
-    <td class="checks"><div class="check-group">
+    <td class="output" data-label="Output"><p>The Leeds branch is open <strong>10:00–16:00</strong> on Sundays.</p></td>
+    <td class="checks" data-label="Judges and checks"><div class="check-group">
     <div class="label">Exact</div>
     <div class="check pass">
       <svg class="icon pass" width="14" height="14" viewBox="0 0 16 16" role="img" aria-label="passed"><path d="M13.78 4.22a.75.75 0 0 1 0 1.06l-7.25 7.25a.75.75 0 0 1-1.06 0L2.22 9.28a.75.75 0 0 1 1.06-1.06L6 10.94l6.72-6.72a.75.75 0 0 1 1.06 0Z"/></svg>
@@ -1557,8 +1621,8 @@ button.theme svg { fill: currentColor; }
       <svg class="icon pass" width="14" height="14" viewBox="0 0 16 16" role="img" aria-label="passed"><path d="M13.78 4.22a.75.75 0 0 1 0 1.06l-7.25 7.25a.75.75 0 0 1-1.06 0L2.22 9.28a.75.75 0 0 1 1.06-1.06L6 10.94l6.72-6.72a.75.75 0 0 1 1.06 0Z"/></svg>
       <div><div>Uses the hours the tool gave</div></div>
     </div>
-  </div></td>
-    <td><div class="mock">
+  </div><button type="button" class="passed-fold" data-passed-fold><svg class="icon pass" width="14" height="14" viewBox="0 0 16 16" role="img" aria-label="passed"><path d="M13.78 4.22a.75.75 0 0 1 0 1.06l-7.25 7.25a.75.75 0 0 1-1.06 0L2.22 9.28a.75.75 0 0 1 1.06-1.06L6 10.94l6.72-6.72a.75.75 0 0 1 1.06 0Z"/></svg> 3 passed</button></td>
+    <td data-label="Tool calls"><div class="mock">
       <span class="mono strong">branch_hours</span> <span class="muted">→</span> {&quot;open&quot;:&quot;10:00&quot;,&quot;close&quot;:&quot;16:00&quot;}
       <div class="fake">fake: branches</div>
     </div>
@@ -1585,19 +1649,19 @@ button.theme svg { fill: currentColor; }
         <span class="badge pass">1 / 1 runs</span>
         <span class="tag">New</span>
         <span class="spacer"></span>
-        <a class="mono" href="https://github.com/marekkirejczyk/skills/blob/db91cdb34074d132ecdacd71e1b6ff654206b4b8/test/eval-report/fixtures/evals/support-handoff.eval.mjs#L37">support-handoff.eval.mjs:37 ↗</a>
+        <a class="mono" href="https://github.com/marekkirejczyk/skills/blob/0fb05aba07c379edb5bf03570298682198dc7641/test/eval-report/fixtures/evals/support-handoff.eval.mjs#L37">support-handoff.eval.mjs:37 ↗</a>
       </div>
       
       
     </td></tr>
     <tr class="run" data-passed="true" data-key="test/eval-report/fixtures/evals/support-handoff.eval.mjs::a refund status is looked up across a long conversation#1" data-fingerprint="8620c0dbf389">
-    <td>
+    <td class="input" data-label="Input">
       <div class="run-label pass"><span>Run 1 · passed · 4.7s</span><label class="review"><input type="checkbox" class="review-box" data-review-run aria-label="Reviewed"> Reviewed</label></div>
       <div class="changed-since" hidden>Changed since you reviewed it</div>
       <div class="message"><div class="who">buyer</div><p>Hi, I returned a car last week.</p></div><div class="message"><div class="who">assistant</div><p>Sorry it didn’t work out. Which email did you order with?</p></div><div class="message"><div class="who">buyer</div><p>buyer@example.com</p></div><div class="message"><div class="who">assistant</div><p>Thanks. Was it the 2017 Ford Focus delivered on 20 November?</p></div><div class="message"><div class="who">buyer</div><p>Yes. When will I get the money?</p></div>
     </td>
-    <td class="output"><p>Your refund of <strong>£8,450</strong> was sent on 24 November. Banks usually take 3–5 working days, so it should arrive by 29 November.</p></td>
-    <td class="checks"><div class="check-group">
+    <td class="output" data-label="Output"><p>Your refund of <strong>£8,450</strong> was sent on 24 November. Banks usually take 3–5 working days, so it should arrive by 29 November.</p></td>
+    <td class="checks" data-label="Judges and checks"><div class="check-group">
     <div class="label">Exact</div>
     <div class="check pass">
       <svg class="icon pass" width="14" height="14" viewBox="0 0 16 16" role="img" aria-label="passed"><path d="M13.78 4.22a.75.75 0 0 1 0 1.06l-7.25 7.25a.75.75 0 0 1-1.06 0L2.22 9.28a.75.75 0 0 1 1.06-1.06L6 10.94l6.72-6.72a.75.75 0 0 1 1.06 0Z"/></svg>
@@ -1612,8 +1676,8 @@ button.theme svg { fill: currentColor; }
       <svg class="icon pass" width="14" height="14" viewBox="0 0 16 16" role="img" aria-label="passed"><path d="M13.78 4.22a.75.75 0 0 1 0 1.06l-7.25 7.25a.75.75 0 0 1-1.06 0L2.22 9.28a.75.75 0 0 1 1.06-1.06L6 10.94l6.72-6.72a.75.75 0 0 1 1.06 0Z"/></svg>
       <div><div>Gives a date the money should arrive by</div></div>
     </div>
-  </div></td>
-    <td><div class="mock">
+  </div><button type="button" class="passed-fold" data-passed-fold><svg class="icon pass" width="14" height="14" viewBox="0 0 16 16" role="img" aria-label="passed"><path d="M13.78 4.22a.75.75 0 0 1 0 1.06l-7.25 7.25a.75.75 0 0 1-1.06 0L2.22 9.28a.75.75 0 0 1 1.06-1.06L6 10.94l6.72-6.72a.75.75 0 0 1 1.06 0Z"/></svg> 3 passed</button></td>
+    <td data-label="Tool calls"><div class="mock">
       <span class="mono strong">lookup_order</span> <span class="muted">→</span> order 55102
       
     </div><div class="mock">
@@ -1653,19 +1717,19 @@ button.theme svg { fill: currentColor; }
         <span class="badge pass">1 / 1 runs</span>
         <span class="tag">New</span>
         <span class="spacer"></span>
-        <a class="mono" href="https://github.com/marekkirejczyk/skills/blob/db91cdb34074d132ecdacd71e1b6ff654206b4b8/test/eval-report/fixtures/evals/support-handoff.eval.mjs#L52">support-handoff.eval.mjs:52 ↗</a>
+        <a class="mono" href="https://github.com/marekkirejczyk/skills/blob/0fb05aba07c379edb5bf03570298682198dc7641/test/eval-report/fixtures/evals/support-handoff.eval.mjs#L52">support-handoff.eval.mjs:52 ↗</a>
       </div>
       <div class="case-note"><strong>Rule:</strong> Instructions, ‘People’: stay calm, don&#39;t mirror the tone, offer a person</div>
       
     </td></tr>
     <tr class="run" data-passed="true" data-key="test/eval-report/fixtures/evals/support-handoff.eval.mjs::an abusive message gets one calm reply#1" data-fingerprint="ad341c9c1839">
-    <td>
+    <td class="input" data-label="Input">
       <div class="run-label pass"><span>Run 1 · passed · 4.7s</span><label class="review"><input type="checkbox" class="review-box" data-review-run aria-label="Reviewed"> Reviewed</label></div>
       <div class="changed-since" hidden>Changed since you reviewed it</div>
       <p>This is useless. You people are crooks.</p>
     </td>
-    <td class="output"><p>I’m sorry this has been frustrating. Would you like me to put you through to someone on the team?</p></td>
-    <td class="checks"><div class="check-group">
+    <td class="output" data-label="Output"><p>I’m sorry this has been frustrating. Would you like me to put you through to someone on the team?</p></td>
+    <td class="checks" data-label="Judges and checks"><div class="check-group">
     <div class="label">Judge</div>
     <div class="check pass">
       <svg class="icon pass" width="14" height="14" viewBox="0 0 16 16" role="img" aria-label="passed"><path d="M13.78 4.22a.75.75 0 0 1 0 1.06l-7.25 7.25a.75.75 0 0 1-1.06 0L2.22 9.28a.75.75 0 0 1 1.06-1.06L6 10.94l6.72-6.72a.75.75 0 0 1 1.06 0Z"/></svg>
@@ -1680,8 +1744,8 @@ button.theme svg { fill: currentColor; }
       <svg class="icon pass" width="14" height="14" viewBox="0 0 16 16" role="img" aria-label="passed"><path d="M13.78 4.22a.75.75 0 0 1 0 1.06l-7.25 7.25a.75.75 0 0 1-1.06 0L2.22 9.28a.75.75 0 0 1 1.06-1.06L6 10.94l6.72-6.72a.75.75 0 0 1 1.06 0Z"/></svg>
       <div><div>the 6 rules for every reply</div></div>
     </div>
-  </div></td>
-    <td><span class="muted">No tools run</span></td>
+  </div><button type="button" class="passed-fold" data-passed-fold><svg class="icon pass" width="14" height="14" viewBox="0 0 16 16" role="img" aria-label="passed"><path d="M13.78 4.22a.75.75 0 0 1 0 1.06l-7.25 7.25a.75.75 0 0 1-1.06 0L2.22 9.28a.75.75 0 0 1 1.06-1.06L6 10.94l6.72-6.72a.75.75 0 0 1 1.06 0Z"/></svg> 3 passed</button></td>
+    <td data-label="Tool calls"><span class="muted">No tools run</span></td>
   </tr>
   </tbody><tbody class="case" data-fresh="true">
     <tr class="case-head"><td colspan="4">
@@ -1692,23 +1756,23 @@ button.theme svg { fill: currentColor; }
         <span class="badge pass">2 / 2 runs</span>
         <span class="tag">New</span>
         <span class="spacer"></span>
-        <a class="mono" href="https://github.com/marekkirejczyk/skills/blob/db91cdb34074d132ecdacd71e1b6ff654206b4b8/test/eval-report/fixtures/evals/support-handoff.eval.mjs#L62">support-handoff.eval.mjs:62 ↗</a>
+        <a class="mono" href="https://github.com/marekkirejczyk/skills/blob/0fb05aba07c379edb5bf03570298682198dc7641/test/eval-report/fixtures/evals/support-handoff.eval.mjs#L62">support-handoff.eval.mjs:62 ↗</a>
       </div>
       
       
     </td></tr>
     <tr class="run" data-passed="true" data-key="test/eval-report/fixtures/evals/support-handoff.eval.mjs::a test drive is booked from the slots offered#1" data-fingerprint="21fc66dfcabe">
-    <td>
+    <td class="input" data-label="Input">
       <div class="run-label pass"><span>Run 1 · passed · 5.5s</span><label class="review"><input type="checkbox" class="review-box" data-review-run aria-label="Reviewed"> Reviewed</label></div>
       <div class="changed-since" hidden>Changed since you reviewed it</div>
       <p>Can I test drive the Octavia this weekend?</p>
     </td>
-    <td class="output"><p>These slots are free at the Leeds branch:</p><div class="card">
+    <td class="output" data-label="Output"><p>These slots are free at the Leeds branch:</p><div class="card">
         <div class="card-title">Question card</div>
         <p>Which time suits you?</p>
         <div class="chips"><span class="chip">Sat 10:00</span><span class="chip">Sat 14:30</span><span class="chip">Sun 11:00</span></div>
       </div></td>
-    <td class="checks"><div class="check-group">
+    <td class="checks" data-label="Judges and checks"><div class="check-group">
     <div class="label">Exact</div>
     <div class="check pass">
       <svg class="icon pass" width="14" height="14" viewBox="0 0 16 16" role="img" aria-label="passed"><path d="M13.78 4.22a.75.75 0 0 1 0 1.06l-7.25 7.25a.75.75 0 0 1-1.06 0L2.22 9.28a.75.75 0 0 1 1.06-1.06L6 10.94l6.72-6.72a.75.75 0 0 1 1.06 0Z"/></svg>
@@ -1720,8 +1784,8 @@ button.theme svg { fill: currentColor; }
       <svg class="icon pass" width="14" height="14" viewBox="0 0 16 16" role="img" aria-label="passed"><path d="M13.78 4.22a.75.75 0 0 1 0 1.06l-7.25 7.25a.75.75 0 0 1-1.06 0L2.22 9.28a.75.75 0 0 1 1.06-1.06L6 10.94l6.72-6.72a.75.75 0 0 1 1.06 0Z"/></svg>
       <div><div>the 6 rules for every reply</div></div>
     </div>
-  </div></td>
-    <td><div class="mock">
+  </div><button type="button" class="passed-fold" data-passed-fold><svg class="icon pass" width="14" height="14" viewBox="0 0 16 16" role="img" aria-label="passed"><path d="M13.78 4.22a.75.75 0 0 1 0 1.06l-7.25 7.25a.75.75 0 0 1-1.06 0L2.22 9.28a.75.75 0 0 1 1.06-1.06L6 10.94l6.72-6.72a.75.75 0 0 1 1.06 0Z"/></svg> 3 passed</button></td>
+    <td data-label="Tool calls"><div class="mock">
       <span class="mono strong">test_drive_slots</span> <span class="muted">→</span> [&quot;Sat 10:00&quot;,&quot;Sat 14:30&quot;,&quot;Sun 11:00&quot;]
       <div class="fake">fake: calendar</div>
     </div>
@@ -1741,17 +1805,17 @@ button.theme svg { fill: currentColor; }
   }
 ]</pre></details></td>
   </tr><tr class="run" data-passed="true" data-key="test/eval-report/fixtures/evals/support-handoff.eval.mjs::a test drive is booked from the slots offered#2" data-fingerprint="21fc66dfcabe">
-    <td>
+    <td class="input" data-label="Input">
       <div class="run-label pass"><span>Run 2 · passed · 5.8s</span><label class="review"><input type="checkbox" class="review-box" data-review-run aria-label="Reviewed"> Reviewed</label></div>
       <div class="changed-since" hidden>Changed since you reviewed it</div>
       <p>Can I test drive the Octavia this weekend?</p>
     </td>
-    <td class="output"><p>These slots are free at the Leeds branch:</p><div class="card">
+    <td class="output" data-label="Output"><p>These slots are free at the Leeds branch:</p><div class="card">
         <div class="card-title">Question card</div>
         <p>Which time suits you?</p>
         <div class="chips"><span class="chip">Sat 10:00</span><span class="chip">Sat 14:30</span><span class="chip">Sun 11:00</span></div>
       </div></td>
-    <td class="checks"><div class="check-group">
+    <td class="checks" data-label="Judges and checks"><div class="check-group">
     <div class="label">Exact</div>
     <div class="check pass">
       <svg class="icon pass" width="14" height="14" viewBox="0 0 16 16" role="img" aria-label="passed"><path d="M13.78 4.22a.75.75 0 0 1 0 1.06l-7.25 7.25a.75.75 0 0 1-1.06 0L2.22 9.28a.75.75 0 0 1 1.06-1.06L6 10.94l6.72-6.72a.75.75 0 0 1 1.06 0Z"/></svg>
@@ -1763,8 +1827,8 @@ button.theme svg { fill: currentColor; }
       <svg class="icon pass" width="14" height="14" viewBox="0 0 16 16" role="img" aria-label="passed"><path d="M13.78 4.22a.75.75 0 0 1 0 1.06l-7.25 7.25a.75.75 0 0 1-1.06 0L2.22 9.28a.75.75 0 0 1 1.06-1.06L6 10.94l6.72-6.72a.75.75 0 0 1 1.06 0Z"/></svg>
       <div><div>the 6 rules for every reply</div></div>
     </div>
-  </div></td>
-    <td><div class="mock">
+  </div><button type="button" class="passed-fold" data-passed-fold><svg class="icon pass" width="14" height="14" viewBox="0 0 16 16" role="img" aria-label="passed"><path d="M13.78 4.22a.75.75 0 0 1 0 1.06l-7.25 7.25a.75.75 0 0 1-1.06 0L2.22 9.28a.75.75 0 0 1 1.06-1.06L6 10.94l6.72-6.72a.75.75 0 0 1 1.06 0Z"/></svg> 3 passed</button></td>
+    <td data-label="Tool calls"><div class="mock">
       <span class="mono strong">test_drive_slots</span> <span class="muted">→</span> [&quot;Sat 10:00&quot;,&quot;Sat 14:30&quot;,&quot;Sun 11:00&quot;]
       <div class="fake">fake: calendar</div>
     </div>
@@ -1878,10 +1942,17 @@ button.theme svg { fill: currentColor; }
       setGroupBox(file.querySelector('[data-review-file]'), rows);
       file.querySelector('[data-file-reviewed]').textContent = rows.filter(isReviewed).length;
     }
+    const countFor = (filter, value) => runs.filter((run) => matchesOthers(run, filter) && matchers[filter](run, value)).length;
     for (const button of all('button[data-filter]')) {
       const { filter, value } = button.dataset;
       button.setAttribute('aria-pressed', String(filters[filter] === value));
-      button.querySelector('.count').textContent = runs.filter((run) => matchesOthers(run, filter) && matchers[filter](run, value)).length;
+      button.querySelector('.count').textContent = countFor(filter, value);
+    }
+    for (const select of all('select[data-filter-select]')) {
+      const filter = select.dataset.filterSelect;
+      for (const option of select.options) option.textContent = `${option.dataset.label} ${countFor(filter, option.value)}`;
+      select.value = filters[filter];
+      select.classList.toggle('active', filters[filter] !== 'all');
     }
     const done = runs.filter(isReviewed).length;
     document.querySelector('[data-reviewed-count]').textContent = done;
@@ -1896,12 +1967,13 @@ button.theme svg { fill: currentColor; }
 
   // ---- Theme: the system's → light → dark ----
   const themes = ['system', 'light', 'dark'];
-  const themeButton = document.querySelector('[data-theme-switch]');
   const currentTheme = () => document.documentElement.dataset.theme ?? 'system';
   function showTheme() {
     const label = `Colour theme: ${currentTheme()}`;
-    themeButton.title = `${label} (click to change)`;
-    themeButton.setAttribute('aria-label', label);
+    for (const button of all('[data-theme-switch]')) {
+      button.title = `${label} (click to change)`;
+      button.setAttribute('aria-label', label);
+    }
   }
 
   // ---- Events ----
@@ -1912,6 +1984,11 @@ button.theme svg { fill: currentColor; }
       apply();
       writeHash();
     }
+    const fold = event.target.closest('[data-passed-fold]');
+    if (fold) fold.closest('td.checks').classList.toggle('show-passed');
+    // On phones a reviewed run folds to its status line; tapping the line opens it.
+    const runLabel = event.target.closest('.run-label');
+    if (runLabel && !event.target.closest('label')) runLabel.closest('tr.run').classList.toggle('open');
     const expandButton = event.target.closest('button[data-expand]');
     if (expandButton) for (const file of all('details.file')) file.open = expandButton.dataset.expand === 'true';
     if (event.target.closest('[data-theme-switch]')) {
@@ -1924,6 +2001,12 @@ button.theme svg { fill: currentColor; }
   });
   document.addEventListener('change', (event) => {
     const box = event.target;
+    if (box.matches('select[data-filter-select]')) {
+      filters[box.dataset.filterSelect] = box.value;
+      apply();
+      writeHash();
+      return;
+    }
     if (box.matches('[data-review-run]')) markReviewed([box.closest('tr.run')], box.checked);
     else if (box.matches('[data-review-case]')) markReviewed(all('tr.run', box.closest('tbody.case')), box.checked);
     else if (box.matches('[data-review-file]')) markReviewed(all('tr.run', box.closest('details.file')), box.checked);
