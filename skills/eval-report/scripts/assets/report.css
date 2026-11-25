@@ -54,9 +54,10 @@ button { font: inherit; font-size: 13px; font-weight: 500; color: var(--fg); bac
 button.plain { border-radius: 6px; }
 .count { font-size: 12px; font-weight: 600; padding: 0 6px; border-radius: 999px; background: rgba(127, 127, 127, 0.18); }
 
-main { padding-top: 20px; padding-bottom: 64px; display: flex; flex-direction: column; gap: 16px; }
+main.wrap { padding-top: 20px; padding-bottom: 64px; display: flex; flex-direction: column; gap: 16px; }
 .empty { border: 1px dashed var(--border); border-radius: 6px; padding: 32px; text-align: center; color: var(--muted); }
-.file { border: 1px solid var(--border); border-radius: 6px; overflow: hidden; }
+/* clip, not hidden: it keeps the corners round without stopping the sticky column headers. */
+.file { border: 1px solid var(--border); border-radius: 6px; overflow: clip; }
 .file > summary { list-style: none; cursor: pointer; background: var(--subtle); padding: 12px 16px; display: flex; gap: 10px; align-items: center; min-height: 48px; }
 .file > summary::-webkit-details-marker { display: none; }
 .chevron { fill: var(--muted); transition: transform 0.1s; flex: none; }
@@ -67,10 +68,11 @@ main { padding-top: 20px; padding-bottom: 64px; display: flex; flex-direction: c
 .badge.fail { background: var(--fail-bg); color: var(--fail-text); }
 .tag { font-size: 12px; padding: 0 8px; border-radius: 999px; border: 1px solid var(--link); color: var(--link); }
 
-.table-scroll { overflow-x: auto; }
+/* Narrow screens scroll the table sideways; wide ones don't, so its headers can stick. */
+@media (max-width: 1100px) { .table-scroll { overflow-x: auto; } }
 table.runs { width: 100%; min-width: 1040px; border-collapse: collapse; table-layout: fixed; }
 .col-input { width: 21%; } .col-output { width: 33%; } .col-checks { width: 28%; } .col-mocks { width: 18%; }
-table.runs th { text-align: left; padding: 8px 16px; border-top: 1px solid var(--border); font-size: 12px; font-weight: 600; color: var(--muted); text-transform: uppercase; letter-spacing: 0.04em; }
+table.runs th { position: sticky; top: var(--toolbar-height, 0px); z-index: 1; background: var(--canvas); box-shadow: 0 1px 0 var(--border); text-align: left; padding: 8px 16px; border-top: 1px solid var(--border); font-size: 12px; font-weight: 600; color: var(--muted); text-transform: uppercase; letter-spacing: 0.04em; }
 table.runs td { padding: 12px 16px; border-top: 1px solid var(--border); vertical-align: top; overflow-wrap: anywhere; }
 table.runs td.checks { padding: 10px 12px; }
 .case-head td { background: var(--subtle); }
@@ -115,4 +117,5 @@ tr.run.is-reviewed > td { opacity: 0.55; }
 button.theme { padding: 4px 8px; }
 button.theme svg { fill: currentColor; }
 [hidden] { display: none !important; }
+@media (max-width: 1100px) { table.runs th { position: static; } }
 @media (max-width: 640px) { .wrap { padding: 0 16px; } .toolbar { position: static; } }

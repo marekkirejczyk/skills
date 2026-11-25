@@ -100,6 +100,10 @@
     if (noMatch) noMatch.hidden = runs.length === 0 || runs.some((run) => !run.hidden);
   }
 
+  // ---- Column headers stick just below the filter bar, whatever its height ----
+  const toolbar = document.querySelector('.toolbar');
+  new ResizeObserver(() => document.documentElement.style.setProperty('--toolbar-height', `${toolbar.offsetHeight}px`)).observe(toolbar);
+
   // ---- Theme: the system's → light → dark ----
   const themes = ['system', 'light', 'dark'];
   const themeButton = document.querySelector('[data-theme-switch]');
