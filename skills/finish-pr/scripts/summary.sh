@@ -6,7 +6,7 @@
 set -euo pipefail
 pr=$1
 dir=$(cd "$(dirname "$0")" && pwd)
-info=$(gh pr view "$pr" --json url,baseRefName,files)
+info=$(gh pr view "$pr" --json url,baseRefName)
 url=$(jq -r .url <<<"$info")
 base=$(jq -r .baseRefName <<<"$info")
 
@@ -15,22 +15,23 @@ echo "PR: $url"
 # A host that deploys previews (Vercel, Netlify, Render, ...) records a GitHub
 # deployment on the head commit seconds after a push, with the preview's
 # address, long before the build is done. Where the repository's recent
-# deployments include one that is not GitHub Pages, wait up to 20 seconds for
-# this push's.
+# deployments include a preview, wait up to 20 seconds for this push's.
 echo "Previews:"
-deployments() {
+# Line 1: how many of the repository's last 10 deployments were previews.
+# Then one line per preview of this PR's head commit.
+previews_here() {
   gh api graphql -F owner='{owner}' -F name='{repo}' -F n="$pr" -f query='
     query($owner:String!,$name:String!,$n:Int!){repository(owner:$owner,name:$name){
       deployments(last:10){nodes{environment}}
       pullRequest(number:$n){commits(last:1){nodes{commit{deployments(first:20){nodes{
         environment latestStatus{environmentUrl}}}}}}}}}' \
-    --jq '.data.repository | ([.deployments.nodes[] | select(.environment != "github-pages")] | length | tostring),
+    --jq '.data.repository | ([.deployments.nodes[] | select(.environment | test("preview"; "i"))] | length | tostring),
       (.pullRequest.commits.nodes[0].commit.deployments.nodes[]
         | select((.latestStatus.environmentUrl // "") != "") | "- \(.environment): \(.latestStatus.environmentUrl)")' 2>/dev/null || echo 0
 }
 previews=""
 for _ in 1 2 3 4 5; do
-  found=$(deployments)
+  found=$(previews_here)
   previews=$(sed 1d <<<"$found")
   [[ -n $previews || $(sed -n 1p <<<"$found") == 0 ]] && break
   sleep 4
@@ -47,7 +48,8 @@ done
 if [[ -z $where ]]; then
   echo "- none: origin/$base has no CODEOWNERS"
 else
-  owned=$(jq -r '.files[].path' <<<"$info" | "$dir/owners.sh" "$rules")
+  # Every changed file: `gh pr view --json files` stops at 100.
+  owned=$(gh api --paginate "repos/{owner}/{repo}/pulls/$pr/files" --jq '.[].filename' | "$dir/owners.sh" "$rules")
   if [[ -z $owned ]]; then
     echo "- none: no changed file has a code owner"
   else

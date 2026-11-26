@@ -22,14 +22,14 @@ Run `<skill-dir>/scripts/status.sh`. It fetches the base and prints the branch, 
 - A wrong base (a stacked PR with no PR open yet): `git config branch.<branch>.gh-merge-base <base>`, and run it again.
 - On the base branch, or nothing ahead of it and nothing uncommitted: there is nothing to finish. Stop. Being behind the base is fine here: baby-sitting rebases.
 - `uncommitted` lists files: commit the ones that belong to this work, with a message saying what changed and why, and run `status.sh` again, as `head` and `ui` have changed. Ask about any that don't belong.
-- `reviewed` names `head` as the reviewed or the fix commit: an earlier run did the review. Go to step 5.
+- `reviewed: yes`: an earlier run reviewed this head. Go to step 5.
 
 ## 2. Self-review
 
 Send all of this in one message:
 
 - Read `<baby-dir>/SKILL.md`: step 4 ships by its "Shipping" section, and step 5 follows the rest.
-- Start the checks the repository asks for before a push (its `AGENTS.md`, `CLAUDE.md` or `CONTRIBUTING.md` names them). They run while the review does; step 4 needs them again only if step 3 changes something.
+- Start the checks the repository asks for before a push: its `AGENTS.md`, `CLAUDE.md` or `CONTRIBUTING.md` names them, and where nothing is written, they are what the PR's required checks run. They run while the review does; step 4 needs them again only if step 3 changes something.
 - The review's sub-agents, each with a fresh context window. Every brief carries the diff command, `git diff origin/<base>...HEAD`, and this line: "Work in `<checkout path>`: `cd` into it in every call. Read only: change no file, and run no lint or tests, which are running already."
   - **Standards**: "Review this change against the repository's written standards. First find them: `AGENTS.md`, `CLAUDE.md`, `CONTRIBUTING.md`, and the documents they point to that say how code here is written. Report each place the change breaks a written rule, quoting the rule and naming its file. Then, marked as judgement calls, the smells the change adds: a name that doesn't say what it holds, logic written twice, a function that works mostly on another module's data, abstraction nothing asks for yet. A written rule wins over a smell. Skip what the formatter, linter or type checker enforces. Each finding with file:line and a fix. Under 400 words."
   - **Spec**: "Compare this change with what was asked for. The spec: <the ticket, spec file or request this session worked from>. Report what the spec asks for that is missing or partial, behaviour nobody asked for, and requirements that look implemented but wrong, quoting the spec's line for each. Under 400 words." When this session has no spec, tell the sub-agent to look for one instead (an issue or ticket named in the commit messages or the branch, a spec or plan file that matches the feature) and to report "no spec available" if it finds none; nobody is asked for one.
@@ -54,36 +54,34 @@ Commit the fixes, and anything the checks themselves changed, as one commit whos
 ## 4. Ship and open the PR
 
 1. In one message:
-   - `<skill-dir>/scripts/timer.sh lap review; <skill-dir>/scripts/timer.sh lap fixes` (a lap already taken is kept), and the checks again when step 3 committed anything.
+   - `<skill-dir>/scripts/timer.sh lap fixes`, and the checks again when step 3 committed anything.
    - Write the PR's description to a file outside the repository, in this order:
      - the repository's own PR template when it has one (`.github/pull_request_template.md`), filled in. Otherwise three sections: **Summary**, what changed and why, with the smallest sketch that makes it clear (a call tree, a file tree, a diff of the shape); **Evidence**, what was run and what it showed, before and after, from what this session already holds; **Risk**, how to undo it and what it could break;
      - any section the repository's instructions require in a PR description;
      - the block, below;
      - any attribution footer, last.
 2. Finish Shipping's steps 1 and 2: the checks green, and whatever else the repository requires before a push done.
-3. Run `<skill-dir>/scripts/open.sh <base> "<title>" <body-file>`. It pushes, creates the PR or updates the open one, and leaves it ready for review. The title follows the base's history, which status printed under `base history`. An open PR keeps its title unless it no longer says what the PR does.
+3. Run `<skill-dir>/scripts/open.sh <base> "<title>" <body-file>`. It pushes and leaves the PR ready for review. With no PR yet it creates one; the title follows the base's history, which status printed under `base history`. A PR that is already open keeps its title and its description, which a reviewer or baby-sitting may have edited: only the block is replaced. Bring by hand what no longer holds there up to date (`gh pr edit <n>`).
 
-The **block** is the one baby-sitting keeps, between its markers, so it ticks the lines this step leaves open:
+The **block** records the review in the description, between its own two markers, each alone on a line. Baby-sitting adds a block of its own beside it later.
 
 ```markdown
-<!-- baby-sitting -->
+<!-- finish-pr -->
 
-### Finishing
+### Self-review
 
-- [x] Self-review of `abc1234`: 5 findings, fixed 1, 2, 4 in `def5678`
-- [ ] Review bot
-- [ ] Ready to merge
+Reviewed `abc1234`: 5 findings, fixed 1, 2, 4 in `def5678`.
 
-<details><summary>Self-review findings</summary>
+<details><summary>Findings</summary>
 
 1. **Standards** `path:line`: the finding. _Fixed._
 2. **Bugs** `path:line`: the finding. _Left: the reason._
 
 </details>
-<!-- /baby-sitting -->
+<!-- /finish-pr -->
 ```
 
-The self-review line names the commit that was reviewed, and ends "none fixed" or "no findings" when that is so. Every finding is in the details, marked fixed or left with its reason. Leave "Review bot" out for a repository without one, and both unticked lines out in auto mode.
+The "Reviewed" line names the commit that was reviewed and the fix commit, and ends "none fixed" or "no findings" when that is so; status reads it on a later run. Every finding is in the details, marked fixed or left with its reason.
 
 ## 5. Summary and baby-sitting
 

@@ -19,7 +19,7 @@ The scripts are in `scripts/` next to this file; `<skill-dir>` below is this fil
 ## Start
 
 1. Read the PR: `gh pr view --json number,url,isDraft,baseRefName`. With no open PR, say so and stop. A draft can't merge and review bots skip it: `gh pr ready <n>`, and say you did.
-2. Name the **review bot**. It is CodeRabbit unless the repository's instructions name another: then `export REVIEW_BOT=<a pattern its login matches>` and `REVIEW_BOT_CHECK=<its check's name on a PR>` in every call of a script. A repository with no review bot: `export REVIEW_BOT=none`.
+2. Name the **review bot**. It is CodeRabbit unless the repository's instructions name another: then `export REVIEW_BOT=<a pattern its login matches>` and `REVIEW_BOT_CHECK=<its check's name on a PR>` in every call of a script. A repository with no review bot: `export REVIEW_BOT=none`. To tell, look at its last few pull requests (`gh pr list --state all --limit 5 --json number,reviews,statusCheckRollup`): a bot that reviews here shows in their reviews or checks.
 3. In auto mode, turn on auto-merge with a method the repository allows (`gh repo view --json squashMergeAllowed,mergeCommitAllowed,rebaseMergeAllowed`; squash when it is allowed): `gh pr merge <n> --auto --squash`. If GitHub answers that the PR is already clean to merge, it is green and approved: merge it (`gh pr merge <n> --squash`), report, and stop. Any other refusal: tell the developer, and carry on as manual.
 4. Watch.
 
@@ -79,7 +79,7 @@ The round is done when every collected thread has a reply. The bot may review th
 
 ## The block
 
-The PR's description carries one block, between `<!-- baby-sitting -->` and `<!-- /baby-sitting -->`, that records what was done, so a reviewer and another session can see it. Where the description has no block yet, write it the first time a line has something to say: pipe the block, without the two markers, to `<skill-dir>/scripts/block.sh <n>`, which appends it. Where it has one (the `finish-pr` skill opens the PR with it, or an earlier session wrote it), keep its other lines: tick a line and reword it with `<skill-dir>/scripts/block.sh <n> tick "<how the line starts>" "<its new text>"`. The rest of the description stays as it is.
+The PR's description carries one block, between `<!-- baby-sitting -->` and `<!-- /baby-sitting -->`, that records what was done, so a reviewer and another session can see it. Where the description has no block yet, write it the first time a line has something to say: pipe the block, without the two markers, to `<skill-dir>/scripts/block.sh <n>`, which appends it. Where an earlier session wrote one, keep its other lines: tick a line and reword it with `<skill-dir>/scripts/block.sh <n> tick "<how the line starts>" "<its new text>"`. The rest of the description stays as it is.
 
 ```markdown
 ### Baby-sitting

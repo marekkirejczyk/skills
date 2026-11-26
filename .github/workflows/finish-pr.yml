@@ -1,0 +1,23 @@
+# Tests the finish-pr skill's code-owner matching: which changed files it
+# gives an owner, where CODEOWNERS and .gitignore matching differ. The test
+# needs only bash and git, and calls nothing on GitHub.
+name: finish-pr
+
+on:
+  pull_request:
+    paths:
+      - 'skills/finish-pr/**'
+      - 'test/finish-pr/**'
+      - '.github/workflows/finish-pr.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - name: Test code-owner matching
+        run: test/finish-pr/owners.test.sh

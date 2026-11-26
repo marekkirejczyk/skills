@@ -17,6 +17,9 @@ cat >"$rules" <<'RULES'
 *.sql                 @data
 /src/payments/README.md @writers
 /config/app.*         @platform
+   /indented/         @indented
+/my\ dir/             @spaced
+/Assets/              @design
 RULES
 
 # expect <path> <owners, or - for none>
@@ -38,11 +41,32 @@ expect "db/migrations/0001_init.sql" "@data"
 expect "src/payments/schema.sql"     "@data"
 expect "config/app.yaml"             "@platform"
 expect "config/other.yaml"           "@default"
+expect "indented/file.txt"           "@indented"
+expect "my dir/file.txt"             "@spaced"
+expect "docs/café.md"                "@writers"
+# Case counts, as on GitHub, whatever the file system.
+expect "Assets/logo.svg"             "@design"
+expect "assets/logo.svg"             "@default"
 
 # Several paths at once keep their order, and a file with no owner is left out.
 got=$(printf '%s\n' docs/internal/notes.md src/main.ts README.md | "$owners" "$rules")
 want=$(printf 'src/main.ts\t@src-top\nREADME.md\t@default')
 if [[ $got == "$want" ]]; then echo "ok   several paths"; else echo "FAIL several paths: got \"$got\""; failed=1; fi
+
+# No path at all: nothing printed, and no complaint.
+got=$("$owners" "$rules" </dev/null 2>&1)
+if [[ -z $got ]]; then echo "ok   no paths"; else echo "FAIL no paths: got \"$got\""; failed=1; fi
+
+# The developer's own ignore file is not a rule: a path it ignores has only
+# the owners CODEOWNERS gives it.
+home=$(mktemp -d)
+mkdir -p "$home/git"
+printf '*.log\n.vscode/\n' >"$home/git/ignore"
+printf '/src/payments/ @payments\n' >"$rules"
+export XDG_CONFIG_HOME=$home
+expect "build/out.log"         "-"
+expect ".vscode/settings.json" "-"
+expect "src/payments/out.log"  "@payments"
 
 # No rule at all: nothing has an owner.
 : >"$rules"

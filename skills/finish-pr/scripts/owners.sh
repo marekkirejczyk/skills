@@ -13,22 +13,29 @@
 set -euo pipefail
 rules=$(cat "$1")
 paths=$(cat)
+[[ -n $paths ]] || exit 0
 tmp=$(mktemp -d)
 trap '[[ -n $tmp ]] && rm -rf "$tmp"' EXIT
 git init -q "$tmp"
+# Only the rule under test may match: not the user's own ignore file. Paths
+# come back as they went in, and case counts, as it does on GitHub.
+matching() {
+  git -C "$tmp" -c core.excludesFile=/dev/null -c core.quotePath=false -c core.ignorecase=false \
+    check-ignore --no-index "$@"
+}
 matches=""
 while IFS= read -r rule; do
-  [[ $rule != \#* ]] || continue
-  rule=$(sed -E 's/[[:space:]]+#.*$//' <<<"$rule")
-  pattern=${rule%%[[:space:]]*}
+  rule=$(sed -E 's/^[[:space:]]+//; /^#/d; s/[[:space:]]+#.*$//' <<<"$rule")
+  # The pattern runs to the first space that isn't escaped.
+  pattern=$(sed -E 's/^(([^[:space:]\\]|\\.)+).*$/\1/' <<<"$rule")
   [[ -n $pattern ]] || continue
-  who=$(awk '{ $1 = ""; sub(/^ /, ""); print }' <<<"$rule")
+  who=$(sed -E 's/^[[:space:]]+//; s/[[:space:]]+$//' <<<"${rule#"$pattern"}")
   printf '%s\n' "$pattern" >"$tmp/.gitignore"
   while IFS= read -r path; do
     [[ -n $path ]] || continue
-    if [[ $pattern == *'/*' ]] && git -C "$tmp" check-ignore -q --no-index "$(dirname "$path")"; then continue; fi
+    if [[ $pattern == *'/*' ]] && matching -q "$(dirname "$path")"; then continue; fi
     matches+="$path"$'\t'"$who"$'\n'
-  done < <(git -C "$tmp" check-ignore --no-index --stdin <<<"$paths" || true)
+  done < <(matching --stdin <<<"$paths" || true)
 done <<<"$rules"
 while IFS= read -r path; do
   [[ -n $path ]] || continue
