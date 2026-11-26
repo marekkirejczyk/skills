@@ -1,6 +1,6 @@
 # Skills
 
-**Explain any codebase or pull request, without writing a single slide.** Two agent skills that read your code, run it, and turn what they find into a walkthrough people actually watch: a slide deck, or a narrated video. Three more skills clean up the code itself: `refactor-tests` brings your tests up to a written standard, `self-documented-code` makes every name explain itself, and `dont-repeat-yourself` gives each concept one implementation. `eval-report` turns an eval run into a report you can review in a minute.
+**Explain any codebase or pull request, without writing a single slide.** Two agent skills that read your code, run it, and turn what they find into a walkthrough people actually watch: a slide deck, or a narrated video. Three more skills clean up the code itself: `refactor-tests` brings your tests up to a written standard, `self-documented-code` makes every name explain itself, and `dont-repeat-yourself` gives each concept one implementation. `eval-report` turns an eval run into a report you can review in a minute, and `refactor-evals` keeps the eval cases themselves tidy.
 
 Works with Claude Code, Codex, Cursor and other agents that read `SKILL.md`.
 
@@ -12,6 +12,7 @@ Works with Claude Code, Codex, Cursor and other agents that read `SKILL.md`.
 | [`/self-documented-code`](#self-documented-code-names-that-explain-themselves) | Names that explain themselves, one name per concept, comments only for the why | A repository, a pull request, a path or a concept |
 | [`/dont-repeat-yourself`](#dont-repeat-yourself-one-implementation-per-concept) | One well-tested implementation of each concept that was written several times | A repository, a pull request, a path or a concept |
 | [`/eval-report`](#eval-report-evals-you-can-review-in-a-minute) | One HTML page of every eval run: input, output, judges and checks, mocks, filterable by failed and by new or changed | A repository, a commit or a pull request, locally or on CI |
+| [`/refactor-evals`](#refactor-evals-one-requirement-per-case) | Eval cases split to one requirement each, duplicates merged, every check at the cheapest grader, every red case diagnosed | An eval suite, a file of cases, a pull request, or the failing cases |
 
 ## /explain-with-video: a narrated explainer
 
@@ -89,9 +90,22 @@ Runs your evals and builds one static HTML page from what they recorded: pass co
 
 Your eval runner writes one JSON line per run to the file `EVAL_REPORT_FILE` names; the skill adds that to it once. [The format →](skills/eval-report/reference/input-format.md)
 
+## /refactor-evals: one requirement per case
+
+Brings an eval suite's cases up to written rules. It lists every expectation against the requirement it holds, then splits each case that bundles several requirements, merges cases that hold one requirement in one scenario, moves what holds for every reply to one place, and puts each check at the cheapest grader that can decide it: code before a judge. Nothing is removed until a hand-written bad reply is shown to go red on what stays. Failing and unsteady cases each get a verdict (the harness, the case, the agent, or the requirement), and a case is never loosened to pass. Rules for the fake world, retries and the judge come as findings.
+
+```
+/refactor-evals                                # the whole suite
+/refactor-evals evals/cases/refunds.json       # a file or a folder of cases
+/refactor-evals pr 123                         # the cases a PR adds or changes
+/refactor-evals failing                        # the cases red or marked in the latest run
+```
+
+It works on any runner and case format: it reads the suite's README and schema first. Trials call your model, so it says how many calls it will make before it runs them.
+
 ## Install
 
-**Claude Code**, all seven skills as a plugin that updates itself:
+**Claude Code**, all eight skills as a plugin that updates itself:
 
 ```bash
 claude plugin marketplace add marekkirejczyk/skills
@@ -101,10 +115,10 @@ claude plugin install marekkirejczyk-skills@marekkirejczyk
 **Codex, Cursor and other agents**, one skill at a time:
 
 ```bash
-npx skills add marekkirejczyk/skills --skill explain-with-video          # or explain-with-slides, refactor-tests, self-documented-code, dont-repeat-yourself, eval-report
+npx skills add marekkirejczyk/skills --skill explain-with-video          # or explain-with-slides, refactor-tests, self-documented-code, dont-repeat-yourself, eval-report, refactor-evals
 ```
 
-Then type `/explain-with-video`, `/explain-with-slides`, `/refactor-tests`, `/self-documented-code`, `/dont-repeat-yourself` or `/eval-report` (`$explain-with-video` in Codex). Each runs only when you ask for it. [More install options →](docs/installation.md)
+Then type `/explain-with-video`, `/explain-with-slides`, `/refactor-tests`, `/self-documented-code`, `/dont-repeat-yourself`, `/eval-report` or `/refactor-evals` (`$explain-with-video` in Codex). Each runs only when you ask for it. [More install options →](docs/installation.md)
 
 ## Using the explainers
 
