@@ -79,7 +79,7 @@ The round is done when every collected thread has a reply. The bot may review th
 
 ## The block
 
-The PR's description carries one block, between `<!-- baby-sitting -->` and `<!-- /baby-sitting -->`, that records what was done, so a reviewer and another session can see it. Write it the first time a line has something to say: pipe the block, without the two markers, to `<skill-dir>/scripts/block.sh <n>`, which appends it to the description. After that, tick a line and reword it with `<skill-dir>/scripts/block.sh <n> tick "<how the line starts>" "<its new text>"`. The rest of the description stays as it is.
+The PR's description carries one block, between `<!-- baby-sitting -->` and `<!-- /baby-sitting -->`, that records what was done, so a reviewer and another session can see it. Where the description has no block yet, write it the first time a line has something to say: pipe the block, without the two markers, to `<skill-dir>/scripts/block.sh <n>`, which appends it. Where it has one (the `finish-pr` skill opens the PR with it, or an earlier session wrote it), keep its other lines: tick a line and reword it with `<skill-dir>/scripts/block.sh <n> tick "<how the line starts>" "<its new text>"`. The rest of the description stays as it is.
 
 ```markdown
 ### Baby-sitting

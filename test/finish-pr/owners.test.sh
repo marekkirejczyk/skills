@@ -1,0 +1,50 @@
+#!/usr/bin/env bash
+# Usage: test/finish-pr/owners.test.sh
+# Checks which changed files finish-pr's owners.sh gives a code owner, for the
+# places CODEOWNERS and .gitignore matching differ. Needs bash and git.
+set -uo pipefail
+owners="$(cd "$(dirname "$0")/../.." && pwd)/skills/finish-pr/scripts/owners.sh"
+rules=$(mktemp)
+failed=0
+
+cat >"$rules" <<'RULES'
+# Everything has a default owner; later rules win.
+*                     @default
+/docs/                @writers
+/docs/internal/       # nobody: an owner-less rule clears the owners
+/src/payments/        @payments @security   # two owners, and a comment
+/src/*                @src-top
+*.sql                 @data
+/src/payments/README.md @writers
+/config/app.*         @platform
+RULES
+
+# expect <path> <owners, or - for none>
+expect() {
+  local got
+  got=$(printf '%s\n' "$1" | "$owners" "$rules" | cut -f2)
+  if [[ ${got:--} == "$2" ]]; then echo "ok   $1 -> $2"; else echo "FAIL $1: wanted \"$2\", got \"${got:--}\""; failed=1; fi
+}
+
+expect "README.md"                   "@default"
+expect "docs/guide.md"               "@writers"
+expect "docs/deep/nested/page.md"    "@writers"
+expect "docs/internal/notes.md"      "-"
+expect "src/payments/charge.ts"      "@payments @security"
+expect "src/payments/README.md"      "@writers"
+expect "src/main.ts"                 "@src-top"
+expect "src/util/dates.ts"           "@default"
+expect "db/migrations/0001_init.sql" "@data"
+expect "src/payments/schema.sql"     "@data"
+expect "config/app.yaml"             "@platform"
+expect "config/other.yaml"           "@default"
+
+# Several paths at once keep their order, and a file with no owner is left out.
+got=$(printf '%s\n' docs/internal/notes.md src/main.ts README.md | "$owners" "$rules")
+want=$(printf 'src/main.ts\t@src-top\nREADME.md\t@default')
+if [[ $got == "$want" ]]; then echo "ok   several paths"; else echo "FAIL several paths: got \"$got\""; failed=1; fi
+
+# No rule at all: nothing has an owner.
+: >"$rules"
+expect "README.md" "-"
+exit $failed

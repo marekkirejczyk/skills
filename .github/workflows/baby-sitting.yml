@@ -1,13 +1,16 @@
-# Tests the baby-sitting skill's watcher: which event it reports for a set of
-# pull request states. The test needs only bash and jq, and calls nothing on
-# GitHub.
+# Tests the pull request skills' scripts: which event baby-sitting's watcher
+# reports for a set of pull request states, and which changed files finish-pr
+# gives a code owner. The tests need only bash, jq and git, and call nothing
+# on GitHub.
 name: baby-sitting
 
 on:
   pull_request:
     paths:
       - 'skills/baby-sitting/**'
+      - 'skills/finish-pr/**'
       - 'test/baby-sitting/**'
+      - 'test/finish-pr/**'
       - '.github/workflows/baby-sitting.yml'
 
 permissions:
@@ -21,3 +24,5 @@ jobs:
       - uses: actions/checkout@v4
       - name: Test the watcher
         run: test/baby-sitting/watch.test.sh
+      - name: Test code-owner matching
+        run: test/finish-pr/owners.test.sh
