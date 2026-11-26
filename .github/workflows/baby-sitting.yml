@@ -1,0 +1,23 @@
+# Tests the baby-sitting skill's watcher: which event it reports for a set of
+# pull request states. The test needs only bash and jq, and calls nothing on
+# GitHub.
+name: baby-sitting
+
+on:
+  pull_request:
+    paths:
+      - 'skills/baby-sitting/**'
+      - 'test/baby-sitting/**'
+      - '.github/workflows/baby-sitting.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - name: Test the watcher
+        run: test/baby-sitting/watch.test.sh
