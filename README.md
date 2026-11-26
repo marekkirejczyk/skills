@@ -1,6 +1,6 @@
 # Skills
 
-**Explain any codebase or pull request, without writing a single slide.** Two agent skills that read your code, run it, and turn what they find into a walkthrough people actually watch: a slide deck, or a narrated video. Three more skills clean up the code itself: `refactor-tests` brings your tests up to a written standard, `self-documented-code` makes every name explain itself, and `dont-repeat-yourself` gives each concept one implementation. `eval-report` turns an eval run into a report you can review in a minute, and `refactor-evals` keeps the eval cases themselves tidy.
+**Explain any codebase or pull request, without writing a single slide.** Two agent skills that read your code, run it, and turn what they find into a walkthrough people actually watch: a slide deck, or a narrated video. Three more skills clean up the code itself: `refactor-tests` brings your tests up to a written standard, `self-documented-code` makes every name explain itself, and `dont-repeat-yourself` gives each concept one implementation. `eval-report` turns an eval run into a report you can review in a minute, and `refactor-evals` keeps the eval cases themselves tidy. `baby-sitting` looks after an open pull request until it is merged.
 
 Works with Claude Code, Codex, Cursor and other agents that read `SKILL.md`.
 
@@ -13,6 +13,7 @@ Works with Claude Code, Codex, Cursor and other agents that read `SKILL.md`.
 | [`/dont-repeat-yourself`](#dont-repeat-yourself-one-implementation-per-concept) | One well-tested implementation of each concept that was written several times | A repository, a pull request, a path or a concept |
 | [`/eval-report`](#eval-report-evals-you-can-review-in-a-minute) | One HTML page of every eval run: input, output, judges and checks, mocks, filterable by failed and by new or changed | A repository, a commit or a pull request, locally or on CI |
 | [`/refactor-evals`](#refactor-evals-one-requirement-per-case) | Eval cases split to one requirement each, duplicates merged, every check at the cheapest grader, every red case diagnosed | An eval suite, a file of cases, a pull request, or the failing cases |
+| [`/baby-sitting`](#baby-sitting-a-pull-request-looked-after-until-it-merges) | An open pull request kept rebased, green and answered until it merges | The current branch's pull request on GitHub |
 
 ## /explain-with-video: a narrated explainer
 
@@ -116,9 +117,20 @@ The rules are good practices taken from published sources, not invented here:
 
 A few rules have no published source and are ordinary testing practice applied to evals: a frozen clock, fixtures parsed with the real types, and a lookup no fixture names failing the case. The ledger, and proving each change on a hand-written good and bad reply, are this skill's own way of applying them.
 
+## /baby-sitting: a pull request looked after until it merges
+
+Watches the current branch's pull request and deals with what happens to it. A red check gets read, fixed and pushed. When the base branch moves, the branch is rebased, conflicts resolved, and the repository's own checks run again before the push. When the review bot comments, you get one numbered list with a verdict on each comment (fix, push back, already done); you pick, it fixes those, and it replies on every thread. Then it tells you the PR is ready and keeps watching until you merge.
+
+```
+/baby-sitting            # manual: kept rebased, green and answered; you merge
+/baby-sitting auto       # GitHub auto-merge: merged once green and approved
+```
+
+One script polls GitHub every 20 seconds and wakes the agent only when something happens, so waiting costs no tokens. The review bot is CodeRabbit unless you name another (`REVIEW_BOT`), or none. It needs `gh`, `jq` and `perl`.
+
 ## Install
 
-**Claude Code**, all eight skills as a plugin that updates itself:
+**Claude Code**, all nine skills as a plugin that updates itself:
 
 ```bash
 claude plugin marketplace add marekkirejczyk/skills
@@ -128,10 +140,10 @@ claude plugin install marekkirejczyk-skills@marekkirejczyk
 **Codex, Cursor and other agents**, one skill at a time:
 
 ```bash
-npx skills add marekkirejczyk/skills --skill explain-with-video          # or explain-with-slides, refactor-tests, self-documented-code, dont-repeat-yourself, eval-report, refactor-evals
+npx skills add marekkirejczyk/skills --skill explain-with-video          # or explain-with-slides, refactor-tests, self-documented-code, dont-repeat-yourself, eval-report, refactor-evals, baby-sitting
 ```
 
-Then type `/explain-with-video`, `/explain-with-slides`, `/refactor-tests`, `/self-documented-code`, `/dont-repeat-yourself`, `/eval-report` or `/refactor-evals` (`$explain-with-video` in Codex). Each runs only when you ask for it. [More install options →](docs/installation.md)
+Then type `/explain-with-video`, `/explain-with-slides`, `/refactor-tests`, `/self-documented-code`, `/dont-repeat-yourself`, `/eval-report`, `/refactor-evals` or `/baby-sitting` (`$explain-with-video` in Codex). Each runs only when you ask for it. [More install options →](docs/installation.md)
 
 ## Using the explainers
 
