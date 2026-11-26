@@ -103,6 +103,19 @@ Brings an eval suite's cases up to written rules. It lists every expectation aga
 
 It works on any runner and case format: it reads the suite's README and schema first. Trials call your model, so it says how many calls it will make before it runs them.
 
+The rules are good practices taken from published sources, not invented here:
+
+| Rules | Taken from |
+| --- | --- |
+| One thing graded at a time, unambiguous cases, both sides of a boundary, the outcome graded and not the path, a new environment for every trial, reading transcripts before trusting a score | Anthropic, [Demystifying evals for AI agents](https://www.anthropic.com/engineering/demystifying-evals-for-ai-agents) |
+| Code checks before a judge, pass or fail and no scales, cases written from real failures, a judge calibrated against labelled examples | Hamel Husain, [evals FAQ](https://hamel.dev/blog/posts/evals-faq/) and [Creating a LLM-as-a-judge that drives business results](https://hamel.dev/blog/posts/llm-judge/) |
+| What a judge gets wrong, and why its model is set apart from the subject's | Eugene Yan, [Evaluating the effectiveness of LLM-evaluators](https://eugeneyan.com/writing/llm-evaluators/) |
+| Tools faked where they are run, with fixed answers and injected errors, around an agent left as it is | Google ADK, [environment simulation](https://adk.dev/evaluate/environment_simulation/) |
+| Several trials, and passing all of them | [τ-bench](https://arxiv.org/abs/2406.12045) |
+| A mark that carries its reason | pytest, [strict `xfail`](https://docs.pytest.org/en/stable/how-to/skipping.html) |
+
+A few rules have no published source and are ordinary testing practice applied to evals: a frozen clock, fixtures parsed with the real types, and a lookup no fixture names failing the case. The ledger, and proving each change on a hand-written good and bad reply, are this skill's own way of applying them.
+
 ## Install
 
 **Claude Code**, all eight skills as a plugin that updates itself:
