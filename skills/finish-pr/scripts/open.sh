@@ -12,14 +12,15 @@ dir=$(cd "$(dirname "$0")" && pwd)
 "$dir/timer.sh" lap checks-and-description
 
 pushed=$(git push -q -u origin HEAD 2>&1) || { echo "$pushed" >&2; exit 1; }
-n=$(gh pr view --json number,state -q 'select(.state == "OPEN") | .number' 2>/dev/null || true)
+open=$(gh pr view --json number,state,isDraft -q 'select(.state == "OPEN") | "\(.number) \(.isDraft)"' 2>/dev/null || true)
+n=${open%% *}
 if [[ -z $n ]]; then
   url=$(gh pr create --base "$base" --title "$title" --body-file "$body")
   n=${url##*/}
 else
   block=$(awk '/^<!-- \/finish-pr -->$/ { inside = 0 } inside { print } /^<!-- finish-pr -->$/ { inside = 1 }' "$body")
   [[ -z $block ]] || BLOCK_MARKER=finish-pr "$dir/../../baby-sitting/scripts/block.sh" "$n" <<<"$block"
-  gh pr ready "$n" >/dev/null
+  [[ ${open##* } != true ]] || gh pr ready "$n" >/dev/null
   url=$(gh pr view "$n" --json url -q .url)
   kept=", its title and description kept"
 fi
