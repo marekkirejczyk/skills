@@ -1,54 +1,59 @@
 # Skills
 
-**Explain any codebase or pull request, without writing a single slide.** Two agent skills that read your code, run it, and turn what they find into a walkthrough people actually watch: a slide deck, or a narrated video. Three more skills clean up the code itself: `refactor-tests` brings your tests up to a written standard, `self-documented-code` makes every name explain itself, and `dont-repeat-yourself` gives each concept one implementation. `eval-report` turns an eval run into a report you can review in a minute, and `refactor-evals` keeps the eval cases themselves tidy. `finish-pr` takes a branch from "it works" to a reviewed, described pull request, and `baby-sitting` looks after it until it is merged.
+**Agent skills for the whole life of a change: cleaner code, code you can understand, and a pull request that gets merged.** Each one reads your code, runs it, and does the work end to end, so you review results instead of writing prompts.
 
 Works with Claude Code, Codex, Cursor and other agents that read `SKILL.md`.
+
+### Code quality
+
+Bring code up to a written standard, without changing what it does. Each skill works in small rounds on its own branch, keeps the tests green, and leaves the decisions only you can make as a list at the end.
+
+| Skill | What you get | Works on |
+| --- | --- | --- |
+| [`/refactor-tests`](#refactor-tests-tests-to-a-written-standard) | Tests rewritten to the rules for their type, with every case covered | A file, a class or a branch |
+| [`/self-documented-code`](#self-documented-code-names-that-explain-themselves) | Names that explain themselves, one name per concept, comments only for the why | A repository, a pull request, a path or a concept |
+| [`/dont-repeat-yourself`](#dont-repeat-yourself-one-implementation-per-concept) | One well-tested implementation of each concept that was written several times | A repository, a pull request, a path or a concept |
+| [`/refactor-evals`](#refactor-evals-one-requirement-per-case) | Eval cases split to one requirement each, duplicates merged, every check at the cheapest grader, every red case diagnosed | An eval suite, a file of cases, a pull request, or the failing cases |
+
+### Understanding code
+
+See what a codebase, a pull request or an eval run actually does. Everything they show comes from running your code: no mockups, no invented numbers.
 
 | Skill | What you get | Works on |
 | --- | --- | --- |
 | [`/explain-with-video`](#explain-with-video-a-narrated-explainer) | A narrated MP4 with captions, chapters and a transcript | A repository or a pull request |
 | [`/explain-with-slides`](#explain-with-slides-a-walkthrough-deck) | A slide deck with screenshots from the running code, diagrams and real code | A repository or a pull request |
-| [`/refactor-tests`](#refactor-tests-tests-to-a-written-standard) | Tests rewritten to the rules for their type, with every case covered | A file, a class or a branch |
-| [`/self-documented-code`](#self-documented-code-names-that-explain-themselves) | Names that explain themselves, one name per concept, comments only for the why | A repository, a pull request, a path or a concept |
-| [`/dont-repeat-yourself`](#dont-repeat-yourself-one-implementation-per-concept) | One well-tested implementation of each concept that was written several times | A repository, a pull request, a path or a concept |
 | [`/eval-report`](#eval-report-evals-you-can-review-in-a-minute) | One HTML page of every eval run: input, output, judges and checks, mocks, filterable by failed and by new or changed | A repository, a commit or a pull request, locally or on CI |
-| [`/refactor-evals`](#refactor-evals-one-requirement-per-case) | Eval cases split to one requirement each, duplicates merged, every check at the cheapest grader, every red case diagnosed | An eval suite, a file of cases, a pull request, or the failing cases |
+
+### Workflow
+
+Take a branch from "it works" to merged. One reviews, fixes and opens the pull request; the other keeps it rebased, green and answered until it lands.
+
+| Skill | What you get | Works on |
+| --- | --- | --- |
 | [`/finish-pr`](#finish-pr-from-it-works-to-a-pull-request-ready-to-merge) | A reviewed, fixed, described pull request, with its previews and the files its code owners must review | The current branch |
 | [`/baby-sitting`](#baby-sitting-a-pull-request-looked-after-until-it-merges) | An open pull request kept rebased, green and answered until it merges | The current branch's pull request on GitHub |
 
-## /explain-with-video: a narrated explainer
+## Install
 
-[![explain-with-video explaining this repository: four build stages appearing one by one](docs/media/explain-with-video-demo.gif)](https://claude.ai/artifact/9S3BAqPTEddbLFLnFgKBsP)
+**Claude Code**, all ten skills as a plugin that updates itself:
 
-**[▶ Watch the example](https://claude.ai/artifact/9S3BAqPTEddbLFLnFgKBsP):** a 5-minute tour of this repository, made by `/explain-with-video`.
-
-Scenes reveal their content step by step, and highlight exactly what the voice is talking about: a card, a line of code, a box in a diagram. You get an MP4 with captions, on a page with chapters and a clickable transcript.
-
-```
-/explain-with-video for a new backend developer     # the whole repository
-/explain-with-video https://github.com/o/r          # a repository by URL
-/explain-with-video pr 123                          # one pull request, for its reviewer
+```bash
+claude plugin marketplace add marekkirejczyk/skills
+claude plugin install marekkirejczyk-skills@marekkirejczyk
 ```
 
-The voice is ElevenLabs if you add a key, or free macOS speech without one. [How it works →](docs/explain-with-video.md)
+**Codex, Cursor and other agents**, one skill at a time:
 
-## /explain-with-slides: a walkthrough deck
-
-[![explain-with-slides's deck about this repository](docs/media/explain-with-slides-demo.png)](https://claude.ai/artifact/EQmgztM99GRNdBugNTMoZK)
-
-**[▶ See the example deck](https://claude.ai/artifact/EQmgztM99GRNdBugNTMoZK):** this repository, presented by `/explain-with-slides`.
-
-Each feature or change gets a screenshot from the code actually running, a diagram with its key files, and the real code. A PR deck adds before/after shots, diffs, the test run and review risks.
-
-```
-/explain-with-slides for a new backend developer   # the whole repository
-/explain-with-slides https://github.com/o/r        # a repository by URL
-/explain-with-slides pr 123                        # one pull request, for its reviewer
+```bash
+npx skills add marekkirejczyk/skills --skill explain-with-video          # or explain-with-slides, refactor-tests, self-documented-code, dont-repeat-yourself, eval-report, refactor-evals, baby-sitting, finish-pr
 ```
 
-[How it works →](docs/explain-with-slides.md)
+Then type `/explain-with-video`, `/explain-with-slides`, `/refactor-tests`, `/self-documented-code`, `/dont-repeat-yourself`, `/eval-report`, `/refactor-evals`, `/baby-sitting` or `/finish-pr` (`$explain-with-video` in Codex). Each runs only when you ask for it. [More install options →](docs/installation.md)
 
-## /refactor-tests: tests to a written standard
+## Code quality
+
+### /refactor-tests: tests to a written standard
 
 Brings the tests of a file, a class or a branch up to the rules for each test type (pure functions, services, route handlers, database round trips, browser journeys), and covers every case those rules name. It pushes each test down to the fastest level that can prove it and removes duplicates, proving each removal by breaking the code. It refactors in small rounds that stay green, measures tests, files and the whole suite against speed budgets, and puts a table of time per test category on the PR. A bug it finds is reported and pinned by a test, not fixed.
 
@@ -59,7 +64,7 @@ Brings the tests of a file, a class or a branch up to the rules for each test ty
 
 The rules assume TypeScript, Vitest and pnpm, with Playwright for browser tests.
 
-## /self-documented-code: names that explain themselves
+### /self-documented-code: names that explain themselves
 
 Reviews every name in a scope, renames what falls short so each concept has one name, keeps comments only for what the code cannot say, and updates the project's glossary to match. It runs without stopping for approval, on its own branch with one commit per round. Lint, tests and behaviour stay as they were, and names other systems depend on (API fields, database columns) are reported rather than changed.
 
@@ -69,7 +74,7 @@ Reviews every name in a scope, renames what falls short so each concept has one 
 /self-documented-code src/payments             # a directory, file or concept
 ```
 
-## /dont-repeat-yourself: one implementation per concept
+### /dont-repeat-yourself: one implementation per concept
 
 Finds concepts implemented more than once, even when the copies are written differently, and gives each one shared, tested implementation. Copies with identical behaviour are extracted automatically, on their own branch with one commit per extraction. Copies that differ, look-alikes that may be separate concepts, and anything touching money, auth, migrations or locking come to you as one list of decisions at the end.
 
@@ -79,20 +84,7 @@ Finds concepts implemented more than once, even when the copies are written diff
 /dont-repeat-yourself src/payments             # a directory, file or concept
 ```
 
-## /eval-report: evals you can review in a minute
-
-Runs your evals and builds one static HTML page from what they recorded: pass counts at the top, a collapsible section per eval file, and a row per run with its input, output, judges and checks (green or red), and the tools it called with what they gave. Filter to failed runs, to cases new or changed in the commit or PR, or to what you haven't reviewed yet: tick runs as reviewed, and a tick clears itself when that run's result changes. Each case links to its code; light and dark themes. A script does the work, so it costs no tokens.
-
-```
-/eval-report                  # every eval
-/eval-report pr               # every eval, with this PR's new or changed cases marked
-/eval-report only pr          # only the eval files this PR changed
-/eval-report-install-ci       # the same on GitHub Actions, linked from every PR
-```
-
-Your eval runner writes one JSON line per run to the file `EVAL_REPORT_FILE` names; the skill adds that to it once. [The format →](skills/eval-report/reference/input-format.md)
-
-## /refactor-evals: one requirement per case
+### /refactor-evals: one requirement per case
 
 Brings an eval suite's cases up to written rules. It lists every expectation against the requirement it holds, then splits each case that bundles several requirements, merges cases that hold one requirement in one scenario, moves what holds for every reply to one place, and puts each check at the cheapest grader that can decide it: code before a judge. Nothing is removed until a hand-written bad reply is shown to go red on what stays. Failing and unsteady cases each get a verdict (the harness, the case, the agent, or the requirement), and a case is never loosened to pass. Rules for the fake world, retries and the judge come as findings.
 
@@ -118,7 +110,67 @@ The rules are good practices taken from published sources, not invented here:
 
 A few rules have no published source and are ordinary testing practice applied to evals: a frozen clock, fixtures parsed with the real types, and a lookup no fixture names failing the case. The ledger, and proving each change on a hand-written good and bad reply, are this skill's own way of applying them.
 
-## /finish-pr: from "it works" to a pull request ready to merge
+## Understanding code
+
+### /explain-with-video: a narrated explainer
+
+[![explain-with-video explaining this repository: four build stages appearing one by one](docs/media/explain-with-video-demo.gif)](https://claude.ai/artifact/9S3BAqPTEddbLFLnFgKBsP)
+
+**[▶ Watch the example](https://claude.ai/artifact/9S3BAqPTEddbLFLnFgKBsP):** a 5-minute tour of this repository, made by `/explain-with-video`.
+
+Scenes reveal their content step by step, and highlight exactly what the voice is talking about: a card, a line of code, a box in a diagram. You get an MP4 with captions, on a page with chapters and a clickable transcript.
+
+```
+/explain-with-video for a new backend developer     # the whole repository
+/explain-with-video https://github.com/o/r          # a repository by URL
+/explain-with-video pr 123                          # one pull request, for its reviewer
+```
+
+The voice is ElevenLabs if you add a key, or free macOS speech without one. [How it works →](docs/explain-with-video.md)
+
+### /explain-with-slides: a walkthrough deck
+
+[![explain-with-slides's deck about this repository](docs/media/explain-with-slides-demo.png)](https://claude.ai/artifact/EQmgztM99GRNdBugNTMoZK)
+
+**[▶ See the example deck](https://claude.ai/artifact/EQmgztM99GRNdBugNTMoZK):** this repository, presented by `/explain-with-slides`.
+
+Each feature or change gets a screenshot from the code actually running, a diagram with its key files, and the real code. A PR deck adds before/after shots, diffs, the test run and review risks.
+
+```
+/explain-with-slides for a new backend developer   # the whole repository
+/explain-with-slides https://github.com/o/r        # a repository by URL
+/explain-with-slides pr 123                        # one pull request, for its reviewer
+```
+
+[How it works →](docs/explain-with-slides.md)
+
+### Using the explainers
+
+```
+/<skill>                                      # the whole repository
+/<skill> https://github.com/o/r               # another repository, by URL
+/<skill> pr 123                               # a pull request: number, URL, branch, or nothing for the current branch
+/<skill> pr 123 polish, for the reviewer      # then a language, then an audience or focus
+```
+
+`explain-with-video` and `explain-with-slides` show you an outline first and build only after you approve it. Each opens with a cover, numbered contents and a detailed summary, then architecture and the rest. Everything they show comes from running your code: no mockups, no invented numbers.
+
+### /eval-report: evals you can review in a minute
+
+Runs your evals and builds one static HTML page from what they recorded: pass counts at the top, a collapsible section per eval file, and a row per run with its input, output, judges and checks (green or red), and the tools it called with what they gave. Filter to failed runs, to cases new or changed in the commit or PR, or to what you haven't reviewed yet: tick runs as reviewed, and a tick clears itself when that run's result changes. Each case links to its code; light and dark themes. A script does the work, so it costs no tokens.
+
+```
+/eval-report                  # every eval
+/eval-report pr               # every eval, with this PR's new or changed cases marked
+/eval-report only pr          # only the eval files this PR changed
+/eval-report-install-ci       # the same on GitHub Actions, linked from every PR
+```
+
+Your eval runner writes one JSON line per run to the file `EVAL_REPORT_FILE` names; the skill adds that to it once. [The format →](skills/eval-report/reference/input-format.md)
+
+## Workflow
+
+### /finish-pr: from "it works" to a pull request ready to merge
 
 The last part of every pull request, done the same way each time. Sub-agents review the branch on separate axes while the repository's own checks run: its written standards, the spec it was built from, a hunt for bugs it can show with an input, and its design system when the change draws UI. It fixes what is worth fixing without asking and lists the rest with a reason. Then it pushes, opens the PR ready for review with a description (your PR template, or summary, evidence and risk), and tells you what you need to act: the PR and its preview links, what the review found, and each changed file that has a code owner, linked to its diff. It finishes by running `/baby-sitting` on the PR.
 
@@ -129,7 +181,7 @@ The last part of every pull request, done the same way each time. Sub-agents rev
 
 The Standards and Spec axes follow the idea of Matt Pocock's [`/code-review`](https://github.com/mattpocock/skills): two reviews that can't mask each other. It needs `/baby-sitting` installed beside it, and `gh`, `jq` and `git`. It prints how long each phase took, so a slow one shows.
 
-## /baby-sitting: a pull request looked after until it merges
+### /baby-sitting: a pull request looked after until it merges
 
 Watches the current branch's pull request and deals with what happens to it. A red check gets read, fixed and pushed. When the base branch moves, the branch is rebased, conflicts resolved, and the repository's own checks run again before the push. When the review bot comments, you get one numbered list with a verdict on each comment (fix, push back, already done); you pick, it fixes those, and it replies on every thread. Then it tells you the PR is ready and keeps watching until you merge.
 
@@ -139,34 +191,6 @@ Watches the current branch's pull request and deals with what happens to it. A r
 ```
 
 One script polls GitHub every 20 seconds and wakes the agent only when something happens, so waiting costs no tokens. The review bot is CodeRabbit unless you name another (`REVIEW_BOT`), or none. It needs `gh`, `jq` and `perl`.
-
-## Install
-
-**Claude Code**, all ten skills as a plugin that updates itself:
-
-```bash
-claude plugin marketplace add marekkirejczyk/skills
-claude plugin install marekkirejczyk-skills@marekkirejczyk
-```
-
-**Codex, Cursor and other agents**, one skill at a time:
-
-```bash
-npx skills add marekkirejczyk/skills --skill explain-with-video          # or explain-with-slides, refactor-tests, self-documented-code, dont-repeat-yourself, eval-report, refactor-evals, baby-sitting, finish-pr
-```
-
-Then type `/explain-with-video`, `/explain-with-slides`, `/refactor-tests`, `/self-documented-code`, `/dont-repeat-yourself`, `/eval-report`, `/refactor-evals`, `/baby-sitting` or `/finish-pr` (`$explain-with-video` in Codex). Each runs only when you ask for it. [More install options →](docs/installation.md)
-
-## Using the explainers
-
-```
-/<skill>                                      # the whole repository
-/<skill> https://github.com/o/r               # another repository, by URL
-/<skill> pr 123                               # a pull request: number, URL, branch, or nothing for the current branch
-/<skill> pr 123 polish, for the reviewer      # then a language, then an audience or focus
-```
-
-`explain-with-video` and `explain-with-slides` show you an outline first and build only after you approve it. Each opens with a cover, numbered contents and a detailed summary, then architecture and the rest. Everything they show comes from running your code: no mockups, no invented numbers.
 
 ## License
 
