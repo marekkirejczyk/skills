@@ -4,35 +4,29 @@
 
 Works with Claude Code, Codex, Cursor and other agents that read `SKILL.md`.
 
-### Code quality
+### 🧹 Code quality
 
 Bring code up to a written standard, without changing what it does. Each skill works in small rounds on its own branch, keeps the tests green, and leaves the decisions only you can make as a list at the end.
 
-| Skill | What you get | Works on |
-| --- | --- | --- |
-| [`/refactor-tests`](#refactor-tests-tests-to-a-written-standard) | Tests rewritten to the rules for their type, with every case covered | A file, a class or a branch |
-| [`/self-documented-code`](#self-documented-code-names-that-explain-themselves) | Names that explain themselves, one name per concept, comments only for the why | A repository, a pull request, a path or a concept |
-| [`/dont-repeat-yourself`](#dont-repeat-yourself-one-implementation-per-concept) | One well-tested implementation of each concept that was written several times | A repository, a pull request, a path or a concept |
-| [`/refactor-evals`](#refactor-evals-one-requirement-per-case) | Eval cases split to one requirement each, duplicates merged, every check at the cheapest grader, every red case diagnosed | An eval suite, a file of cases, a pull request, or the failing cases |
+- **[`/refactor-tests`](#refactor-tests-tests-to-a-written-standard)**: tests rewritten to the rules for their type, with every case covered.
+- **[`/self-documented-code`](#self-documented-code-names-that-explain-themselves)**: names that explain themselves, one name per concept, comments only for the why.
+- **[`/dont-repeat-yourself`](#dont-repeat-yourself-one-implementation-per-concept)**: one well-tested implementation of each concept that was written several times.
+- **[`/refactor-evals`](#refactor-evals-one-requirement-per-case)**: eval cases split to one requirement each, duplicates merged, every red case diagnosed.
 
-### Understanding code
+### 🔍 Understanding code
 
 See what a codebase, a pull request or an eval run actually does. Everything they show comes from running your code: no mockups, no invented numbers.
 
-| Skill | What you get | Works on |
-| --- | --- | --- |
-| [`/explain-with-video`](#explain-with-video-a-narrated-explainer) | A narrated MP4 with captions, chapters and a transcript | A repository or a pull request |
-| [`/explain-with-slides`](#explain-with-slides-a-walkthrough-deck) | A slide deck with screenshots from the running code, diagrams and real code | A repository or a pull request |
-| [`/eval-report`](#eval-report-evals-you-can-review-in-a-minute) | One HTML page of every eval run: input, output, judges and checks, mocks, filterable by failed and by new or changed | A repository, a commit or a pull request, locally or on CI |
+- **[`/explain-with-video`](#explain-with-video-a-narrated-explainer)**: a narrated MP4 of a repository or a pull request, with captions, chapters and a transcript.
+- **[`/explain-with-slides`](#explain-with-slides-a-walkthrough-deck)**: a walkthrough deck with screenshots from the running code, diagrams and real code.
+- **[`/eval-report`](#eval-report-evals-you-can-review-in-a-minute)**: every eval run on one HTML page, filterable to what failed or changed, locally or on CI.
 
-### Workflow
+### 🚀 Workflow
 
-Take a branch from "it works" to merged. One reviews, fixes and opens the pull request; the other keeps it rebased, green and answered until it lands.
+Take a branch from "it works" to merged, without babysitting it yourself.
 
-| Skill | What you get | Works on |
-| --- | --- | --- |
-| [`/finish-pr`](#finish-pr-from-it-works-to-a-pull-request-ready-to-merge) | A reviewed, fixed, described pull request, with its previews and the files its code owners must review | The current branch |
-| [`/baby-sitting`](#baby-sitting-a-pull-request-looked-after-until-it-merges) | An open pull request kept rebased, green and answered until it merges | The current branch's pull request on GitHub |
+- **[`/finish-pr`](#finish-pr-from-it-works-to-a-pull-request-ready-to-merge)**: the branch reviewed, fixed and opened as a described pull request, with its previews and code owners.
+- **[`/baby-sitting`](#baby-sitting-a-pull-request-looked-after-until-it-merges)**: the pull request kept rebased, green and answered until it merges.
 
 ## Install
 
