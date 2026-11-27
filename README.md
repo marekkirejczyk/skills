@@ -58,6 +58,13 @@ Brings the tests of a file, a class or a branch up to the rules for each test ty
 
 The rules assume TypeScript, Vitest and pnpm, with Playwright for browser tests.
 
+#### Tips for a big codebase
+
+- 😈 Start with the worst offenders: `/refactor-tests worst offenders`
+- 🤯 For team buy-in, open one throw-away massive PR, just to show the tests speed-up
+- 🪮 Use Opus on medium or high effort, not Fable
+- 🧩 Run many rounds on many scopes, and merge them one by one to production
+
 ### /self-documented-code: names that explain themselves
 
 Reviews every name in a scope, renames what falls short so each concept has one name, keeps comments only for what the code cannot say, and updates the project's glossary to match. It runs without stopping for approval, on its own branch with one commit per round. Lint, tests and behaviour stay as they were, and names other systems depend on (API fields, database columns) are reported rather than changed.
@@ -103,15 +110,6 @@ The rules are good practices taken from published sources, not invented here:
 | A mark that carries its reason | pytest, [strict `xfail`](https://docs.pytest.org/en/stable/how-to/skipping.html) |
 
 A few rules have no published source and are ordinary testing practice applied to evals: a frozen clock, fixtures parsed with the real types, and a lookup no fixture names failing the case. The ledger, and proving each change on a hand-written good and bad reply, are this skill's own way of applying them.
-
-### Tips for a big codebase
-
-What works when you run the code quality skills on a large repository, learned with `/refactor-tests`:
-
-- 😈 **Start with the worst offenders.** Point the skill at the slowest, messiest files first (`/refactor-tests worst offenders`): that's where one round gains the most.
-- 🤯 **Win the team over with one throw-away PR.** Run it once across a big scope and open a massive PR nobody merges, just to show how much faster the tests get. Then do the real work in small pieces.
-- 🪮 **Use Opus on medium or high effort, not Fable.**
-- 🧩 **Many rounds, many scopes, merged one by one.** Run it again and again on small scopes, and ship each PR to production on its own before the next.
 
 ## Understanding code
 
