@@ -104,6 +104,15 @@ The rules are good practices taken from published sources, not invented here:
 
 A few rules have no published source and are ordinary testing practice applied to evals: a frozen clock, fixtures parsed with the real types, and a lookup no fixture names failing the case. The ledger, and proving each change on a hand-written good and bad reply, are this skill's own way of applying them.
 
+### Tips for a big codebase
+
+What works when you run the code quality skills on a large repository, learned with `/refactor-tests`:
+
+- 😈 **Start with the worst offenders.** Point the skill at the slowest, messiest files first (`/refactor-tests worst offenders`): that's where one round gains the most.
+- 🤯 **Win the team over with one throw-away PR.** Run it once across a big scope and open a massive PR nobody merges, just to show how much faster the tests get. Then do the real work in small pieces.
+- 🪮 **Use Opus on medium or high effort, not Fable.**
+- 🧩 **Many rounds, many scopes, merged one by one.** Run it again and again on small scopes, and ship each PR to production on its own before the next.
+
 ## Understanding code
 
 ### /explain-with-video: a narrated explainer
