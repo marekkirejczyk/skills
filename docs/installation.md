@@ -2,11 +2,11 @@
 
 [← README](../README.md)
 
-Every agent reads the same `skills/<skill>/SKILL.md`. Choose one install method per agent; installing a skill twice makes it show up twice. In the commands below, replace `<skill>` with `explain-with-slides`, `explain-with-video`, `refactor-tests`, `self-documented-code`, `dont-repeat-yourself`, `eval-report`, `eval-report-install-ci`, `refactor-evals` or `baby-sitting`. `eval-report-install-ci` uses `eval-report`'s scripts, so install both.
+Every agent reads the same `skills/<skill>/SKILL.md`. Choose one install method per agent; installing a skill twice makes it show up twice. In the commands below, replace `<skill>` with `explain-with-slides`, `explain-with-video`, `refactor-tests`, `self-documented-code`, `dont-repeat-yourself`, `eval-report`, `eval-report-install-ci`, `refactor-evals`, `baby-sitting` or `finish-pr`. `eval-report-install-ci` uses `eval-report`'s scripts, so install both. `finish-pr` hands over to `baby-sitting`, so install both.
 
 ## Claude Code
 
-As a plugin, which installs all nine skills and updates itself:
+As a plugin, which installs all ten skills and updates itself:
 
 ```bash
 claude plugin marketplace add marekkirejczyk/skills

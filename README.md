@@ -1,6 +1,6 @@
 # Skills
 
-**Explain any codebase or pull request, without writing a single slide.** Two agent skills that read your code, run it, and turn what they find into a walkthrough people actually watch: a slide deck, or a narrated video. Three more skills clean up the code itself: `refactor-tests` brings your tests up to a written standard, `self-documented-code` makes every name explain itself, and `dont-repeat-yourself` gives each concept one implementation. `eval-report` turns an eval run into a report you can review in a minute, and `refactor-evals` keeps the eval cases themselves tidy. `baby-sitting` looks after an open pull request until it is merged.
+**Explain any codebase or pull request, without writing a single slide.** Two agent skills that read your code, run it, and turn what they find into a walkthrough people actually watch: a slide deck, or a narrated video. Three more skills clean up the code itself: `refactor-tests` brings your tests up to a written standard, `self-documented-code` makes every name explain itself, and `dont-repeat-yourself` gives each concept one implementation. `eval-report` turns an eval run into a report you can review in a minute, and `refactor-evals` keeps the eval cases themselves tidy. `finish-pr` takes a branch from "it works" to a reviewed, described pull request, and `baby-sitting` looks after it until it is merged.
 
 Works with Claude Code, Codex, Cursor and other agents that read `SKILL.md`.
 
@@ -13,6 +13,7 @@ Works with Claude Code, Codex, Cursor and other agents that read `SKILL.md`.
 | [`/dont-repeat-yourself`](#dont-repeat-yourself-one-implementation-per-concept) | One well-tested implementation of each concept that was written several times | A repository, a pull request, a path or a concept |
 | [`/eval-report`](#eval-report-evals-you-can-review-in-a-minute) | One HTML page of every eval run: input, output, judges and checks, mocks, filterable by failed and by new or changed | A repository, a commit or a pull request, locally or on CI |
 | [`/refactor-evals`](#refactor-evals-one-requirement-per-case) | Eval cases split to one requirement each, duplicates merged, every check at the cheapest grader, every red case diagnosed | An eval suite, a file of cases, a pull request, or the failing cases |
+| [`/finish-pr`](#finish-pr-from-it-works-to-a-pull-request-ready-to-merge) | A reviewed, fixed, described pull request, with its previews and the files its code owners must review | The current branch |
 | [`/baby-sitting`](#baby-sitting-a-pull-request-looked-after-until-it-merges) | An open pull request kept rebased, green and answered until it merges | The current branch's pull request on GitHub |
 
 ## /explain-with-video: a narrated explainer
@@ -117,6 +118,17 @@ The rules are good practices taken from published sources, not invented here:
 
 A few rules have no published source and are ordinary testing practice applied to evals: a frozen clock, fixtures parsed with the real types, and a lookup no fixture names failing the case. The ledger, and proving each change on a hand-written good and bad reply, are this skill's own way of applying them.
 
+## /finish-pr: from "it works" to a pull request ready to merge
+
+The last part of every pull request, done the same way each time. Sub-agents review the branch on separate axes while the repository's own checks run: its written standards, the spec it was built from, a hunt for bugs it can show with an input, and its design system when the change draws UI. It fixes what is worth fixing without asking and lists the rest with a reason. Then it pushes, opens the PR ready for review with a description (your PR template, or summary, evidence and risk), and tells you what you need to act: the PR and its preview links, what the review found, and each changed file that has a code owner, linked to its diff. It finishes by running `/baby-sitting` on the PR.
+
+```
+/finish-pr            # manual: reviewed, opened, kept green; you merge
+/finish-pr auto       # the same, merged by GitHub once green and approved
+```
+
+The Standards and Spec axes follow the idea of Matt Pocock's [`/code-review`](https://github.com/mattpocock/skills): two reviews that can't mask each other. It needs `/baby-sitting` installed beside it, and `gh`, `jq` and `git`. It prints how long each phase took, so a slow one shows.
+
 ## /baby-sitting: a pull request looked after until it merges
 
 Watches the current branch's pull request and deals with what happens to it. A red check gets read, fixed and pushed. When the base branch moves, the branch is rebased, conflicts resolved, and the repository's own checks run again before the push. When the review bot comments, you get one numbered list with a verdict on each comment (fix, push back, already done); you pick, it fixes those, and it replies on every thread. Then it tells you the PR is ready and keeps watching until you merge.
@@ -130,7 +142,7 @@ One script polls GitHub every 20 seconds and wakes the agent only when something
 
 ## Install
 
-**Claude Code**, all nine skills as a plugin that updates itself:
+**Claude Code**, all ten skills as a plugin that updates itself:
 
 ```bash
 claude plugin marketplace add marekkirejczyk/skills
@@ -140,10 +152,10 @@ claude plugin install marekkirejczyk-skills@marekkirejczyk
 **Codex, Cursor and other agents**, one skill at a time:
 
 ```bash
-npx skills add marekkirejczyk/skills --skill explain-with-video          # or explain-with-slides, refactor-tests, self-documented-code, dont-repeat-yourself, eval-report, refactor-evals, baby-sitting
+npx skills add marekkirejczyk/skills --skill explain-with-video          # or explain-with-slides, refactor-tests, self-documented-code, dont-repeat-yourself, eval-report, refactor-evals, baby-sitting, finish-pr
 ```
 
-Then type `/explain-with-video`, `/explain-with-slides`, `/refactor-tests`, `/self-documented-code`, `/dont-repeat-yourself`, `/eval-report`, `/refactor-evals` or `/baby-sitting` (`$explain-with-video` in Codex). Each runs only when you ask for it. [More install options →](docs/installation.md)
+Then type `/explain-with-video`, `/explain-with-slides`, `/refactor-tests`, `/self-documented-code`, `/dont-repeat-yourself`, `/eval-report`, `/refactor-evals`, `/baby-sitting` or `/finish-pr` (`$explain-with-video` in Codex). Each runs only when you ask for it. [More install options →](docs/installation.md)
 
 ## Using the explainers
 
