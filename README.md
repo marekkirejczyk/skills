@@ -1,3 +1,5 @@
+![skills: ten agent skills to understand, improve and ship code](docs/media/cover.svg)
+
 # Skills
 
 **Agent skills for the whole life of a change: cleaner code, code you can understand, and a pull request that gets merged.** Each one reads your code, runs it, and does the work end to end, so you review results instead of writing prompts.
